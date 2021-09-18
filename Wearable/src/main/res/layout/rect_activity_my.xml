@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".watchface.MyActivity"
+    android:id="@+id/Relative"
+    android:verticalScrollbarPosition="left"
+    tools:deviceIds="wear_round">
+
+    <Button
+        android:id="@+id/backspace"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="30dp"
+
+        android:text="D" />
+
+    <EditText
+        android:id="@+id/textedit"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/backspace"
+        android:layout_marginTop="2dp"
+        android:background="@android:color/white"
+        android:ellipsize="end"
+        android:hint="write text"
+        android:paddingLeft="20dp"
+        android:textColor="@android:color/black"
+        android:textColorHint="#55000000" />
+
+    <Button
+        android:id="@+id/send"
+        android:layout_width="55dp"
+        android:layout_height="60dp"
+        android:layout_alignTop="@id/textedit"
+        android:layout_marginTop="0dp"
+        android:layout_toRightOf="@id/textedit"
+        android:text="ok" />
+    <Button
+        android:id="@+id/simple"
+        android:layout_width="55dp"
+        android:layout_height="60dp"
+        android:layout_alignTop="@id/textedit"
+        android:layout_marginTop="0dp"
+        android:layout_toRightOf="@id/send"
+        android:text="simple" />
+    <Button
+        android:id="@+id/space"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+
+
+        android:layout_toRightOf="@id/backspace"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:text="_" />
+
+    <Button
+        android:id="@+id/numbers"
+        android:layout_width="40dp"
+
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="0dp"
+        android:layout_toRightOf="@id/space"
+        android:text="123"
+        android:textSize="7sp" />
+
+    <Button
+        android:id="@+id/capital"
+        android:layout_width="40dp"
+
+        android:layout_height="40dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@id/numbers"
+
+        android:text="^" />
+
+    <ScrollView
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollview"
+        android:scrollbarAlwaysDrawHorizontalTrack="true"
+        android:layout_below="@id/textedit"
+        android:layout_marginLeft="14dp">
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:id="@+id/scroll">
+
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

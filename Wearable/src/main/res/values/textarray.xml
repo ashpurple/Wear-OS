@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string-array name="text_array">
+        <item>알겠습니다.</item>
+        <item>나중에 연락 드리겠습니다.</item>
+        <item>간편3</item>
+        <item>간편4</item>
+        <item>간편5</item>
+    </string-array>
+</resources>
