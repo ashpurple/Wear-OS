@@ -68,6 +68,8 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -947,27 +949,23 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         public void onDraw(Canvas canvas, Rect bounds) {
             RequestThread thread = new RequestThread();
             thread.start();
-            String name;
-            int stpoint=0,endpoint=0;
-            for(int i=0; i<why.length()-4; i++)
-            {
-                if(why.substring(i,i+4).equals("name")){
 
-                    int j=i;
-                    while(why.charAt(j)!=','){
-                        if(why.charAt(j)==':')
-                        {
-                            stpoint=j+6;
-                        }
-                        j++;
-                        endpoint=j-1;
-                    }
-                    break;
-                }
+            // 파싱
+            JsonParser jsonParser = new JsonParser();
+            UserInfo userInfo = new UserInfo();
+            String name = userInfo.getName();
+            String group = userInfo.getGroup();
+            try {
+                userInfo = jsonParser.getUserInfo(why);
+                name = userInfo.getName();
+                group = userInfo.getGroup();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            Log.d("SUBSTRING",why.substring(stpoint,endpoint));
 
-            Log.d("SUBSTRING",why.substring(stpoint,endpoint));
+            Log.d("Parsing Name",name);
+            Log.d("Parsing Group",group);
+
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
             Log.d("onDraw", String.valueOf(canvas));
@@ -1018,7 +1016,10 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 // Draw the background.
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
 
-                canvas.drawText(why.substring(stpoint,endpoint),160, 130, mSecondPaint);
+                // 사용자 이름 디스플레이
+                canvas.drawText(name,160, 130, mSecondPaint);
+                canvas.drawText(group,180, 100, mSecondPaint);
+
                 // Draw the hours.
                 float x = mXOffset;
                 String hourString;
@@ -1099,7 +1100,8 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 // Draw the background.
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
 
-                canvas.drawText(why.substring(stpoint,endpoint),160, 130, mSecondPaint);
+                canvas.drawText(name,160, 130, mSecondPaint);
+                canvas.drawText(group,180, 100, mSecondPaint);
                 // Draw the hours.
                 float x = mXOffset;
                 String hourString;
@@ -1403,7 +1405,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
 
     class RequestThread extends Thread {
-        public String urlStr = "http://15.164.45.229:8888/users/OUM6NUE6NDQ6Qjc6Qjk6OEU=";
+        public String urlStr = "http://15.164.45.229:8888/users/MDg6OTc6OTg6MEU6RTY6REE=";
         Handler handler = new Handler();
 
         @Override
@@ -1453,7 +1455,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                             if (data.charAt(i) == ':')
                                 temp2 = i;
                         }
-                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "9C:5A:44:B7:B9:8E");
+                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
 
                         Log.d("hiypypy", temp);
                     } catch (Exception e) {
