@@ -20,7 +20,7 @@ public class JsonParser {
             userInfo.setSkin(jsonObject.getString("skin"));
             userInfo.setSkin(jsonObject.getString("maxHeartRate"));
             userInfo.setGroup(jsonObject.getString("group"));
-            return userInfo;
+            return userInfo; // 여기서 return 안하면 error
 
         } catch (JSONException e){
             e.printStackTrace();

@@ -12,13 +12,17 @@ public class UserInfo {
     UserInfo(){
         this.name = "홍길동";
         this.group = "가천대";
+        this.birthday = "None";
+        this.skin = "None";
+        this.protective = "None";
+        this.maxHeartRate = "None";
     }
 
     public void setBirthday(String birthday){
         this.birthday = birthday;
     }
     public void setName(String name){
-        this.name = name;
+        this.name = name.substring(5);
     }
     public void setSkin(String skin){
         this.skin = skin;

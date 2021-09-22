@@ -950,15 +950,27 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             RequestThread thread = new RequestThread();
             thread.start();
 
-            // 파싱
+            // Get User Info
             JsonParser jsonParser = new JsonParser();
             UserInfo userInfo = new UserInfo();
+            // default value
             String name = userInfo.getName();
             String group = userInfo.getGroup();
-            try {
-                userInfo = jsonParser.getUserInfo(why);
+            String birthday = userInfo.getBirthday();
+            String skin = userInfo.getSkin();
+            String protective = userInfo.getProtective();
+            String maxHeartRate = userInfo.getMaxHeartRate();
+
+            try { // Parsing and Store
+                userInfo = jsonParser.getUserInfo(why); // 유저 정보 객체
+                // update
                 name = userInfo.getName();
                 group = userInfo.getGroup();
+                birthday = userInfo.getBirthday();
+                skin = userInfo.getSkin();
+                protective = userInfo.getProtective();
+                maxHeartRate = userInfo.getMaxHeartRate();
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -1100,8 +1112,8 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 // Draw the background.
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
 
-                canvas.drawText(name,160, 130, mSecondPaint);
-                canvas.drawText(group,180, 100, mSecondPaint);
+                canvas.drawText(name,180, 160, mSecondPaint);
+                canvas.drawText(group,180, 130, mSecondPaint);
                 // Draw the hours.
                 float x = mXOffset;
                 String hourString;
