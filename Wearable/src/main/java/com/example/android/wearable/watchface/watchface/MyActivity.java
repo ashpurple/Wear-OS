@@ -38,8 +38,8 @@ public class MyActivity extends Activity implements View.OnClickListener {
     private TextView mTextView;
     static EditText editText;
     static Button del,space, num, cap, OK;
-   RelativeLayout Scroll;
-static String letters = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅍㅌㅎ";
+    RelativeLayout Scroll;
+    static String letters = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅍㅌㅎ";
     static String capitalletters = "ㄲㄴㄸㄹㅁㅃㅆㅇㅉㅊㅋㅍㅌㅎ";
     static String letters2="ㅛㅕㅑㅐㅔㅗㅓㅏㅣㅠㅜㅡ";
     static String numbers = "1234567890";

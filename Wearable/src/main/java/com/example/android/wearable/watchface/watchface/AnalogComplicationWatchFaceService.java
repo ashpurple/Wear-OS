@@ -380,8 +380,10 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             **/
             soson = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_on2), 50, 50, true);
             sosoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_off2), 50, 50, true);
-            mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_on), 50, 50, true);
-            mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_off), 50, 50, true);
+//            mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_on), 50, 50, true);
+//            mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_off), 50, 50, true);
+            mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.useri), 50, 50, true);
+            mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.useri), 50, 50, true);
 
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mLineHeight = resources.getDimension(R.dimen.digital_line_height);
@@ -609,30 +611,31 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                     // If your background complication is the first item in your array, you need
                     // to walk backward through the array to make sure the tap isn't for a
                     // complication above the background complication.
-                    if (x < 20 * mCenterX / 15f + 30 && x > 20 * mCenterX / 15f - 30 && y < 14 * mCenterY / 8f + 30 && y > 14 * mCenterY / 8f - 30) {
-
-                        Log.d(TAG, "Button4 : SOS BUTTON");
-                        if (SOSBUTTON == 0) {
-                            sendData("SOS");
-                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-
-                            SOSBUTTON = 1;
-                            Intent intent = new Intent(getApplicationContext(), SosActivity.class);
-                            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
-                        } else if (SOSBUTTON == 1) {
-                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-                            if (((SosActivity) SosActivity.context).locationinfo != null) {
-                                ((SosActivity) SosActivity.context).locationinfo = "END";
-                            }
-                            SOSBUTTON = 0;
-                        }
-                    }
+//                    if (x < 20 * mCenterX / 15f + 30 && x > 20 * mCenterX / 15f - 30 && y < 14 * mCenterY / 8f + 30 && y > 14 * mCenterY / 8f - 30) {
+//
+//                        Log.d(TAG, "Button4 : SOS BUTTON");
+//                        if (SOSBUTTON == 0) {
+//                            sendData("SOS");
+//                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
+//
+//                            SOSBUTTON = 1;
+//                            Intent intent = new Intent(getApplicationContext(), SosActivity.class);
+//                            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+//
+//                        } else if (SOSBUTTON == 1) {
+//                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
+//                            if (((SosActivity) SosActivity.context).locationinfo != null) {
+//                                ((SosActivity) SosActivity.context).locationinfo = "END";
+//                            }
+//                            SOSBUTTON = 0;
+//                        }
+//                    }
 
                     if (x < 20 * mCenterX / 15f + 30 && x > 20 * mCenterX / 15f - 30 && y < 2 * 3 * mCenterY / 8f + 30 && y > 3 * mCenterY / 8f - 30) {
 
                         Log.d(TAG, "Button1 : TEXT SENDING");
-                        Intent intent = new Intent(getApplicationContext(), MyActivity.class);
+                        //Intent intent = new Intent(getApplicationContext(), MyActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), DisplayInfo.class);
                         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }
                     if (x > 198 && y < 230 && y > 180) {
@@ -1067,9 +1070,9 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 //BUTTONS ARE HERE
 
                 canvas.drawBitmap(mailon, 6 * mCenterX / 5f, 1 * mCenterY / 2 - 2 * mCenterX / 8f, null);
-                canvas.drawCircle(8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
-                canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
-                canvas.drawBitmap(soson, 6 * mCenterX / 5f, 2 * mCenterY - 3 * mCenterX / 8f, null);
+//                canvas.drawCircle(8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
+//                canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
+//                canvas.drawBitmap(soson, 6 * mCenterX / 5f, 2 * mCenterY - 3 * mCenterX / 8f, null);
                 // Draw the minutes.
                 String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
                 canvas.drawText(minuteString, mCenterX, mCenterY / 2, mMinutePaint);
@@ -1150,9 +1153,9 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 //BUTTONS ARE HERE
                 //canvas.drawBitmap(mailon,61f,283f,null);
                 canvas.drawBitmap(mailon, 6 * mCenterX / 5f, 1 * mCenterY / 2 - 2 * mCenterX / 8f, null);
-                canvas.drawCircle(8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
-                canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
-                canvas.drawBitmap(sosoff, 6 * mCenterX / 5f, 2 * mCenterY - 3 * mCenterX / 8f, null);
+                //canvas.drawCircle(8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
+                //canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
+                //canvas.drawBitmap(sosoff, 6 * mCenterX / 5f, 2 * mCenterY - 3 * mCenterX / 8f, null);
                 /**
                  canvas.drawCircle(20*mCenterX/15f,3*mCenterY/8f,30,mColonPaint);
                  canvas.drawCircle(20*mCenterX/15f,14*mCenterY/8f,30,mColonPaint);

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2017 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2017 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -50,7 +49,7 @@
     <string name="color_white">White</string>
     <string name="analog_complication_config">Analog Complication Config</string>
     <string name="add_complication">Add Complication</string>
-    <string name="edit_complication">Edit Complication <xliff:g id="name" example="World Clock">%1$s</xliff:g></string>
+    <string name="edit_complication">Edit Complication <xliff:g example="World Clock" id="name">%1$s</xliff:g></string>
 
     <string-array name="color_array">
         <item>@string/color_black</item>
