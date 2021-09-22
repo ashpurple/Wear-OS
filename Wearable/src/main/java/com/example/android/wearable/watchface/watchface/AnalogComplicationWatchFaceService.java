@@ -636,6 +636,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         Log.d(TAG, "Button1 : TEXT SENDING");
                         //Intent intent = new Intent(getApplicationContext(), MyActivity.class);
                         Intent intent = new Intent(getApplicationContext(), DisplayInfo.class);
+                        intent.putExtra("json",why);
                         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }
                     if (x > 198 && y < 230 && y > 180) {
