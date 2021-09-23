@@ -628,9 +628,9 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
                         } else if (SOSBUTTON == 1) {
                             Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-                            if (((SosActivity) SosActivity.context).locationinfo != null) {
+                           /** if (((SosActivity) SosActivity.context).locationinfo != null) {
                                 ((SosActivity) SosActivity.context).locationinfo = "END";
-                            }
+                            }**/
                             SOSBUTTON = 0;
                         }
                     }
@@ -1032,7 +1032,118 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 Log.d(TAG, "LTE no connected");
                 checkingLTE = 0;
             }
+            mDate.setTime(now);
+            boolean is24Hour = DateFormat.is24HourFormat(AnalogComplicationWatchFaceService.this);
+
+            // Show colons for the first half of each second so the colons blink on when the time
+            // updates.
+            mShouldDrawColons = (System.currentTimeMillis() % 1000) < 500;
+
+            // Draw the background.
+            canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+
+            canvas.drawText(name,180, 160, mSecondPaint);
+            canvas.drawText(group,180, 130, mSecondPaint);
+            // Draw the hours.
+            float x = mXOffset;
+            String hourString;
+            if (is24Hour) {
+                hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
+            } else {
+                int hour = mCalendar.get(Calendar.HOUR);
+                if (hour == 0) {
+                    hour = 12;
+                }
+                hourString = String.valueOf(hour);
+            }
+
+            canvas.drawText(hourString, mCenterX / 3f, mCenterY, mHourPaint);
+            x += mHourPaint.measureText(hourString);
+
+            // In ambient and mute modes, always draw the first colon. Otherwise, draw the
+            // first colon for the first half of each second.
+            if (isInAmbientMode() || mMute || mShouldDrawColons) {
+                //canvas.drawText(COLON_STRING, x, mYOffset, mColonPaint);
+            }
+            x += mColonWidth;
+            if (checkingwifi == 1) {
+                canvas.drawBitmap(wifion, 130f, 30f, null);
+                Log.d("wifion ", "wifion");
+            }
+            if (checkingwifi == 0)
+                canvas.drawBitmap(wifioff, 130f, 30f, null);
+            /**if(checkingLTE==1)
+             canvas.drawCircle(146,30,16,mCirclePaint);
+             if(checkingLTE==0)
+             canvas.drawCircle(146,30,16,mColonPaint);
+             **/
+            //BUTTONS ARE HERE
+            //canvas.drawBitmap(mailon,61f,283f,null);
+            canvas.drawBitmap(UserInfo, 6 * mCenterX / 5f, 1 * mCenterY / 2 - 2 * mCenterX / 8f, null);
+            //canvas.drawBitmap(soson, 8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
+            //canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
+            canvas.drawBitmap(mailon, 9 * mCenterX / 6f, 2 * mCenterY - 8 * mCenterX / 8f, null);
+            canvas.drawBitmap(soson, 6 * mCenterX / 5f, 2 * mCenterY - 5 * mCenterX / 8f, null);
+            /**
+             canvas.drawCircle(20*mCenterX/15f,3*mCenterY/8f,30,mColonPaint);
+             canvas.drawCircle(20*mCenterX/15f,14*mCenterY/8f,30,mColonPaint);
+             **/
+            if (SOSBUTTON==0){
+                Context context = getApplicationContext();
+                mSharedPref =
+                        context.getSharedPreferences(
+                                getString(R.string.analog_complication_preference_file_key),
+                                Context.MODE_PRIVATE);
+                String backgroundColorResourceName =
+                        getApplicationContext().getString(R.string.saved_background_color);
+                SharedPreferences sharedPref = context.getSharedPreferences(
+                        context.getString(R.string.analog_complication_preference_file_key),
+                        Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+
+                editor.putInt("saved_background_color",-16777216);
+                editor.commit();
+            }
+            if (SOSBUTTON == 1) {
+                Context context = getApplicationContext();
+                mSharedPref =
+                        context.getSharedPreferences(
+                                getString(R.string.analog_complication_preference_file_key),
+                                Context.MODE_PRIVATE);
+                String backgroundColorResourceName =
+                        getApplicationContext().getString(R.string.saved_background_color);
+                SharedPreferences sharedPref = context.getSharedPreferences(
+                        context.getString(R.string.analog_complication_preference_file_key),
+                        Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+
+                editor.putInt("saved_background_color",-769226);
+                editor.commit();
+            }
+            
+            //canvas.drawCircle(7*mCenterX/5f,2*mCenterY-2*mCenterX/8f,mCenterX/8f,mColonPaint);
+            //canvas.drawBitmap(sosoff,295f,283f,null);
+            // Draw the minutes.
+            String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
+            canvas.drawText(minuteString, mCenterX / 3f, mCenterY + TextSize, mMinutePaint);
+            x = mCenterX / 3f + TextSize + 10;
+            // In unmuted interactive mode, draw a second blinking colon followed by the seconds.
+            // Otherwise, if we're in 12-hour mode, draw AM/PM
+            if (!isInAmbientMode() && !mMute) {
+                if (mShouldDrawColons) {
+                    canvas.drawText(COLON_STRING, x, mCenterY + TextSize, mColonPaint);
+                }
+                x += mColonWidth;
+                canvas.drawText(formatTwoDigitNumber(
+                        mCalendar.get(Calendar.SECOND)), x, mCenterY + TextSize, mSecondPaint);
+            } else if (!is24Hour) {
+                x += mColonWidth;
+                canvas.drawText(getAmPmString(
+                        mCalendar.get(Calendar.AM_PM)), x, mCenterY + TextSize, mAmPmPaint);
+            }
+
             //this is where determine the watchhhhh
+            /**
             if (SOSBUTTON == 1) {
                 mDate.setTime(now);
                 boolean is24Hour = DateFormat.is24HourFormat(AnalogComplicationWatchFaceService.this);
@@ -1081,7 +1192,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                  canvas.drawCircle(146,30,16,mColonPaint);
                  **/
                 //BUTTONS ARE HERE
-
+/**
                 canvas.drawBitmap(mailon, 6 * mCenterX / 5f, 1 * mCenterY / 2 - 2 * mCenterX / 8f, null);
 //                canvas.drawCircle(8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
 //                canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
@@ -1105,96 +1216,19 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                  mCalendar.get(Calendar.AM_PM)), x, mYOffset, mAmPmPaint);
                  }
                  **/
-                String locationin = "";
+            /**    String locationin = "";
                 /** if(((SosActivity)SosActivity.context).locationinfo!=null){
                  locationin=((SosActivity)SosActivity.context).locationinfo;
                  }**/
                 // Day of week
-                canvas.drawText(locationin, mCenterX / 3f, mCenterY + TextSize, mMinutePaint);
+          //      canvas.drawText(locationin, mCenterX / 3f, mCenterY + TextSize, mMinutePaint);
 
 
-            }
+     //       }
             if (checking == 1 && SOSBUTTON == 0) {
                 drawWatchFace(canvas);
             }
             if (checking == 0 && SOSBUTTON == 0) {
-                mDate.setTime(now);
-                boolean is24Hour = DateFormat.is24HourFormat(AnalogComplicationWatchFaceService.this);
-
-                // Show colons for the first half of each second so the colons blink on when the time
-                // updates.
-                mShouldDrawColons = (System.currentTimeMillis() % 1000) < 500;
-
-                // Draw the background.
-                canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-
-                canvas.drawText(name,180, 160, mSecondPaint);
-                canvas.drawText(group,180, 130, mSecondPaint);
-                // Draw the hours.
-                float x = mXOffset;
-                String hourString;
-                if (is24Hour) {
-                    hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
-                } else {
-                    int hour = mCalendar.get(Calendar.HOUR);
-                    if (hour == 0) {
-                        hour = 12;
-                    }
-                    hourString = String.valueOf(hour);
-                }
-
-                canvas.drawText(hourString, mCenterX / 3f, mCenterY, mHourPaint);
-                x += mHourPaint.measureText(hourString);
-
-                // In ambient and mute modes, always draw the first colon. Otherwise, draw the
-                // first colon for the first half of each second.
-                if (isInAmbientMode() || mMute || mShouldDrawColons) {
-                    //canvas.drawText(COLON_STRING, x, mYOffset, mColonPaint);
-                }
-                x += mColonWidth;
-                if (checkingwifi == 1) {
-                    canvas.drawBitmap(wifion, 130f, 30f, null);
-                    Log.d("wifion ", "wifion");
-                }
-                if (checkingwifi == 0)
-                    canvas.drawBitmap(wifioff, 130f, 30f, null);
-                /**if(checkingLTE==1)
-                 canvas.drawCircle(146,30,16,mCirclePaint);
-                 if(checkingLTE==0)
-                 canvas.drawCircle(146,30,16,mColonPaint);
-                 **/
-                //BUTTONS ARE HERE
-                //canvas.drawBitmap(mailon,61f,283f,null);
-                canvas.drawBitmap(UserInfo, 6 * mCenterX / 5f, 1 * mCenterY / 2 - 2 * mCenterX / 8f, null);
-                //canvas.drawBitmap(soson, 8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
-                //canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
-                canvas.drawBitmap(mailon, 9 * mCenterX / 6f, 2 * mCenterY - 8 * mCenterX / 8f, null);
-                canvas.drawBitmap(soson, 6 * mCenterX / 5f, 2 * mCenterY - 5 * mCenterX / 8f, null);
-                /**
-                 canvas.drawCircle(20*mCenterX/15f,3*mCenterY/8f,30,mColonPaint);
-                 canvas.drawCircle(20*mCenterX/15f,14*mCenterY/8f,30,mColonPaint);
-                 **/
-
-                //canvas.drawCircle(7*mCenterX/5f,2*mCenterY-2*mCenterX/8f,mCenterX/8f,mColonPaint);
-                //canvas.drawBitmap(sosoff,295f,283f,null);
-                // Draw the minutes.
-                String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
-                canvas.drawText(minuteString, mCenterX / 3f, mCenterY + TextSize, mMinutePaint);
-                x = mCenterX / 3f + TextSize + 10;
-                // In unmuted interactive mode, draw a second blinking colon followed by the seconds.
-                // Otherwise, if we're in 12-hour mode, draw AM/PM
-                if (!isInAmbientMode() && !mMute) {
-                    if (mShouldDrawColons) {
-                        canvas.drawText(COLON_STRING, x, mCenterY + TextSize, mColonPaint);
-                    }
-                    x += mColonWidth;
-                    canvas.drawText(formatTwoDigitNumber(
-                            mCalendar.get(Calendar.SECOND)), x, mCenterY + TextSize, mSecondPaint);
-                } else if (!is24Hour) {
-                    x += mColonWidth;
-                    canvas.drawText(getAmPmString(
-                            mCalendar.get(Calendar.AM_PM)), x, mCenterY + TextSize, mAmPmPaint);
-                }
 
                 // Day of week
                 /**canvas.drawText(
