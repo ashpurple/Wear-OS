@@ -657,52 +657,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         String message = "Right" + Rightnum;
                         Rightnum++;
                         sendData(message);
-                        /**
-                         Context context = getApplicationContext();
-                         mSharedPref =
-                         context.getSharedPreferences(
-                         getString(R.string.analog_complication_preference_file_key),
-                         Context.MODE_PRIVATE);
-
-                         mCalendar = Calendar.getInstance();
-
-                         setWatchFaceStyle(
-                         new WatchFaceStyle.Builder(AnalogComplicationWatchFaceService.this)
-                         .setAcceptsTapEvents(true)
-                         .setHideNotificationIndicator(true)
-                         .build());
-
-                         loadSavedPreferences();
-                         initializeComplicationsAndBackground();
-                         initializeWatchFace();
-                         **/
-                        /**if(((AnalogComplicationConfigActivity)AnalogComplicationConfigActivity.context).color!=null)
-                         {
-                         //change the watchface background color, It could change background imgae if content is changed.
-                         /** color2=Integer.parseInt(((AnalogComplicationConfigActivity)AnalogComplicationConfigActivity.context).color);
-                         Context context = getApplicationContext();
-                         mSharedPref =
-                         context.getSharedPreferences(
-                         getString(R.string.analog_complication_preference_file_key),
-                         Context.MODE_PRIVATE);
-                         String backgroundColorResourceName =
-                         getApplicationContext().getString(R.string.saved_background_color);
-                         SharedPreferences sharedPref = context.getSharedPreferences(
-                         context.getString(R.string.analog_complication_preference_file_key),
-                         Context.MODE_PRIVATE);
-                         SharedPreferences.Editor editor = sharedPref.edit();
-
-                         Log.d("editselectedcolor", String.valueOf(color2));
-                         editor.putInt("saved_background_color",color2);
-                         editor.commit();
-                         Log.d("AnalogCOmplicationWatchFAceService : getbackgroundcolor : ", backgroundColorResourceName);
-                         updateWatchPaintStyles();
-                         onVisibilityChanged(true);
-                         /** Intent intent=new Intent(getApplicationContext(), ChangeScreen.class);
-                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                         startActivity(intent);
-
-                         }**/
+                        
                         Log.d("AnalogComplicationWatchfaceservice", "RIGHT");
                     }
                     if (x < 199 && y < 230 && y > 180) {
@@ -711,32 +666,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         Leftnum++;
                         sendData(message);
 
-                        /**if(((AnalogComplicationConfigActivity)AnalogComplicationConfigActivity.context).color2!=null)
-                         {
-                         /**
-                         color3=Integer.parseInt(((AnalogComplicationConfigActivity)AnalogComplicationConfigActivity.context).color2);
-                         Context context = getApplicationContext();
-                         mSharedPref =
-                         context.getSharedPreferences(
-                         getString(R.string.analog_complication_preference_file_key),
-                         Context.MODE_PRIVATE);
-                         String backgroundColorResourceName =
-                         getApplicationContext().getString(R.string.saved_background_color);
-                         SharedPreferences sharedPref = context.getSharedPreferences(
-                         context.getString(R.string.analog_complication_preference_file_key),
-                         Context.MODE_PRIVATE);
-                         SharedPreferences.Editor editor = sharedPref.edit();
-
-                         Log.d("editselectedcolor", String.valueOf(color3));
-                         editor.putInt("saved_background_color",color3);
-                         editor.commit();
-                         Log.d("AnalogCOmplicationWatchFAceService : getbackgroundcolor : ", backgroundColorResourceName);
-                         updateWatchPaintStyles();
-                         onVisibilityChanged(true);
-                         /** Intent intent=new Intent(getApplicationContext(), ChangeScreen.class);
-                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                         startActivity(intent);
-                         }**/
+                      
                         Log.d("AnalogCOmplicationWatchfaceservice", "Left");
                     }
             }
@@ -1142,89 +1072,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         mCalendar.get(Calendar.AM_PM)), x, mCenterY + TextSize, mAmPmPaint);
             }
 
-            //this is where determine the watchhhhh
-            /**
-            if (SOSBUTTON == 1) {
-                mDate.setTime(now);
-                boolean is24Hour = DateFormat.is24HourFormat(AnalogComplicationWatchFaceService.this);
-
-                // Show colons for the first half of each second so the colons blink on when the time
-                // updates.
-                mShouldDrawColons = (System.currentTimeMillis() % 1000) < 500;
-
-                // Draw the background.
-                canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-
-                // 사용자 이름 디스플레이
-                canvas.drawText(name,160, 130, mSecondPaint);
-                canvas.drawText(group,180, 100, mSecondPaint);
-
-                // Draw the hours.
-                float x = mXOffset;
-                String hourString;
-                if (is24Hour) {
-                    hourString = formatTwoDigitNumber(mCalendar.get(Calendar.HOUR_OF_DAY));
-                } else {
-                    int hour = mCalendar.get(Calendar.HOUR);
-                    if (hour == 0) {
-                        hour = 12;
-                    }
-                    hourString = String.valueOf(hour);
-                }
-                canvas.drawText(hourString, x, mYOffset, mHourPaint);
-                x += mHourPaint.measureText(hourString);
-
-                // In ambient and mute modes, always draw the first colon. Otherwise, draw the
-                // first colon for the first half of each second.
-                if (isInAmbientMode() || mMute || mShouldDrawColons) {
-                    canvas.drawText(COLON_STRING, x, mYOffset, mColonPaint);
-                }
-                x += mColonWidth;
-                if (checkingwifi == 1) {
-                    canvas.drawBitmap(wifion, 130, 30, null);
-                    Log.d("wifion ", "wifion");
-                }
-                if (checkingwifi == 0)
-                    canvas.drawBitmap(wifioff, 130, 30, null);
-                /**   if(checkingLTE==1)
-                 canvas.drawCircle(146,30,16,mCirclePaint);
-                 if(checkingLTE==0)
-                 canvas.drawCircle(146,30,16,mColonPaint);
-                 **/
-                //BUTTONS ARE HERE
-/**
-                canvas.drawBitmap(mailon, 6 * mCenterX / 5f, 1 * mCenterY / 2 - 2 * mCenterX / 8f, null);
-//                canvas.drawCircle(8 * mCenterX / 5f, mCenterY - 1 * mCenterY / 5f, 25, mColonPaint);
-//                canvas.drawCircle(8 * mCenterX / 5f, 3 * mCenterY / 2 - 1 * mCenterY / 5f, 25, mColonPaint);
-//                canvas.drawBitmap(soson, 6 * mCenterX / 5f, 2 * mCenterY - 3 * mCenterX / 8f, null);
-                // Draw the minutes.
-                String minuteString = formatTwoDigitNumber(mCalendar.get(Calendar.MINUTE));
-                canvas.drawText(minuteString, mCenterX, mCenterY / 2, mMinutePaint);
-                x = mCenterX;
-                // In unmuted interactive mode, draw a second blinking colon followed by the seconds.
-                // Otherwise, if we're in 12-hour mode, draw AM/PM
-                /** if (!isInAmbientMode() && !mMute) {
-                 if (mShouldDrawColons) {
-                 canvas.drawText(COLON_STRING, x, mYOffset, mColonPaint);
-                 }
-                 x += mColonWidth;
-                 canvas.drawText(formatTwoDigitNumber(
-                 mCalendar.get(Calendar.SECOND)), x, mYOffset, mSecondPaint);
-                 } else if (!is24Hour) {
-                 x += mColonWidth;
-                 canvas.drawText(getAmPmString(
-                 mCalendar.get(Calendar.AM_PM)), x, mYOffset, mAmPmPaint);
-                 }
-                 **/
-            /**    String locationin = "";
-                /** if(((SosActivity)SosActivity.context).locationinfo!=null){
-                 locationin=((SosActivity)SosActivity.context).locationinfo;
-                 }**/
-                // Day of week
-          //      canvas.drawText(locationin, mCenterX / 3f, mCenterY + TextSize, mMinutePaint);
-
-
-     //       }
+              }
             if (checking == 1 && SOSBUTTON == 0) {
                 drawWatchFace(canvas);
             }
