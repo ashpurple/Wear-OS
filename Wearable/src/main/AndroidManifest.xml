@@ -5,6 +5,10 @@
 
     <uses-feature android:name="android.hardware.type.watch" /> <!-- Required to act as a custom watch face. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Required for complications to receive complication data and open the provider chooser. -->
@@ -67,6 +71,8 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
+        <service android:name=".watchface.BackService"
+            android:enabled="true"></service>
         <service
             android:name=".watchface.AnalogComplicationWatchFaceService"
             android:enabled="true"
@@ -104,6 +110,7 @@
             </intent-filter>
         </service>
 
+        <activity android:name=".watchface.MainActivity" />
         <activity android:name=".watchface.MyActivity" />
         <activity android:name=".watchface.SosActivity" />
         <activity android:name=".watchface.SimpleList" />
