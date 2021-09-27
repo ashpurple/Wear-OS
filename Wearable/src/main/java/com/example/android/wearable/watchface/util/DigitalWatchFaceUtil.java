@@ -88,10 +88,7 @@ public final class DigitalWatchFaceUtil {
 
     
     public interface FetchConfigDataMapCallback {
-        /**
-         * Callback invoked with the current config {@link DataMap} for
-         * {@link DigitalWatchFaceService}.
-         */
+       
         void onConfigDataMapFetched(DataMap config);
     }
 
@@ -154,7 +151,7 @@ public final class DigitalWatchFaceUtil {
                 });
     }
 
-    /
+    
     public static void overwriteKeysInConfigDataMap(
             final Context context,
             final DataMap configKeysToOverwrite,
@@ -176,10 +173,7 @@ public final class DigitalWatchFaceUtil {
         );
     }
 
-    /**
-     * Overwrites the current config {@link DataItem}'s {@link DataMap} with {@code newConfig}.
-     * If the config DataItem doesn't exist, it's created.
-     */
+    
     public static void putConfigDataItem(
             final Context context,
             DataMap newConfig,
