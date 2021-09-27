@@ -40,33 +40,19 @@ import java.util.concurrent.Callable;
 public final class DigitalWatchFaceUtil {
     private static final String TAG = "DigitalWatchFaceUtil";
 
-    /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} background color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
+    
     public static final String KEY_BACKGROUND_COLOR = "BACKGROUND_COLOR";
 
-    /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} hour digits color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
+  
     public static final String KEY_HOURS_COLOR = "HOURS_COLOR";
 
-    /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} minute digits color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
+    
     public static final String KEY_MINUTES_COLOR = "MINUTES_COLOR";
 
-    /**
-     * The {@link DataMap} key for {@link DigitalWatchFaceService} second digits color name.
-     * The color name must be a {@link String} recognized by {@link Color#parseColor}.
-     */
+    
     public static final String KEY_SECONDS_COLOR = "SECONDS_COLOR";
 
-    /**
-     * The path for the {@link DataItem} containing {@link DigitalWatchFaceService} configuration.
-     */
+   
     public static final String PATH_WITH_FEATURE = "/watch_face_config/Digital";
 
     /**
@@ -100,10 +86,7 @@ public final class DigitalWatchFaceUtil {
     public static final int COLOR_VALUE_DEFAULT_AND_AMBIENT_SECOND_DIGITS =
             parseColor(COLOR_NAME_DEFAULT_AND_AMBIENT_SECOND_DIGITS);
 
-    /**
-     * Callback interface to perform an action with the current config {@link DataMap} for
-     * {@link DigitalWatchFaceService}.
-     */
+    
     public interface FetchConfigDataMapCallback {
         /**
          * Callback invoked with the current config {@link DataMap} for
@@ -116,13 +99,6 @@ public final class DigitalWatchFaceUtil {
         return Color.parseColor(colorName.toLowerCase());
     }
 
-    /**
-     * Asynchronously fetches the current config {@link DataMap} for {@link DigitalWatchFaceService}
-     * and passes it to the given callback.
-     * <p>
-     * If the current config {@link DataItem} doesn't exist, it isn't created and the callback
-     * receives an empty DataMap.
-     */
     public static void fetchConfigDataMap(
             final Context context,
             final FetchConfigDataMapCallback callback) {
@@ -178,14 +154,7 @@ public final class DigitalWatchFaceUtil {
                 });
     }
 
-    /**
-     * Overwrites (or sets, if not present) the keys in the current config {@link DataItem} with
-     * the ones appearing in the given {@link DataMap}. If the config DataItem doesn't exist,
-     * it's created.
-     * <p>
-     * It is allowed that only some of the keys used in the config DataItem appear in
-     * {@code configKeysToOverwrite}. The rest of the keys remains unmodified in this case.
-     */
+    /
     public static void overwriteKeysInConfigDataMap(
             final Context context,
             final DataMap configKeysToOverwrite,
