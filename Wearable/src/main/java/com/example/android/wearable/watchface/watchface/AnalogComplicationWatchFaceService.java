@@ -16,12 +16,14 @@
 
 package com.example.android.wearable.watchface.watchface;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -50,6 +52,7 @@ import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.android.wearable.watchface.R;
@@ -81,6 +84,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.android.wearable.watchface.watchface.SharedPreference.SERVICE_HANDLER;
 /** Demonstrates two simple complications in a watch face. */
 public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService implements DataClient.OnDataChangedListener {
     private static final String TAG = "AnalogWatchFace";
@@ -238,7 +242,10 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         }
     }
 
-
+    public static boolean checkpermission(final Context context){
+        Log.d(TAG, "Requesting permissions");
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.BODY_SENSORS)==PackageManager.PERMISSION_GRANTED;
+    }
     private class Engine extends CanvasWatchFaceService.Engine implements DataClient.OnDataChangedListener {
         private static final int MSG_UPDATE_TIME = 0;
         public int color3 = 0;
@@ -288,6 +295,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
          */
         private SparseArray<ComplicationData> mActiveComplicationDataSparseArray;
 
+        private static final int REQUEST_RECORD_PERMISSION = 100;
         /* Maps complication ids to corresponding ComplicationDrawable that renders the
          * the complication data on the watch face.
          */
@@ -300,6 +308,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         // Used to pull user's preferences for background color, highlight color, and visual
         // indicating there are unread notifications.
         SharedPreferences mSharedPref;
+        private final String[] permissions = new String[]{Manifest.permission.BODY_SENSORS};
 
         // User's preference for if they want visual shown to indicate unread notifications.
         private boolean mUnreadNotificationsPreference;
@@ -358,12 +367,43 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             //  Ask for a hardware accelerated canvas.
             super(true);
         }
+        private boolean permissionsGranted() {
+            Boolean result = true;
+            for (String permission : permissions) {
+                if (ContextCompat.checkSelfPermission(getApplicationContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+                    result = false;
+                }
+            }
+            return result;
+        }
+        public void init(){
+            try {
 
+                Log.d("ww","ww");
+                SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"y");
+                BackService.start_handler = true;
+                startService(new Intent(getApplicationContext(), BackService.class));
+
+
+
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
         @Override
         public void onCreate(SurfaceHolder holder) {
             Log.d(TAG, "onCreate");
             Log.d("on", "on");
             super.onCreate(holder);
+            startActivity(new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+
+/**
+            SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"n");
+            BackService.start_handler = false;
+            stopService(intent);**/
+            Log.e("Service started","serviceSTarted");
+
             context = getApplicationContext();
             mDate = new Date();
             Resources resources = AnalogComplicationWatchFaceService.this.getResources();
@@ -374,11 +414,11 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             //sosoff=BitmapFactory.decodeResource(getApplicationContext().getResources(),R.drawable.sos_off2);
             // soson=BitmapFactory.decodeResource(getApplicationContext().getResources(),R.drawable.sos_on2);
             int len = Math.round(mCenterX / 8f * 2);
-           /** soson = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_on2), 60, 60, true);
-            sosoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_off2), 60, 60, true);
-            mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_on), 60, 60, true);
-            mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_off), 60, 60, true);
-            **/
+            /** soson = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_on2), 60, 60, true);
+             sosoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_off2), 60, 60, true);
+             mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_on), 60, 60, true);
+             mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_off), 60, 60, true);
+             **/
             soson = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_on2), 50, 50, true);
             sosoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.sos_off2), 50, 50, true);
             mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_on), 50, 50, true);
@@ -628,9 +668,9 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
                         } else if (SOSBUTTON == 1) {
                             Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-                           /** if (((SosActivity) SosActivity.context).locationinfo != null) {
-                                ((SosActivity) SosActivity.context).locationinfo = "END";
-                            }**/
+                            /** if (((SosActivity) SosActivity.context).locationinfo != null) {
+                             ((SosActivity) SosActivity.context).locationinfo = "END";
+                             }**/
                             SOSBUTTON = 0;
                         }
                     }
@@ -640,11 +680,11 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         //Log.d(TAG, "Button1 : UserInfo");
                         //Intent intent = new Intent(getApplicationContext(), MyActivity.class);
                         Intent intent = new Intent(getApplicationContext(), DisplayInfo.class);
-                        intent.putExtra("json",why);
+                        intent.putExtra("json", why);
                         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }
                     // Message Tap
-                    if (x < 24 * mCenterX / 15f + 30 && x > 24 * mCenterX / 15f - 30 && y < 9  * mCenterY / 8f + 30 && y > 9 * mCenterY / 8f - 30) {
+                    if (x < 24 * mCenterX / 15f + 30 && x > 24 * mCenterX / 15f - 30 && y < 9 * mCenterY / 8f + 30 && y > 9 * mCenterY / 8f - 30) {
 
                         //Log.d(TAG, "Button3 : Message management");
                         Intent intent = new Intent(getApplicationContext(), MyActivity.class);
@@ -657,7 +697,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         String message = "Right" + Rightnum;
                         Rightnum++;
                         sendData(message);
-                        
+
                         Log.d("AnalogComplicationWatchfaceservice", "RIGHT");
                     }
                     if (x < 199 && y < 230 && y > 180) {
@@ -666,7 +706,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         Leftnum++;
                         sendData(message);
 
-                      
+
                         Log.d("AnalogCOmplicationWatchfaceservice", "Left");
                     }
             }
@@ -889,12 +929,27 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             mColonPaint.setTextSize(textSize / 3);
 
             mColonWidth = mColonPaint.measureText(COLON_STRING);
+           // init();
         }
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
+
             RequestThread thread = new RequestThread();
             thread.start();
+
+/**
+                SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"y");
+                BackService.start_handler = true;
+                Intent intent= new Intent(getApplicationContext(), BackService.class);
+
+                startService(intent);
+                SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"n");
+                BackService.start_handler = false;
+                stopService(new Intent(getApplicationContext(), BackService.class));
+                Log.e("Service started","serviceSTarted");
+          **/
+
 
             // Get User Info
             JsonParser jsonParser = new JsonParser();
@@ -921,8 +976,8 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 e.printStackTrace();
             }
 
-            Log.d("Parsing Name",name);
-            Log.d("Parsing Group",group);
+            Log.d("Parsing Name", name);
+            Log.d("Parsing Group", group);
 
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
@@ -972,8 +1027,8 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             // Draw the background.
             canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
 
-            canvas.drawText(name,180, 160, mSecondPaint);
-            canvas.drawText(group,180, 130, mSecondPaint);
+            canvas.drawText(name, 180, 160, mSecondPaint);
+            canvas.drawText(group, 180, 130, mSecondPaint);
             // Draw the hours.
             float x = mXOffset;
             String hourString;
@@ -1018,7 +1073,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
              canvas.drawCircle(20*mCenterX/15f,3*mCenterY/8f,30,mColonPaint);
              canvas.drawCircle(20*mCenterX/15f,14*mCenterY/8f,30,mColonPaint);
              **/
-            if (SOSBUTTON==0){
+            if (SOSBUTTON == 0) {
                 Context context = getApplicationContext();
                 mSharedPref =
                         context.getSharedPreferences(
@@ -1031,7 +1086,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
 
-                editor.putInt("saved_background_color",-16777216);
+                editor.putInt("saved_background_color", -16777216);
                 editor.commit();
             }
             if (SOSBUTTON == 1) {
@@ -1047,10 +1102,10 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
 
-                editor.putInt("saved_background_color",-769226);
+                editor.putInt("saved_background_color", -769226);
                 editor.commit();
             }
-            
+
             //canvas.drawCircle(7*mCenterX/5f,2*mCenterY-2*mCenterX/8f,mCenterX/8f,mColonPaint);
             //canvas.drawBitmap(sosoff,295f,283f,null);
             // Draw the minutes.
@@ -1072,24 +1127,27 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         mCalendar.get(Calendar.AM_PM)), x, mCenterY + TextSize, mAmPmPaint);
             }
 
-              }
-            if (checking == 1 && SOSBUTTON == 0) {
-                drawWatchFace(canvas);
-            }
-            if (checking == 0 && SOSBUTTON == 0) {
 
-                // Day of week
-                /**canvas.drawText(
-                 mDayOfWeekFormat.format(mDate),
-                 mXOffset, mYOffset + mLineHeight*4, mDatePaint);
+            if(checking ==1&&SOSBUTTON ==0){
 
-                 Log.d(TAG,mDayOfWeekFormat.format(mDate).substring(1));
-                 // Date
-                 canvas.drawText(
-                 mDateFormat.format(mDate),
-                 mXOffset, mYOffset + mLineHeight * 3, mDatePaint);**/
-            }
+            drawWatchFace(canvas);}
+
+            if(checking ==0&&SOSBUTTON ==0)
+        {
+
+            // Day of week
+            /**canvas.drawText(
+             mDayOfWeekFormat.format(mDate),
+             mXOffset, mYOffset + mLineHeight*4, mDatePaint);
+
+             Log.d(TAG,mDayOfWeekFormat.format(mDate).substring(1));
+             // Date
+             canvas.drawText(
+             mDateFormat.format(mDate),
+             mXOffset, mYOffset + mLineHeight * 3, mDatePaint);**/
         }
+    }
+
 
         private void drawUnreadNotificationIcon(Canvas canvas) {
 
@@ -1368,7 +1426,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         }
                         temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
 
-                        Log.d("hiypypy", temp);
+                        //Log.d("hiypypy", temp);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
