@@ -34,7 +34,6 @@ import com.google.android.gms.wearable.NodeClient;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 
-import com.example.android.wearable.watchface.watchface.DigitalWatchFaceService;
 import java.util.concurrent.Callable;
 
 public final class DigitalWatchFaceUtil {
