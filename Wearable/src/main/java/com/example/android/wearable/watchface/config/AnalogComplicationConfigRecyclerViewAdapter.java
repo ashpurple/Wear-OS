@@ -57,7 +57,6 @@ import com.example.android.wearable.watchface.model.AnalogComplicationConfigData
 import com.example.android.wearable.watchface.model.AnalogComplicationConfigData.PreviewAndComplicationsConfigItem;
 import com.example.android.wearable.watchface.model.AnalogComplicationConfigData.UnreadNotificationConfigItem;
 import com.example.android.wearable.watchface.watchface.AnalogComplicationWatchFaceService;
-import com.example.android.wearable.watchface.watchface.DigitalWatchFaceService;
 import com.example.android.wearable.watchface.watchface.OpenGLWatchFaceService;
 
 import java.util.ArrayList;
