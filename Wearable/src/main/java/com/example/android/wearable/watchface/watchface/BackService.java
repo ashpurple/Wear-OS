@@ -245,14 +245,7 @@ public class BackService extends Service implements RecognitionListener, SensorE
                     Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
 
                     if (hasCalledBecauseOfSensor == false){
-                        hasCalledBecauseOfSensor = true;
-                        //Place call
-                        String number = getPhoneNumber("david",context);
-                        Log.e("Number","=>"+number);
-                        Intent intent = new Intent(Intent.ACTION_CALL);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.setData(Uri.parse("tel:" + number));
-                        context.startActivity(intent);
+                       
                     }
                 }
             }
