@@ -3,6 +3,7 @@ package com.example.android.wearable.watchface.watchface;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
+import android.location.LocationListener;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -66,7 +67,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
     public int onStartCommand(Intent intent, int flags, int startId) {
         //Sensor Manager shit
         sensorManager = getSystemService(SensorManager.class); // sensor (heart rate, step)
-        locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE); // location (gps)
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE); // location (gps)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 //        if (!hasGps()) {
 //            Log.e(LOCATION_TAG, "This hardware doesn't have GPS.");
@@ -80,7 +81,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
             Log.e(LOCATION_TAG, "Location Permission Success");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
         }
-        getLocation();
+        //getLocation();
         handler = new Handler();
         runnable = new Runnable() {
             public void run() {
@@ -123,6 +124,31 @@ public class BackService extends Service implements SensorEventListener, Locatio
             final Sensor stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
             sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
 
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            locationListener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+
+                    sendMsgToActivity(Math.round(location.getLatitude()*100)/100 ,"LATI");
+                    sendMsgToActivity(Math.round(location.getLongitude()*100)/100 ,"LANGI");
+                    Log.e("!!!!!!1","!!!!!!!!!!");
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+            };
         } else {
             Log.e(SENSOR_TAG, "SensorManager is null");
         }
@@ -139,7 +165,8 @@ public class BackService extends Service implements SensorEventListener, Locatio
                     sendMsgToActivity(value,"HEART");
                 }
                 Log.e(SENSOR_TAG, "heart Rate : " + value + "bpm");
-                getLocation();/**
+                //getLocation();
+                /**
                 if (value > 90) {
                     String text = "CRITICAL HEART RATE. Heart Rate: " + value;
                     Log.e(SENSOR_TAG, text);
@@ -170,7 +197,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // meter
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1; // milli * sec * min
     public String LOCATION_TAG = "LocationManager";
-
+    private LocationListener locationListener;
 //    public BackService(Context context){ // constructor
 //        this.context = context;
 //        getLocation();
@@ -188,6 +215,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
         return longitude;
     }
 
+        /**
     public Location getLocation() {
         try {
             boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -242,7 +270,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
         printGPS();
         return location;
     }
-
+**/
     public void stopUsingGPS() {
         if (locationManager != null) {
             locationManager.removeUpdates(BackService.this);
