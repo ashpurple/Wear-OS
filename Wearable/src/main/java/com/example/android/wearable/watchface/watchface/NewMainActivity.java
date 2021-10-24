@@ -74,23 +74,17 @@ public class NewMainActivity extends Activity {
         protective = userInfo.getProtective();
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
-        refreshText();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         updateInfo();
-        refreshText();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-    }
-
-    public void refreshText(){
-        userText.setText(name);
     }
 
     public void updateInfo(){
@@ -106,33 +100,43 @@ public class NewMainActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        userText.setText(name);
     }
 
     public void getTime(){
-        Calendar calendar = Calendar.getInstance();
-        year = calendar.get(Calendar.YEAR); // 년
-        month = calendar.get(Calendar.MONTH); // 월
-        day = calendar.get(Calendar.DAY_OF_MONTH); // 일
-        week = calendar.get(Calendar.DAY_OF_WEEK); // 요일
-        hour = calendar.get(Calendar.HOUR); // 시
-        minute = calendar.get(Calendar.MINUTE); // 분
-        second = calendar.get(Calendar.SECOND); // 초
-        amPm = calendar.get(Calendar.AM_PM); // 오전 오후
+        Calendar now = Calendar.getInstance();
+        year = now.get(Calendar.YEAR); // 년
+        month = now.get(Calendar.MONTH); // 월
+        day = now.get(Calendar.DAY_OF_MONTH); // 일
+        week = now.get(Calendar.DAY_OF_WEEK); // 요일
+        hour = now.get(Calendar.HOUR); // 시
+        minute = now.get(Calendar.MINUTE); // 분
+        second = now.get(Calendar.SECOND); // 초
+        amPm = now.get(Calendar.AM_PM); // 오전 오후
     }
 
     public void setTime(){
         String newMonth = getMonth(month);
         String newWeek = getWeek(week);
+        String newHour = getTime(hour);
+        String newMin = getTime(minute);
         monthDayText.setText(newMonth + " " + day + " " + newWeek);
-        hourMinuteText.setText(hour + ":" + minute);
+        hourMinuteText.setText(newHour + ":" + newMin);
+        secondText.setText(String.valueOf(second));
         if(amPm == 0)
             amPmText.setText("AM");
         else
             amPmText.setText("PM");
 
     }
+    public String getTime(int time){
+        String newTime = String.valueOf(time);
+        if(time < 10)
+            newTime = "0"+newTime;
+        return newTime;
+    }
 
-    public  String getWeek(int week){
+    public String getWeek(int week){
         String newWeek = "default";
         switch(week){
             case 1:
@@ -234,17 +238,13 @@ public class NewMainActivity extends Activity {
         public void run() {
             try {
                 URL url = new URL(urlStr);
-                Log.d("hI", String.valueOf(url));
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn != null) {
                     conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
                     conn.setRequestMethod("GET");
-                    Log.d("hI", String.valueOf(url));
                     conn.setDoInput(true);
 
                     int resCode = conn.getResponseCode();
-                    Log.d("hi", String.valueOf(resCode));
-                    Log.d("hi", String.valueOf(HttpURLConnection.HTTP_OK));
 
                     if (resCode == HttpURLConnection.HTTP_OK) {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
