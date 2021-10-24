@@ -15,6 +15,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -49,6 +52,10 @@ public class BackService extends Service implements SensorEventListener, Locatio
     public String LOG_TAG = "VoiceRecognitionActivity";
 
     //SENSOR MANAGER STUFF
+    private Messenger mClient=null;
+    public static final int MSG_REGISTER_CLIENT = 1;
+    public static final int MSG_SEND_TO_SERVICE = 3;
+    public static final int MSG_SEND_TO_ACTIVITY = 4;
     private SensorManager sensorManager;
     public String SENSOR_TAG = "SensorEventListener";
     public Boolean hasCalledBecauseOfSensor = false;
@@ -96,7 +103,8 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+
+        return mMessenger.getBinder();
     }
 
 
@@ -127,6 +135,9 @@ public class BackService extends Service implements SensorEventListener, Locatio
             final float value = sensorEvent.values[0];
 
             if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE) {
+                if(mClient!=null) {
+                    sendMsgToService(value);
+                }
                 Log.e(SENSOR_TAG, "heart Rate : " + value + "bpm");
                 getLocation();
                 if (value > 90) {
@@ -137,7 +148,9 @@ public class BackService extends Service implements SensorEventListener, Locatio
             }
             if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
                 Log.e(SENSOR_TAG, "Step Count : " + value + "step");
-
+                if(mClient!=null) {
+                    sendMsgToService(value);
+                }
             }
         } else {
 
@@ -234,6 +247,31 @@ public class BackService extends Service implements SensorEventListener, Locatio
             locationManager.removeUpdates(BackService.this);
         }
     }
+    private void sendMsgToService(float sendValue){
+        try{
+            Bundle bundle= new Bundle();
+            bundle.putFloat("fromservice",sendValue);
+            Message msg=Message.obtain(null,MSG_SEND_TO_SERVICE);
+            msg.setData(bundle);
+            mClient.send(msg);
+        }
+        catch (RemoteException e){
+
+        }
+    }
+    private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            Log.w("test","ControlService - message what : "+msg.what +" , msg.obj "+ msg.obj);
+            switch (msg.what) {
+                case MSG_REGISTER_CLIENT:
+                    mClient = msg.replyTo;
+
+                    break;
+            }
+            return false;
+        }
+    }));
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {

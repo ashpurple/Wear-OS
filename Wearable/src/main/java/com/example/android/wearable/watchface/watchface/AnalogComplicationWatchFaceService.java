@@ -19,9 +19,11 @@ package com.example.android.wearable.watchface.watchface;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -38,7 +40,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.rendering.ComplicationDrawable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
@@ -50,6 +55,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -134,6 +140,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
     float mXOffset;
     float mYOffset;
     float mLineHeight;
+    public float temp=0;
     String mAmString;
     String mPmString;
     int mInteractiveBackgroundColor =
@@ -396,6 +403,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             Log.d(TAG, "onCreate");
             Log.d("on", "on");
             super.onCreate(holder);
+            bindService(new Intent(AnalogComplicationWatchFaceService.this, BackService.class),mConnection, Context.BIND_AUTO_CREATE);
             startActivity(new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
 /**
@@ -932,11 +940,46 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
            // init();
         }
 
+//Bundle connection
+        private Messenger mServiceMessenger =null;
+        private ServiceConnection mConnection = new ServiceConnection() {
+
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                Log.d("test","onServiceConnected!!!!!!!!1");
+                mServiceMessenger = new Messenger(iBinder);
+                try {
+                    Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
+                    msg.replyTo = mMessenger;
+                    Log.d("test","onServiceConnected!!!!!!!!1!1111");
+
+                    mServiceMessenger.send(msg);
+                }
+                catch (RemoteException e) {
+                }
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+            }
+        };
+        private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+
+                temp = msg.getData().getFloat("fromservice");
+                Log.e("message from service!!!!!!!!!1",String.valueOf(temp));
+                return false;
+            }
+        }));
+
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
 
             RequestThread thread = new RequestThread();
             thread.start();
+
+
 
 /**
                 SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"y");
