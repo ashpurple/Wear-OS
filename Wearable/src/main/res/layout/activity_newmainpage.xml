@@ -5,9 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/box_inset_layout_padding"
-    tools:context=".config.AnalogComplicationConfigActivity"
-    tools:deviceIds="wear"
+
+    tools:context=".watchface.MainActivity"
     android:background="#000000">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,15 +15,6 @@
         android:layout_height="match_parent"
         android:padding="@dimen/inner_frame_layout_padding"
         app:layout_boxedEdges="all">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/Name"
@@ -191,9 +181,9 @@
             android:id="@+id/DistanceValue"
             android:layout_width="20dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="100dp"
-            android:text="137.9"
+            android:text="0"
             android:textColor="#FBFAFA"
             android:textSize="7dp"
             android:textStyle="bold"
@@ -265,7 +255,7 @@
             android:id="@+id/button2"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginLeft="116dp"
+            android:layout_marginLeft="119dp"
             android:layout_marginTop="55dp"
             android:background="@drawable/heart2"
 
@@ -274,26 +264,31 @@
 
         <TextView
             android:id="@+id/HeartRateValue"
-            android:layout_width="15dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="122dp"
-            android:layout_marginTop="70dp"
-            android:text="70"
+            android:layout_width="13dp"
+            android:layout_height="9dp"
+            android:layout_below="@+id/button2"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="20dp"
+            android:text="118"
             android:textColor="#C6C6C6"
             android:textSize="6dp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textAlignment="center"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="@+id/button2"
+            app:layout_constraintTop_toBottomOf="@+id/button2"
+            app:layout_constraintTop_toTopOf="@+id/button2" />
 
         <Button
             android:id="@+id/button3"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginLeft="105dp"
-            android:layout_marginTop="85dp"
+            android:layout_marginTop="90dp"
             android:background="@drawable/circle_button3"
             android:text="SOS"
             android:textSize="8dp"
+            android:textColor="#ffffff"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
