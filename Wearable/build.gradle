@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:18.0.0'
     compileOnly 'com.google.android.wearable:wearable:2.8.1'
     implementation 'com.ssomai:android.scalablelayout:2.1.6'
-
+    compile 'androidx.wear:wear:1.0.0'
 
 }
 
