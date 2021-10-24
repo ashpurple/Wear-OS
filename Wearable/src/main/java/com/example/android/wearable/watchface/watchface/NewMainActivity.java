@@ -3,12 +3,18 @@ package com.example.android.wearable.watchface.watchface;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +35,7 @@ public class NewMainActivity extends Activity {
     TextView monthDayText;
     TextView amPmText;
 
+    public float temp=0;
     UserInfo userInfo;
     JsonParser jsonParser;
     String name;
@@ -44,6 +51,7 @@ public class NewMainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newmainpage);
+        bindService(new Intent(NewMainActivity.this, BackService.class),mConnection, Context.BIND_AUTO_CREATE);
 
         /* Text Views */
         userText = (TextView) findViewById(R.id.Name);
@@ -71,7 +79,37 @@ public class NewMainActivity extends Activity {
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
     }
+    private Messenger mServiceMessenger =null;
+    private ServiceConnection mConnection = new ServiceConnection() {
 
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.d("test","onServiceConnected!!!!!!!!1");
+            mServiceMessenger = new Messenger(iBinder);
+            try {
+                Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
+                msg.replyTo = mMessenger;
+                Log.d("test","onServiceConnected!!!!!!!!1!1111");
+
+                mServiceMessenger.send(msg);
+            }
+            catch (RemoteException e) {
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+        }
+    };
+    private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+
+            temp = msg.getData().getFloat("fromservice");
+            Log.e("message from service!!!!!!!!!1",String.valueOf(temp));
+            return false;
+        }
+    }));
     @Override
     protected void onStart() {
         super.onStart();

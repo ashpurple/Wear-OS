@@ -136,7 +136,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
             if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE) {
                 if(mClient!=null) {
-                    sendMsgToService(value);
+                    sendMsgToActivity(value);
                 }
                 Log.e(SENSOR_TAG, "heart Rate : " + value + "bpm");
                 getLocation();
@@ -149,7 +149,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
             if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
                 Log.e(SENSOR_TAG, "Step Count : " + value + "step");
                 if(mClient!=null) {
-                    sendMsgToService(value);
+                    sendMsgToActivity(value);
                 }
             }
         } else {
@@ -247,11 +247,11 @@ public class BackService extends Service implements SensorEventListener, Locatio
             locationManager.removeUpdates(BackService.this);
         }
     }
-    private void sendMsgToService(float sendValue){
+    private void sendMsgToActivity(float sendValue){
         try{
             Bundle bundle= new Bundle();
             bundle.putFloat("fromservice",sendValue);
-            Message msg=Message.obtain(null,MSG_SEND_TO_SERVICE);
+            Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
             msg.setData(bundle);
             mClient.send(msg);
         }
