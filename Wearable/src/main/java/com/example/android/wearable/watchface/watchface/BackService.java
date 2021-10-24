@@ -136,20 +136,20 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
             if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE) {
                 if(mClient!=null) {
-                    sendMsgToActivity(value);
+                    sendMsgToActivity(value,"HEART");
                 }
                 Log.e(SENSOR_TAG, "heart Rate : " + value + "bpm");
-                getLocation();
+                getLocation();/**
                 if (value > 90) {
                     String text = "CRITICAL HEART RATE. Heart Rate: " + value;
                     Log.e(SENSOR_TAG, text);
                     Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
-                }
+                }**/
             }
             if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
                 Log.e(SENSOR_TAG, "Step Count : " + value + "step");
                 if(mClient!=null) {
-                    sendMsgToActivity(value);
+                    sendMsgToActivity(value,"STEP");
                 }
             }
         } else {
@@ -227,6 +227,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
                         if (location != null) {
                             latitude = location.getLatitude();
                             longitude = location.getLongitude();
+
                         } else {
                             Log.e(LOCATION_TAG, "Location is null");
                         }
@@ -247,10 +248,10 @@ public class BackService extends Service implements SensorEventListener, Locatio
             locationManager.removeUpdates(BackService.this);
         }
     }
-    private void sendMsgToActivity(float sendValue){
+    private void sendMsgToActivity(float sendValue,String type){
         try{
             Bundle bundle= new Bundle();
-            bundle.putFloat("fromservice",sendValue);
+            bundle.putFloat(type,sendValue);
             Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
             msg.setData(bundle);
             mClient.send(msg);

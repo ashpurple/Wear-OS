@@ -35,7 +35,8 @@ public class NewMainActivity extends Activity {
     TextView monthDayText;
     TextView amPmText;
 
-    public float temp=0;
+    TextView heartrate;
+    public float hearttemp=0,locationtemp=0,steptemp=0;
     UserInfo userInfo;
     JsonParser jsonParser;
     String name;
@@ -104,9 +105,11 @@ public class NewMainActivity extends Activity {
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
+            if(msg.getData().getFloat("HEART")!=0){
+                hearttemp = msg.getData().getFloat("HEART");}
 
-            temp = msg.getData().getFloat("fromservice");
-            Log.e("message from service!!!!!!!!!1",String.valueOf(temp));
+            if(msg.getData().getFloat("STEP")!=0){
+                steptemp = msg.getData().getFloat("STEP");}
             return false;
         }
     }));
@@ -161,6 +164,10 @@ public class NewMainActivity extends Activity {
                     @Override
                     public void run() {
                         setTime();
+                        heartrate=findViewById(R.id.HeartRateValue);
+                        heartrate.setText(String.valueOf(hearttemp));
+                        TextView step=findViewById(R.id.StepValue);
+                        step.setText(String.valueOf(steptemp));
                         //secondText.setText(second);
                     }
                 });
