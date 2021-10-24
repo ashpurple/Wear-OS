@@ -216,15 +216,15 @@ public class NewMainActivity extends Activity {
                     public void run() {
                         setTime();
                         heartrate=findViewById(R.id.HeartRateValue);
-                        heartrate.setText(String.valueOf(hearttemp));
+                        heartrate.setText(String.valueOf((int)hearttemp));
                         TextView step=findViewById(R.id.StepValue);
-                        step.setText(String.valueOf(steptemp));
+                        step.setText(String.valueOf((int)steptemp));
                         double distancetemp=steptemp*0.5;
                         TextView distance=findViewById(R.id.DistanceValue);
-                        distance.setText(distancetemp+"m");
+                        distance.setText((int)distancetemp+"m");
                         double calorytemp=Math.round((steptemp*388/10000)*100)/100;
                         TextView calory=findViewById(R.id.CaloriesValue);
-                        calory.setText(String.valueOf(calorytemp));
+                        calory.setText(String.valueOf((int)calorytemp));
                         LocationFind();
                         //secondText.setText(second);
                     }
