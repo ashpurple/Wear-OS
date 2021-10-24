@@ -33,6 +33,27 @@
         <entry key="..\:/Users/code/Desktop/github/wear-os-samples-main/WatchFace/Wearable/src/main/res/layout/simple_answer_list.xml" value="0.7264150943396226" />
         <entry key="..\:/Users/code/Desktop/github/wear-os-samples-main/WatchFace/Wearable/src/main/res/layout/sos_activity.xml" value="0.6827830188679245" />
         <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/activity_display_info.xml" value="1.3453947368421053" />
+<<<<<<< HEAD
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/activity_mainpage.xml" value="1.0" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/activity_my.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/activity_newmainpage.xml" value="0.966183574879227" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/color_config_list_item.xml" value="0.966183574879227" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/config_list_background_complication_item.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/config_list_color_item.xml" value="0.966183574879227" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/config_list_complication_button.xml" value="0.966183574879227" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/config_list_complication_button2.xml" value="0.966183574879227" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/config_list_more_options_item.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/config_list_preview_and_complications_item.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/config_list_unread_notif_item.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/digital_color_picker_item.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/keyboard.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/rect_activity_my.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/rect_activity_my1.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/round_activity_my.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/simple_answer_list.xml" value="1.3157894736842106" />
+        <entry key="..\:/Users/keon/AndroidStudioProjects/Wear_OS/Wearable/src/main/res/layout/sos_activity.xml" value="0.5465768799102132" />
+=======
+>>>>>>> 2216d3bf324a64a2b9741cf8ff42a8fd90c03ef0
         <entry key="..\:/Wear-OS/Wearable/src/main/res/layout/activity_analog_complication_config.xml" value="1.486842105263158" />
         <entry key="..\:/Wear-OS/Wearable/src/main/res/layout/activity_change_screen.xml" value="1.486842105263158" />
         <entry key="..\:/Wear-OS/Wearable/src/main/res/layout/activity_digital_config.xml" value="1.486842105263158" />
