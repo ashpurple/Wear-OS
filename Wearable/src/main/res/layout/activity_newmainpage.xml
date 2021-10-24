@@ -106,12 +106,12 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/SleepValue"
+            android:id="@+id/GPSValue"
             android:layout_width="25dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="55dp"
             android:layout_marginTop="80dp"
-            android:text="0m"
+            android:text="0.0"
             android:textColor="#FBFAFA"
             android:textSize="7dp"
             android:textStyle="bold"
@@ -119,12 +119,12 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/Sleep"
+            android:id="@+id/GPS"
             android:layout_width="20dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="75dp"
             android:layout_marginTop="80dp"
-            android:text="SLEEP"
+            android:text="GPS"
             android:textColor="#C6C6C6"
             android:textSize="6dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -273,7 +273,7 @@
             android:layout_below="@+id/button2"
             android:layout_marginStart="4dp"
             android:layout_marginTop="20dp"
-            android:text="118"
+            android:text="00"
             android:textColor="#C6C6C6"
             android:textSize="6dp"
             android:textStyle="bold"

@@ -1,6 +1,8 @@
 package com.example.android.wearable.watchface.watchface;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -36,14 +38,7 @@ public class NewMainActivity extends Activity {
     String protective;
     String maxHeartRate;
 
-    int year;
-    int month;
-    int day;
-    int week;
-    int hour;
-    int minute;
-    int second;
-    int amPm;
+    Time time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +53,7 @@ public class NewMainActivity extends Activity {
         amPmText = (TextView) findViewById(R.id.AMPM);
 
         /* Threads */
+        time = new Time();
         RequestThread requestThread = new RequestThread();
         requestThread.start();
         TimeThread timeThread = new TimeThread();
@@ -103,111 +99,21 @@ public class NewMainActivity extends Activity {
         userText.setText(name);
     }
 
-    public void getTime(){
-        Calendar now = Calendar.getInstance();
-        year = now.get(Calendar.YEAR); // 년
-        month = now.get(Calendar.MONTH); // 월
-        day = now.get(Calendar.DAY_OF_MONTH); // 일
-        week = now.get(Calendar.DAY_OF_WEEK); // 요일
-        hour = now.get(Calendar.HOUR); // 시
-        minute = now.get(Calendar.MINUTE); // 분
-        second = now.get(Calendar.SECOND); // 초
-        amPm = now.get(Calendar.AM_PM); // 오전 오후
-    }
-
+    @SuppressLint("SetTextI18n")
     public void setTime(){
-        String newMonth = getMonth(month);
-        String newWeek = getWeek(week);
-        String newHour = getTime(hour);
-        String newMin = getTime(minute);
-        monthDayText.setText(newMonth + " " + day + " " + newWeek);
+        time.setCalendar();
+        String newMonth = time.transformMonth();
+        String newWeek = time.transformWeek();
+        String newHour = time.transformHour();
+        String newMin = time.transformMin();
+        monthDayText.setText(newMonth + " " + time.getDay() + " " + newWeek);
         hourMinuteText.setText(newHour + ":" + newMin);
-        secondText.setText(String.valueOf(second));
-        if(amPm == 0)
+        secondText.setText(String.valueOf(time.getSecond()));
+        if(time.getAmPm() == 0)
             amPmText.setText("AM");
         else
             amPmText.setText("PM");
-
     }
-    public String getTime(int time){
-        String newTime = String.valueOf(time);
-        if(time < 10)
-            newTime = "0"+newTime;
-        return newTime;
-    }
-
-    public String getWeek(int week){
-        String newWeek = "default";
-        switch(week){
-            case 1:
-                newWeek = "Sun";
-                break;
-            case 2:
-                newWeek = "Mon";
-                break;
-            case 3:
-                newWeek = "Tue";
-                break;
-            case 4:
-                newWeek = "Wed";
-                break;
-            case 5:
-                newWeek = "Thu";
-                break;
-            case 6:
-                newWeek = "Fri";
-                break;
-            case 7:
-                newWeek = "Sat";
-                break;
-        }
-        return newWeek;
-    }
-
-
-    public String getMonth(int month){
-        String newMonth = "default";
-        switch(month){
-            case 0:
-                newMonth = "Jan";
-                break;
-            case 1:
-                newMonth = "Feb";
-                break;
-            case 2:
-                newMonth = "Mar";
-                break;
-            case 3:
-                newMonth = "Apr";
-                break;
-            case 4:
-                newMonth = "May";
-                break;
-            case 5:
-                newMonth = "Jun";
-                break;
-            case 6:
-                newMonth = "Jul";
-                break;
-            case 7:
-                newMonth = "Aug";
-                break;
-            case 8:
-                newMonth = "Sep";
-                break;
-            case 9:
-                newMonth = "Oct";
-                break;
-            case 10:
-                newMonth = "Nov";
-                break;
-            case 11:
-                newMonth = "Dec";
-                break;
-        }
-        return newMonth;
-    }
-
 
     class TimeThread extends Thread{
         @Override
@@ -216,7 +122,6 @@ public class NewMainActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        getTime();
                         setTime();
                         //secondText.setText(second);
                     }
