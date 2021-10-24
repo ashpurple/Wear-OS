@@ -679,7 +679,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
                         //Log.d(TAG, "Button1 : UserInfo");
                         //Intent intent = new Intent(getApplicationContext(), MyActivity.class);
-                        Intent intent = new Intent(getApplicationContext(), DisplayInfo.class);
+                        Intent intent = new Intent(getApplicationContext(), NewMainActivity.class);
                         intent.putExtra("json", why);
                         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }

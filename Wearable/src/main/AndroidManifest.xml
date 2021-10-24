@@ -17,12 +17,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".watchface.NewMainActivity"
+            android:exported="true" />
         <activity
             android:name=".watchface.DisplayInfo"
             android:exported="true" />
@@ -73,8 +75,9 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
-        <service android:name=".watchface.BackService"
-            android:enabled="true"></service>
+        <service
+            android:name=".watchface.BackService"
+            android:enabled="true" />
         <service
             android:name=".watchface.AnalogComplicationWatchFaceService"
             android:enabled="true"

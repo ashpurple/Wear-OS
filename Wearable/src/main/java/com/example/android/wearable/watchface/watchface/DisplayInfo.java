@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.example.android.wearable.watchface.R;
-
 import org.json.JSONException;
 
 public class DisplayInfo extends Activity {
