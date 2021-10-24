@@ -1,10 +1,16 @@
 package com.example.android.wearable.watchface.watchface;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -46,6 +52,8 @@ public class NewMainActivity extends Activity {
     String protective;
     String maxHeartRate;
 
+    private LocationListener locationListener;
+    private LocationManager locationManager;
     Time time;
 
     @Override
@@ -79,6 +87,49 @@ public class NewMainActivity extends Activity {
         protective = userInfo.getProtective();
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
+        }
+        public void LocationFind(){
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            locationListener = new LocationListener() {
+
+                @Override
+                public void onLocationChanged(Location location) {
+
+                    Log.d("dd",String.valueOf(Math.round(location.getLatitude()*100)/100));
+                    //sendMsgToActivity(Math.round(location.getLongitude()*100)/100 ,"LANGI");
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+            };
+            configureButton();
+
+        }
+    public void configureButton() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+
     }
     private Messenger mServiceMessenger =null;
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -168,6 +219,13 @@ public class NewMainActivity extends Activity {
                         heartrate.setText(String.valueOf(hearttemp));
                         TextView step=findViewById(R.id.StepValue);
                         step.setText(String.valueOf(steptemp));
+                        double distancetemp=steptemp*0.5;
+                        TextView distance=findViewById(R.id.DistanceValue);
+                        distance.setText(distancetemp+"m");
+                        double calorytemp=Math.round((steptemp*388/10000)*100)/100;
+                        TextView calory=findViewById(R.id.CaloriesValue);
+                        calory.setText(String.valueOf(calorytemp));
+                        LocationFind();
                         //secondText.setText(second);
                     }
                 });
