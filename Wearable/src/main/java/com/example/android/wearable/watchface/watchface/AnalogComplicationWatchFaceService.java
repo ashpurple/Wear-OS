@@ -663,22 +663,25 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                     // SoS Tap
                     if (x < 20 * mCenterX / 15f + 30 && x > 20 * mCenterX / 15f - 30 && y < 13 * mCenterY / 8f + 30 && y > 13 * mCenterY / 8f - 30) {
 
-                        Log.d(TAG, "Button4 : SOS BUTTON");
-                        if (SOSBUTTON == 0) {
-                            sendData("SOS");
-                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-
-                            SOSBUTTON = 1;
-                            Intent intent = new Intent(getApplicationContext(), SosActivity.class);
-                            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
-                        } else if (SOSBUTTON == 1) {
-                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-                            /** if (((SosActivity) SosActivity.context).locationinfo != null) {
-                             ((SosActivity) SosActivity.context).locationinfo = "END";
-                             }**/
-                            SOSBUTTON = 0;
-                        }
+//                        Log.d(TAG, "Button4 : SOS BUTTON");
+//                        if (SOSBUTTON == 0) {
+//                            sendData("SOS");
+//                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
+//
+//                            SOSBUTTON = 1;
+//                            Intent intent = new Intent(getApplicationContext(), SosActivity.class);
+//                            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+//
+//                        } else if (SOSBUTTON == 1) {
+//                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
+//                            /** if (((SosActivity) SosActivity.context).locationinfo != null) {
+//                             ((SosActivity) SosActivity.context).locationinfo = "END";
+//                             }**/
+//                            SOSBUTTON = 0;
+//                        }
+                        Intent intent = new Intent(getApplicationContext(), DisplayInfo.class);
+                        intent.putExtra("json", why);
+                        startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }
                     // User info Tap
                     if (x < 20 * mCenterX / 15f + 30 && x > 20 * mCenterX / 15f - 30 && y < 2 * 2 * mCenterY / 8f + 30 && y > 2 * mCenterY / 8f - 30) {
@@ -686,7 +689,6 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         //Log.d(TAG, "Button1 : UserInfo");
                         //Intent intent = new Intent(getApplicationContext(), MyActivity.class);
                         Intent intent = new Intent(getApplicationContext(), NewMainActivity.class);
-                        intent.putExtra("json", why);
                         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }
                     // Message Tap
@@ -1442,6 +1444,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         e.printStackTrace();
                     }
                     why = temp;
+                    Log.e("Json",why);
                 }
             });
         }
