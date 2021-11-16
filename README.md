@@ -50,7 +50,6 @@ this will allow runs.
 
 Pre-requisites
 --------------
-
 - Android SDK 28
 - Android Build Tools v29.0.2
 - Android Support Repository
