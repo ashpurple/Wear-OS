@@ -430,7 +430,6 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_on), 50, 50, true);
 //
 //
-//           mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_off), 50, 50, true);
             UserInfo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.useri), 50, 50, true);
             mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.useri), 50, 50, true);
 
