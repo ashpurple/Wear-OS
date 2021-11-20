@@ -65,6 +65,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.e(SENSOR_TAG, "onStartCommand");
         //Sensor Manager shit
         sensorManager = getSystemService(SensorManager.class); // sensor (heart rate, step)
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE); // location (gps)
@@ -89,12 +90,13 @@ public class BackService extends Service implements SensorEventListener, Locatio
             }
         };
         handler.postDelayed(runnable, 1000);
+
         return START_STICKY;
     }
 
     @Override
     public boolean stopService(Intent name) {
-        Log.e("Service", "Stop Service");
+        Log.e(SENSOR_TAG, "Stop Service");
         speech.stopListening();
         sensorManager.unregisterListener(this);
         handler.removeCallbacks(runnable);
@@ -116,6 +118,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
      */
     private void startSensors() {
         if (sensorManager != null) {
+            Log.e(SENSOR_TAG, "startSensors");
             // Start heart rate sensor
             final Sensor heartRateSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
             sensorManager.registerListener(this, heartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -128,10 +131,11 @@ public class BackService extends Service implements SensorEventListener, Locatio
             locationListener = new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-
-                    sendMsgToActivity(Math.round(location.getLatitude()*100)/100 ,"LATI");
-                    sendMsgToActivity(Math.round(location.getLongitude()*100)/100 ,"LANGI");
-                    Log.e("!!!!!!1","!!!!!!!!!!");
+                    float lat = Math.round(location.getLatitude()*100)/100;
+                    float lang = Math.round(location.getLongitude()*100)/100;
+                    sendMsgToActivity(lat ,"LATI");
+                    sendMsgToActivity(lang ,"LANGI");
+                    Log.e(LOCATION_TAG,lat + " " + lang);
                 }
 
                 @Override
@@ -156,6 +160,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        Log.e(SENSOR_TAG, "onSensorChanged");
         // Check if a value is attached, if not we can ignore it
         if (sensorEvent.values.length > 0) {
             final float value = sensorEvent.values[0];
@@ -180,7 +185,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
                 }
             }
         } else {
-
+            Log.e(SENSOR_TAG, "No Sensor detected");
         }
     }
 
