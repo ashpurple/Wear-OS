@@ -227,29 +227,29 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
     @Override
     public void onDataChanged(@NonNull DataEventBuffer dataEventBuffer) {
-        Log.d(TAG, "onDataChanged: " + dataEventBuffer);
+//        Log.d(TAG, "onDataChanged: " + dataEventBuffer);
         for (DataEvent event : dataEventBuffer) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
                 String path = event.getDataItem().getUri().getPath();
                 if (datapath.equals(path)) {
                     DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                     String message = dataMapItem.getDataMap().getString("message");
-                    Log.v(TAG, "Wear activity received message: " + message);
+//                    Log.v(TAG, "Wear activity received message: " + message);
                     // Display message in UI
 
                 } else {
-                    Log.e(TAG, "Unrecognized path: " + path);
+//                    Log.e(TAG, "Unrecognized path: " + path);
                 }
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
-                Log.v(TAG, "Data deleted : " + event.getDataItem().toString());
+//                Log.v(TAG, "Data deleted : " + event.getDataItem().toString());
             } else {
-                Log.e(TAG, "Unknown data event Type = " + event.getType());
+//                Log.e(TAG, "Unknown data event Type = " + event.getType());
             }
         }
     }
 
     public static boolean checkpermission(final Context context){
-        Log.d(TAG, "Requesting permissions");
+//        Log.d(TAG, "Requesting permissions");
         return ActivityCompat.checkSelfPermission(context, Manifest.permission.BODY_SENSORS)==PackageManager.PERMISSION_GRANTED;
     }
     private class Engine extends CanvasWatchFaceService.Engine implements DataClient.OnDataChangedListener {
@@ -332,23 +332,23 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
         @Override
         public void onDataChanged(@NonNull DataEventBuffer dataEventBuffer) {
-            Log.d(TAG, "onDataChanged: " + dataEventBuffer);
+//            Log.d(TAG, "onDataChanged: " + dataEventBuffer);
             for (DataEvent event : dataEventBuffer) {
                 if (event.getType() == DataEvent.TYPE_CHANGED) {
                     String path = event.getDataItem().getUri().getPath();
                     if (datapath.equals(path)) {
                         DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                         String message = dataMapItem.getDataMap().getString("message");
-                        Log.v(TAG, "Wear activity received message: " + message);
+//                        Log.v(TAG, "Wear activity received message: " + message);
                         // Display message in UI
 
                     } else {
-                        Log.e(TAG, "Unrecognized path: " + path);
+//                        Log.e(TAG, "Unrecognized path: " + path);
                     }
                 } else if (event.getType() == DataEvent.TYPE_DELETED) {
-                    Log.v(TAG, "Data deleted : " + event.getDataItem().toString());
+//                    Log.v(TAG, "Data deleted : " + event.getDataItem().toString());
                 } else {
-                    Log.e(TAG, "Unknown data event Type = " + event.getType());
+//                    Log.e(TAG, "Unknown data event Type = " + event.getType());
                 }
             }
         }
@@ -385,7 +385,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         public void init(){
             try {
 
-                Log.d("ww","ww");
+//                Log.d("ww","ww");
                 SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"y");
                 BackService.start_handler = true;
                 startService(new Intent(getApplicationContext(), BackService.class));
@@ -399,8 +399,8 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         }
         @Override
         public void onCreate(SurfaceHolder holder) {
-            Log.d(TAG, "onCreate");
-            Log.d("on", "on");
+//            Log.d(TAG, "onCreate");
+//            Log.d("on", "on");
             super.onCreate(holder);
             startActivity(new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
@@ -408,7 +408,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"n");
             BackService.start_handler = false;
             stopService(intent);**/
-            Log.e("Service started","serviceSTarted");
+//            Log.e("Service started","serviceSTarted");
 
             context = getApplicationContext();
             mDate = new Date();
@@ -430,7 +430,6 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             mailon = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_on), 50, 50, true);
 //
 //
-//           mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.mail_off), 50, 50, true);
             UserInfo = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.useri), 50, 50, true);
             mailoff = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.useri), 50, 50, true);
 
@@ -508,7 +507,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         }
 
         private void initializeComplicationsAndBackground() {
-            Log.d(TAG, "initializeComplications()");
+//            Log.d(TAG, "initializeComplications()");
 
             // Initialize background color (in case background complication is inactive).
             mBackgroundPaint = new Paint();
@@ -612,7 +611,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         @Override
         public void onPropertiesChanged(Bundle properties) {
             super.onPropertiesChanged(properties);
-            Log.d(TAG, "onPropertiesChanged: low-bit ambient = " + mLowBitAmbient);
+//            Log.d(TAG, "onPropertiesChanged: low-bit ambient = " + mLowBitAmbient);
 
             mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
             mBurnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
@@ -635,7 +634,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         @Override
         public void onComplicationDataUpdate(
                 int complicationId, ComplicationData complicationData) {
-            Log.d(TAG, "onComplicationDataUpdate() id: " + complicationId);
+//            Log.d(TAG, "onComplicationDataUpdate() id: " + complicationId);
 
             // Adds/updates active complication data in the array.
             mActiveComplicationDataSparseArray.put(complicationId, complicationData);
@@ -651,10 +650,10 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         @SuppressLint("WrongConstant")
         @Override
         public void onTapCommand(int tapType, int x, int y, long eventTime) {
-            Log.d(TAG, "OnTapCommand()");
-            Log.d(TAG, "TaPTYPE" + String.valueOf(tapType));
+//            Log.d(TAG, "OnTapCommand()");
+//            Log.d(TAG, "TaPTYPE" + String.valueOf(tapType));
 
-            Log.d(TAG, "x : " + String.valueOf(x) + "  y  :  " + String.valueOf(y));
+//            Log.d(TAG, "x : " + String.valueOf(x) + "  y  :  " + String.valueOf(y));
             switch (tapType) {
                 case TAP_TYPE_TAP:
                     // If your background complication is the first item in your array, you need
@@ -663,22 +662,25 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                     // SoS Tap
                     if (x < 20 * mCenterX / 15f + 30 && x > 20 * mCenterX / 15f - 30 && y < 13 * mCenterY / 8f + 30 && y > 13 * mCenterY / 8f - 30) {
 
-                        Log.d(TAG, "Button4 : SOS BUTTON");
-                        if (SOSBUTTON == 0) {
-                            sendData("SOS");
-                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-
-                            SOSBUTTON = 1;
-                            Intent intent = new Intent(getApplicationContext(), SosActivity.class);
-                            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
-                        } else if (SOSBUTTON == 1) {
-                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
-                            /** if (((SosActivity) SosActivity.context).locationinfo != null) {
-                             ((SosActivity) SosActivity.context).locationinfo = "END";
-                             }**/
-                            SOSBUTTON = 0;
-                        }
+//                        Log.d(TAG, "Button4 : SOS BUTTON");
+//                        if (SOSBUTTON == 0) {
+//                            sendData("SOS");
+//                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
+//
+//                            SOSBUTTON = 1;
+//                            Intent intent = new Intent(getApplicationContext(), SosActivity.class);
+//                            startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+//
+//                        } else if (SOSBUTTON == 1) {
+//                            Log.d(TAG, "Button4 : SOS BUTTON" + SOSBUTTON);
+//                            /** if (((SosActivity) SosActivity.context).locationinfo != null) {
+//                             ((SosActivity) SosActivity.context).locationinfo = "END";
+//                             }**/
+//                            SOSBUTTON = 0;
+//                        }
+                        Intent intent = new Intent(getApplicationContext(), DisplayInfo.class);
+                        intent.putExtra("json", why);
+                        startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }
                     // User info Tap
                     if (x < 20 * mCenterX / 15f + 30 && x > 20 * mCenterX / 15f - 30 && y < 2 * 2 * mCenterY / 8f + 30 && y > 2 * mCenterY / 8f - 30) {
@@ -686,7 +688,6 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         //Log.d(TAG, "Button1 : UserInfo");
                         //Intent intent = new Intent(getApplicationContext(), MyActivity.class);
                         Intent intent = new Intent(getApplicationContext(), NewMainActivity.class);
-                        intent.putExtra("json", why);
                         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                     }
                     // Message Tap
@@ -704,7 +705,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         Rightnum++;
                         sendData(message);
 
-                        Log.d("AnalogComplicationWatchfaceservice", "RIGHT");
+//                        Log.d("AnalogComplicationWatchfaceservice", "RIGHT");
                     }
                     if (x < 199 && y < 230 && y > 180) {
                         checking = 1;
@@ -713,7 +714,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         sendData(message);
 
 
-                        Log.d("AnalogCOmplicationWatchfaceservice", "Left");
+//                        Log.d("AnalogCOmplicationWatchfaceservice", "Left");
                     }
             }
         }
@@ -746,7 +747,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
-            Log.d(TAG, "onAmbientModeChanged: " + inAmbientMode);
+//            Log.d(TAG, "onAmbientModeChanged: " + inAmbientMode);
 
             mAmbient = inAmbientMode;
             if (mLowBitAmbient) {
@@ -797,7 +798,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 mTickAndCirclePaint.clearShadowLayer();
 
             } else {
-                Log.d("AnalogComplicaationwatchfaceservice", "color is here00");
+//                Log.d("AnalogComplicaationwatchfaceservice", "color is here00");
                 mBackgroundPaint.setColor(mBackgroundColor);
 
                 mHourPaint.setColor(mWatchHandAndComplicationsColor);
@@ -912,7 +913,6 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "onApplyWindowInsets: " + (insets.isRound() ? "round" : "square"));
             }
             super.onApplyWindowInsets(insets);
 
@@ -987,12 +987,12 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 e.printStackTrace();
             }
 
-            Log.d("Parsing Name", name);
-            Log.d("Parsing Group", group);
+//            Log.d("Parsing Name", name);
+//            Log.d("Parsing Group", group);
 
             long now = System.currentTimeMillis();
             mCalendar.setTimeInMillis(now);
-            Log.d("onDraw", String.valueOf(canvas));
+//            Log.d("onDraw", String.valueOf(canvas));
             drawBackground(canvas);
             drawComplications(canvas, now);
             drawUnreadNotificationIcon(canvas);
@@ -1003,11 +1003,11 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             if (conwifi != null && conwifi.isConnectedOrConnecting()) {
                 switch (conwifi.getType()) {
                     case ConnectivityManager.TYPE_MOBILE:
-                        Log.d(TAG, "3G");
+//                        Log.d(TAG, "3G");
                         checkingLTE = 1;
                         break;
                     case ConnectivityManager.TYPE_WIFI:
-                        Log.d(TAG, "WIFI");
+//                        Log.d(TAG, "WIFI");
                         checkingwifi = 1;
                         break;
                     default:
@@ -1016,16 +1016,16 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 }
 
             } else {
-                Log.d(TAG, "WIFI no connected");
+//                Log.d(TAG, "WIFI no connected");
                 checkingwifi = 0;
             }
             //LTE checking
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
             if (telephonyManager.getNetworkType() == TelephonyManager.NETWORK_TYPE_LTE) {
-                Log.d(TAG, "LTE Connected");
+//                Log.d(TAG, "LTE Connected");
                 checkingLTE = 1;
             } else {
-                Log.d(TAG, "LTE no connected");
+//                Log.d(TAG, "LTE no connected");
                 checkingLTE = 0;
             }
             mDate.setTime(now);
@@ -1064,7 +1064,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             x += mColonWidth;
             if (checkingwifi == 1) {
                 canvas.drawBitmap(wifion, 130f, 30f, null);
-                Log.d("wifion ", "wifion");
+//                Log.d("wifion ", "wifion");
             }
             if (checkingwifi == 0)
                 canvas.drawBitmap(wifioff, 130f, 30f, null);
@@ -1293,7 +1293,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                 // the user actually makes a change to the highlight color, not when the watch goes
                 // in and out of ambient mode.
                 setComplicationsActiveAndAmbientColors(mWatchHandHighlightColor);
-                Log.d("AnalogComplicationWatchFaceService", "this is where changes the color");
+//                Log.d("AnalogComplicationWatchFaceService", "this is where changes the color");
                 updateWatchPaintStyles();
 
                 registerReceiver();
@@ -1310,7 +1310,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
         @Override
         public void onUnreadCountChanged(int count) {
-            Log.d(TAG, "onUnreadCountChanged(): " + count);
+//            Log.d(TAG, "onUnreadCountChanged(): " + count);
 
             if (mUnreadNotificationsPreference) {
 
@@ -1359,7 +1359,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         private void sendData(String message) {
             PutDataMapRequest dataMap = PutDataMapRequest.create(datapath);
             dataMap.getDataMap().putString("message", message);
-            Log.d("WEARABLE STUFF", dataMap.getDataMap().getString("message"));
+//            Log.d("WEARABLE STUFF", dataMap.getDataMap().getString("message"));
             PutDataRequest request = dataMap.asPutDataRequest();
             request.setUrgent();
 
@@ -1368,13 +1368,13 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                     .addOnSuccessListener(new OnSuccessListener<DataItem>() {
                         @Override
                         public void onSuccess(DataItem dataItem) {
-                            Log.d(TAG, "Sending message was successful: " + dataItem);
+//                            Log.d(TAG, "Sending message was successful: " + dataItem);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.e(TAG, "Sending message failed: " + e);
+//                            Log.e(TAG, "Sending message failed: " + e);
                         }
                     })
             ;
@@ -1385,25 +1385,20 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 
 
     class RequestThread extends Thread {
-        public String urlStr = "http://15.164.45.229:8888/users/MDg6OTc6OTg6MEU6RTY6REE=";
+        public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
         Handler handler = new Handler();
 
         @Override
         public void run() {
             try {
                 URL url = new URL(urlStr);
-                Log.d("hI", String.valueOf(url));
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn != null) {
                     conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
                     conn.setRequestMethod("GET");
-                    Log.d("hI", String.valueOf(url));
                     conn.setDoInput(true);
 
-
                     int resCode = conn.getResponseCode();
-                    Log.d("hi", String.valueOf(resCode));
-                    Log.d("hi", String.valueOf(HttpURLConnection.HTTP_OK));
 
                     if (resCode == HttpURLConnection.HTTP_OK) {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -1442,6 +1437,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         e.printStackTrace();
                     }
                     why = temp;
+                    //Log.e("Json",why);
                 }
             });
         }

@@ -51,6 +51,7 @@ public class NewMainActivity extends Activity {
     String skin;
     String protective;
     String maxHeartRate;
+    String MAIN_TAG = "NEW MAIN";
 
     private LocationListener locationListener;
     private LocationManager locationManager;
@@ -58,6 +59,7 @@ public class NewMainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(MAIN_TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newmainpage);
         bindService(new Intent(NewMainActivity.this, BackService.class),mConnection, Context.BIND_AUTO_CREATE);
@@ -88,67 +90,64 @@ public class NewMainActivity extends Activity {
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
         }
-        public void LocationFind(){
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            locationListener = new LocationListener() {
-
-                @Override
-                public void onLocationChanged(Location location) {
-
-                    Log.d("dd",String.valueOf(Math.round(location.getLatitude()*100)/100));
-                    //sendMsgToActivity(Math.round(location.getLongitude()*100)/100 ,"LANGI");
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-
-                }
-            };
-            configureButton();
-
-        }
-    public void configureButton() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
-
-    }
+//        public void LocationFind(){
+//            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+//            locationListener = new LocationListener() {
+//
+//                @Override
+//                public void onLocationChanged(Location location) {
+//
+//                    Log.d("dd",String.valueOf(Math.round(location.getLatitude()*100)/100));
+//                    //sendMsgToActivity(Math.round(location.getLongitude()*100)/100 ,"LANGI");
+//                }
+//
+//                @Override
+//                public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//                }
+//
+//                @Override
+//                public void onProviderEnabled(String provider) {
+//
+//                }
+//
+//                @Override
+//                public void onProviderDisabled(String provider) {
+//
+//                }
+//            };
+//            configureButton();
+//
+//        }
+//    public void configureButton() {
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+//
+//    }
     private Messenger mServiceMessenger =null;
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.d("test","onServiceConnected!!!!!!!!1");
             mServiceMessenger = new Messenger(iBinder);
             try {
                 Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
                 msg.replyTo = mMessenger;
-                Log.d("test","onServiceConnected!!!!!!!!1!1111");
-
+                Log.d(MAIN_TAG,"onServiceConnected");
                 mServiceMessenger.send(msg);
             }
             catch (RemoteException e) {
             }
         }
-
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
         }
@@ -225,7 +224,7 @@ public class NewMainActivity extends Activity {
                         double calorytemp=Math.round((steptemp*388/10000)*100)/100;
                         TextView calory=findViewById(R.id.CaloriesValue);
                         calory.setText(String.valueOf((int)calorytemp));
-                        LocationFind();
+                        //LocationFind();
                         //secondText.setText(second);
                     }
                 });
@@ -239,7 +238,7 @@ public class NewMainActivity extends Activity {
     }
 
     class RequestThread extends Thread {
-        public String urlStr = "http://15.164.45.229:8888/users/MDg6OTc6OTg6MEU6RTY6REE=";
+        public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
         Handler handler = new Handler();
 
         @Override
@@ -264,6 +263,7 @@ public class NewMainActivity extends Activity {
                             println(line);
                         }
                         reader.close();
+
                     }
                     conn.disconnect();
                 }
@@ -288,6 +288,7 @@ public class NewMainActivity extends Activity {
                         e.printStackTrace();
                     }
                     jsonInput = temp;
+                    Log.e(MAIN_TAG, jsonInput);
                 }
             });
         }
