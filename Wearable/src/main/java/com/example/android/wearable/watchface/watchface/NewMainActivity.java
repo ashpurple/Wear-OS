@@ -152,6 +152,7 @@ public class NewMainActivity extends Activity {
         public void onServiceDisconnected(ComponentName componentName) {
         }
     };
+
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -163,10 +164,11 @@ public class NewMainActivity extends Activity {
             return false;
         }
     }));
+
     @Override
     protected void onStart() {
-        super.onStart();
-        updateInfo();
+            super.onStart();
+            updateInfo();
     }
 
     @Override
