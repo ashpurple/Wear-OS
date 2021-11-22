@@ -26,9 +26,7 @@ public class AES256s {
 		if(length > 32) {
 			return key.substring(0, 32);
 		}
-		System.out.println("length : " + length);
 		int mod = (length % 32);
-		System.out.println("mod : " + mod);
 		
 		if(mod==0) {
 			return key;
@@ -77,7 +75,6 @@ public class AES256s {
 		try {
 			String key = getKey(duid);
 			SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes(AES256s.CHARSET), AES256s.ALGORITHM);
-			System.out.println(skeySpec);
 			Cipher cipher = Cipher.getInstance(AES256s.TRANSFORMATION);
 			
 			byte[] ivBytes = key.substring(0, 16).getBytes(AES256s.CHARSET);
@@ -232,10 +229,9 @@ public class AES256s {
 //		String duid = "08:97:98:0E:E6:DA";
 		String duid = "3ww4lqOTSX2D1e1q123oO1R6SUQ=";
 		String str = "인코딩 필요";
+
 		String key = getKey(duid);
-		System.out.println(key);
 		String aaa = encrypt(str, duid);
-		System.out.println(aaa);
 //		System.out.println(decrypt(encrypted, key));
 	}
 }

@@ -382,21 +382,21 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
             }
             return result;
         }
-        public void init(){
-            try {
-
+//        public void init(){
+//            try {
+//
 //                Log.d("ww","ww");
-                SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"y");
-                BackService.start_handler = true;
-                startService(new Intent(getApplicationContext(), BackService.class));
-
-
-
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+//                SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"y");
+//                BackService.start_handler = true;
+//                startService(new Intent(getApplicationContext(), BackService.class));
+//
+//
+//
+//
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+//        }
         @Override
         public void onCreate(SurfaceHolder holder) {
 //            Log.d(TAG, "onCreate");
