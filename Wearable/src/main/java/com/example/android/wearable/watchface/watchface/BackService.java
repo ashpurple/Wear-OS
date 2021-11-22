@@ -49,9 +49,8 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
     public static boolean start_handler = true;
     public static SpeechRecognizer speech = null;
-    public Intent recognizerIntent;
-    public String LOG_TAG = "VoiceRecognitionActivity";
 
+    private final String[] permissions = new String[]{Manifest.permission.BODY_SENSORS};
     //SENSOR MANAGER STUFF
     private Messenger mClient=null;
     public static final int MSG_REGISTER_CLIENT = 1;
@@ -64,8 +63,40 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private FusedLocationProviderClient fusedLocationClient;
 
     @Override
+    public void onCreate() {
+        Log.e(SENSOR_TAG, "onCreate");
+        Log.d(SENSOR_TAG,"Permission "+ permissionsGranted());
+        //Sensor Manager shit
+        sensorManager = getSystemService(SensorManager.class); // sensor (heart rate, step)
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE); // location (gps)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        if (!hasGps()) {
+//            Log.e(LOCATION_TAG, "This hardware doesn't have GPS.");
+//            // Fall back to functionality that does not use location or
+//            // warn the user that location function is not available.
+//        }
+        startSensors();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.e(LOCATION_TAG, "Location Permission Fail");
+        } else{
+            Log.e(LOCATION_TAG, "Location Permission Success");
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+        }
+        //getLocation();
+        handler = new Handler();
+        runnable = new Runnable() {
+            public void run() {
+                handler.postDelayed(runnable, 5000);
+            }
+        };
+        handler.postDelayed(runnable, 1000);
+        super.onCreate();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(SENSOR_TAG, "onStartCommand");
+        Log.d(SENSOR_TAG,"Permission "+ permissionsGranted());
         //Sensor Manager shit
         sensorManager = getSystemService(SensorManager.class); // sensor (heart rate, step)
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE); // location (gps)
@@ -94,6 +125,17 @@ public class BackService extends Service implements SensorEventListener, Locatio
         return START_STICKY;
     }
 
+    private boolean permissionsGranted() {
+        boolean result = true;
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), permission) != PackageManager.PERMISSION_GRANTED) {
+                result = false;
+
+            }
+        }
+        return result;
+    }
+
     @Override
     public boolean stopService(Intent name) {
         Log.e(SENSOR_TAG, "Stop Service");
@@ -106,7 +148,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
     @Override
     public IBinder onBind(Intent intent) {
-
         return mMessenger.getBinder();
     }
 

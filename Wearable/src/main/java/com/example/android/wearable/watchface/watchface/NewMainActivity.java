@@ -1,37 +1,30 @@
 package com.example.android.wearable.watchface.watchface;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+
 import com.example.android.wearable.watchface.R;
 import org.json.JSONException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Calendar;
 
 public class NewMainActivity extends Activity {
     String jsonInput = "";
@@ -41,8 +34,8 @@ public class NewMainActivity extends Activity {
     TextView monthDayText;
     TextView amPmText;
 
-    TextView heartrate;
-    public float hearttemp=0,locationtemp=0,steptemp=0;
+    TextView heartRate;
+    public float heartTemp =0,locationtemp=0, stepTemp =0;
     UserInfo userInfo;
     JsonParser jsonParser;
     String name;
@@ -57,12 +50,39 @@ public class NewMainActivity extends Activity {
     private LocationManager locationManager;
     Time time;
 
+    /* Service Binding */
+    boolean isServiced = false;
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Messenger mServiceMessenger = new Messenger(iBinder);
+            try {
+                Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
+                msg.replyTo = mMessenger;
+                mServiceMessenger.send(msg);
+                isServiced = true;
+                Log.d(MAIN_TAG,"onServiceConnected Success");
+            }
+            catch (RemoteException e) {
+                Log.e(MAIN_TAG,"onServiceConnected Fail");
+            }
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isServiced= false;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.e(MAIN_TAG, "onCreate");
+        // ContextCompat.checkSelfPermission(); // ->권한 확인
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newmainpage);
-        bindService(new Intent(NewMainActivity.this, BackService.class),mConnection, Context.BIND_AUTO_CREATE);
+        // Starts Service Binding
+        Intent intent = new Intent(NewMainActivity.this, BackService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        //getApplicationContext().bindService(new Intent(NewMainActivity.this, BackService.class), mConnection, Context.BIND_AUTO_CREATE);
 
         /* Text Views */
         userText = (TextView) findViewById(R.id.Name);
@@ -89,7 +109,8 @@ public class NewMainActivity extends Activity {
         protective = userInfo.getProtective();
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
-        }
+
+    }
 //        public void LocationFind(){
 //            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 //            locationListener = new LocationListener() {
@@ -133,34 +154,17 @@ public class NewMainActivity extends Activity {
 //        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
 //
 //    }
-    private Messenger mServiceMessenger =null;
-    private ServiceConnection mConnection = new ServiceConnection() {
 
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mServiceMessenger = new Messenger(iBinder);
-            try {
-                Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
-                msg.replyTo = mMessenger;
-                Log.d(MAIN_TAG,"onServiceConnected");
-                mServiceMessenger.send(msg);
-            }
-            catch (RemoteException e) {
-            }
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-        }
-    };
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
+            Log.d(MAIN_TAG,"Messenger handler");
             if(msg.getData().getFloat("HEART")!=0){
-                hearttemp = msg.getData().getFloat("HEART");}
+                heartTemp = msg.getData().getFloat("HEART");}
 
             if(msg.getData().getFloat("STEP")!=0){
-                steptemp = msg.getData().getFloat("STEP");}
+                stepTemp = msg.getData().getFloat("STEP");}
             return false;
         }
     }));
@@ -216,14 +220,14 @@ public class NewMainActivity extends Activity {
                     @Override
                     public void run() {
                         setTime();
-                        heartrate=findViewById(R.id.HeartRateValue);
-                        heartrate.setText(String.valueOf((int)hearttemp));
+                        heartRate =findViewById(R.id.HeartRateValue);
+                        heartRate.setText(String.valueOf((int) heartTemp));
                         TextView step=findViewById(R.id.StepValue);
-                        step.setText(String.valueOf((int)steptemp));
-                        double distancetemp=steptemp*0.5;
+                        step.setText(String.valueOf((int) stepTemp));
+                        double distancetemp= stepTemp *0.5;
                         TextView distance=findViewById(R.id.DistanceValue);
                         distance.setText((int)distancetemp+"m");
-                        double calorytemp=Math.round((steptemp*388/10000)*100)/100;
+                        double calorytemp=Math.round((stepTemp *388/10000)*100)/100;
                         TextView calory=findViewById(R.id.CaloriesValue);
                         calory.setText(String.valueOf((int)calorytemp));
                         //LocationFind();

@@ -6,8 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,11 +16,9 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends WearableActivity {
     private static final int REQUEST_RECORD_PERMISSION = 100;
-    private final static String TAG = MainActivity.class.getSimpleName();
+    private final static String TAG = "MAIN";
 
     private final static String[] permissions = new String[]{Manifest.permission.BODY_SENSORS};
-
-    TextView start_service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +26,7 @@ public class MainActivity extends WearableActivity {
 
         // If we already have all the permissions start immediately, otherwise request permissions
         if (permissionsGranted()) {
-            init();
+            //init();
         } else {
             Log.d(TAG, "Requesting permissions");
             ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_PERMISSION);
@@ -55,17 +51,12 @@ public class MainActivity extends WearableActivity {
 
     public void init(){
         try {
-
-
-            Log.d("ww","ww");
+            Log.d(TAG,"INIT");
             SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"y");
             BackService.start_handler = true;
             startService(new Intent(MainActivity.this, BackService.class));
-
-
-
-
         }catch (Exception e){
+            Log.d(TAG,"INIT Fail");
             e.printStackTrace();
         }
     }
