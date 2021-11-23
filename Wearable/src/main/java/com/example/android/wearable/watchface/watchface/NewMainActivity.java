@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
@@ -26,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.android.wearable.watchface.R;
 import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -121,6 +121,8 @@ public class NewMainActivity extends Activity {
         time = new Time();
         RequestThread requestThread = new RequestThread();
         requestThread.start();
+        PostWearThread postWearThread = new PostWearThread();
+        postWearThread.start();
         TimeThread timeThread = new TimeThread();
         timeThread.start();
 
@@ -290,64 +292,79 @@ public class NewMainActivity extends Activity {
         }
     }
 
-    class postThread extends Thread {
-        public String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
+    class PostWearThread extends Thread {
         Handler handler = new Handler();
         @Override
         public void run() {
-            Log.e(MAIN_TAG, "RUN");
+            Log.e(MAIN_TAG, "POST RUN");
             try {
                 while(true) {
+                    String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
+                    if(heartTemp == 0){
+                        Log.e(MAIN_TAG, "OFF");
+                        urlStr += "off";
+                    } else{
+                        Log.e(MAIN_TAG, "ON");
+                        urlStr += "on";
+                    }
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
                         conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
                         conn.setRequestMethod("POST");
                         conn.setDoInput(true);
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("Content-Type","application/json");
+                        conn.setRequestProperty("Accept","application/json");
+                        Log.e(MAIN_TAG, "POST REQUEST");
                         int resCode = conn.getResponseCode();
-                        if (resCode == HttpURLConnection.HTTP_OK) {
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                            String line = null;
-                            while (true) {
-                                line = reader.readLine();
-                                if (line == null)
-                                    break;
-                                decrypt(line);
-                            }
-                            reader.close();
-                        }
                         conn.disconnect();
-
                     }
                     sleep(5000); // delay value
                     handler.post(this);
                 }
             } catch (Exception e) {
-                Log.e(MAIN_TAG, "HTTP Request error");
+                Log.e(MAIN_TAG, "POST Request error");
                 e.printStackTrace();
             }
         }
-        public void decrypt(final String data) {
-            Log.e(MAIN_TAG, "DECRYPT");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    String temp = "";
-                    int temp2 = 0;
-                    try {
-                        for (int i = 0; i < data.length(); i++) {
-                            if (data.charAt(i) == ':')
-                                temp2 = i;
-                        }
-                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
-                    } catch (Exception e) {
-                        e.printStackTrace();
+    }
+
+    class PostSensorThread extends Thread {
+        Handler handler = new Handler();
+        @Override
+        public void run() {
+            Log.e(MAIN_TAG, "POST RUN");
+            try {
+                while(true) {
+                    String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos/";
+                    if(heartTemp == 0){
+                        Log.e(MAIN_TAG, "OFF");
+                        urlStr += "off";
+                    } else{
+                        Log.e(MAIN_TAG, "ON");
+                        urlStr += "on";
                     }
-                    jsonInput = temp;
-                    updateInfo();
-                    Log.e(MAIN_TAG, jsonInput);
+                    URL url = new URL(urlStr);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    if (conn != null) {
+                        conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
+                        conn.setRequestMethod("POST");
+                        conn.setDoInput(true);
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("Content-Type","application/json");
+                        conn.setRequestProperty("Accept","application/json");
+                        Log.e(MAIN_TAG, "POST REQUEST");
+                        int resCode = conn.getResponseCode();
+                        conn.disconnect();
+                    }
+                    sleep(5000); // delay value
+                    handler.post(this);
                 }
-            });
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "POST Request error");
+                e.printStackTrace();
+            }
         }
     }
 
