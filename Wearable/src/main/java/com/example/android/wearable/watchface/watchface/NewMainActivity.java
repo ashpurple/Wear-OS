@@ -26,13 +26,20 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.android.wearable.watchface.R;
+
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +66,7 @@ public class NewMainActivity extends Activity {
     Button scanning;
 
     public float heartTemp = 0, stepTemp = 0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
+    public float distance, calorie;
     UserInfo userInfo;
     JsonParser jsonParser;
     String name;
@@ -129,6 +137,8 @@ public class NewMainActivity extends Activity {
         getInfoThread.start();
         PostWearThread postWearThread = new PostWearThread();
         postWearThread.start();
+        PostSensorThread postSensorThread= new PostSensorThread();
+        postSensorThread.start();
         TimeThread timeThread = new TimeThread();
         timeThread.start();
 
@@ -225,9 +235,9 @@ public class NewMainActivity extends Activity {
                         setTime();
                         heartText.setText(String.valueOf((int) heartTemp));
                         stepText.setText(String.valueOf((int) stepTemp));
-                        double distance= stepTemp *0.5;
+                        distance = (float) (stepTemp * 0.5);
                         distanceText.setText((int)distance+"m");
-                        double calorie=Math.round((stepTemp *388/10000)*100)/100;
+                        calorie = Math.round((stepTemp *388/10000)*100)/100;
                         calorieText.setText(String.valueOf((int)calorie));
                         int intLatitude = (int)latitude;
                         int intLongitude = (int)longitude;
@@ -350,15 +360,15 @@ public class NewMainActivity extends Activity {
     }
 
     class PostSensorThread extends Thread {
+        String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos";
         Handler handler = new Handler();
         @Override
         public void run() {
             Log.e(MAIN_TAG, "SENSOR POST RUN");
             try {
                 while(true) {
-                    String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos/";
-                    String json = "";
-
+                    int sec = 60000;
+                    sleep(sec); // delay value
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
@@ -369,29 +379,32 @@ public class NewMainActivity extends Activity {
                         conn.setRequestProperty("Content-Type","application/json");
                         conn.setRequestProperty("Accept","application/json");
 
-                        OutputStream os = conn.getOutputStream();
-                        os.write(json.getBytes("euc-kr"));
-                        os.flush();
+                        JsonBuilder jsonBuilder = new JsonBuilder();
+//                        JSONObject jsonObj = jsonBuilder.getHRM(heartTemp); // heart
+//                        JSONObject jsonObj = jsonBuilder.getPedometer((int)stepTemp, (int)calorie, (int)distance); // step
+                        JSONObject jsonObj = jsonBuilder.getGPS(latitude, longitude); // gps
 
-                        /* Read */
+                        /* Body Write */
+                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+                        bw.write(jsonObj.toString());
+                        Log.e(MAIN_TAG,"JSON : "+jsonObj.toString());
+                        //Log.e(MAIN_TAG,"ENCRYPT : "+input);
+                        bw.flush();
+                        bw.close();
+
+                        /* Result Read */
+                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        String returnMsg = in.readLine();
+                        Log.e(MAIN_TAG, "Return Msg = "+returnMsg);
+
+                        /* Response Code */
                         int resCode = conn.getResponseCode();
                         if (resCode == HttpURLConnection.HTTP_OK) {
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                            String line = null;
-                            while (true) {
-                                line = reader.readLine();
-                                if (line == null)
-                                    break;
-                                decrypt(line);
-                            }
-                            reader.close();
-                        }
-
-                        Log.e(MAIN_TAG, "SENSOR POST REQUEST");
+                        } else { Log.e(MAIN_TAG, "RESPONSE CODE ERROR");}
 
                         conn.disconnect();
                     }
-                    sleep(5000); // delay value
+
                     handler.post(this);
                 }
             } catch (Exception e) {
@@ -399,42 +412,15 @@ public class NewMainActivity extends Activity {
                 e.printStackTrace();
             }
         }
-        public void decrypt(final String data) {
-            Log.e(MAIN_TAG, "SENSOR POST DECRYPT");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    String temp = "";
-                    int temp2 = 0;
-                    try {
-                        for (int i = 0; i < data.length(); i++) {
-                            if (data.charAt(i) == ':')
-                                temp2 = i;
-                        }
-                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    Log.e(MAIN_TAG, "Request Result:" + temp);
-                }
-            });
-        }
         public String encrypt(final String data) {
-            final String[] code = {""};
-            Log.e(MAIN_TAG, "SENSOR POST ENCRYPT");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    int temp2 = 0;
-                    try {
-                        code[0] = AES256s.encrypt(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    Log.e(MAIN_TAG, "Encrypt Result:" + code[0]);
-                }
-            });
-            return code[0];
+            String encrypted = "";
+            //Log.e(MAIN_TAG, "SENSOR POST ENCRYPT");
+            try {
+                encrypted = AES256s.encrypt(data, "08:97:98:0E:E6:DA");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return encrypted;
         }
     }
 
