@@ -29,8 +29,6 @@ import com.example.android.wearable.watchface.R;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -124,8 +122,8 @@ public class NewMainActivity extends Activity {
 
         /* Threads */
         time = new Time();
-        RequestThread requestThread = new RequestThread();
-        requestThread.start();
+        GetInfoThread getInfoThread = new GetInfoThread();
+        getInfoThread.start();
         PostWearThread postWearThread = new PostWearThread();
         postWearThread.start();
         TimeThread timeThread = new TimeThread();
@@ -243,7 +241,7 @@ public class NewMainActivity extends Activity {
         }
     }
 
-    class RequestThread extends Thread {
+    class GetInfoThread extends Thread {
         public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
         Handler handler = new Handler();
         @Override
@@ -352,13 +350,7 @@ public class NewMainActivity extends Activity {
                 while(true) {
                     String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos/";
                     String json = "";
-                    if(heartTemp == 0){
-                        Log.e(MAIN_TAG, "OFF");
-                        urlStr += "off";
-                    } else{
-                        Log.e(MAIN_TAG, "ON");
-                        urlStr += "on";
-                    }
+
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
