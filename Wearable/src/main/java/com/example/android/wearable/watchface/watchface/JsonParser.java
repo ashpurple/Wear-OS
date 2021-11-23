@@ -30,10 +30,10 @@ public class JsonParser {
             userInfo.setOnOff(obj.getString("onOff"));
             userInfo.setIntervalSec(obj.getString("intervalSec"));
             userInfo.setDurationSec(obj.getString("durationSec"));
-            userInfo.setTimerMillis(obj.getString("timerMillis"));
+            userInfo.setTimerMillis(obj.getString("timeMillis")); // 값 변경 이슈
             userInfo.setLoopCount(obj.getString("loopCount"));
             userInfo.setTmrGbn(obj.getString("tmrGbn"));
-            userInfo.setMemo(obj.getString("mem"));
+            //userInfo.setMemo(obj.getString("memo")); // 값 변경 이슈
             userInfo.setStartDt(obj.getString("startDt"));
             userInfo.setEndDt(obj.getString("endDt"));
             //Log.d("Parser",userInfo.getTimerMillis());
