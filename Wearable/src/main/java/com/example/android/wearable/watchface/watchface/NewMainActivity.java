@@ -17,6 +17,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -51,7 +53,7 @@ public class NewMainActivity extends Activity {
     TextView gpsText;
     TextView fatigueText;
     TextView stressText;
-
+    Button scanning;
     public float heartTemp =0, stepTemp =0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
     UserInfo userInfo;
     JsonParser jsonParser;
@@ -108,7 +110,7 @@ public class NewMainActivity extends Activity {
         secondText = (TextView) findViewById(R.id.Second);
         monthDayText = (TextView) findViewById(R.id.MonthDay);
         amPmText = (TextView) findViewById(R.id.AMPM);
-
+        scanning=(Button)findViewById(R.id.button);
         heartText =findViewById(R.id.HeartRateValue);
         stepText=findViewById(R.id.StepValue);
         distanceText=findViewById(R.id.DistanceValue);
@@ -137,7 +139,14 @@ public class NewMainActivity extends Activity {
         protective = userInfo.getProtective();
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
+        scanning.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+             Intent intent=new Intent(getApplicationContext(),BeaconActivity.class);
+             startActivity(intent);
+            }
 
+        });
     }
 
 
