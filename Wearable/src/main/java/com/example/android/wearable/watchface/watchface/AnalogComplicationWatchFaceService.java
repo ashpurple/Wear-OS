@@ -399,16 +399,8 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 //        }
         @Override
         public void onCreate(SurfaceHolder holder) {
-//            Log.d(TAG, "onCreate");
-//            Log.d("on", "on");
             super.onCreate(holder);
-            startActivity(new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
-/**
-            SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"n");
-            BackService.start_handler = false;
-            stopService(intent);**/
-//            Log.e("Service started","serviceSTarted");
+            //startActivity(new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
             context = getApplicationContext();
             mDate = new Date();
