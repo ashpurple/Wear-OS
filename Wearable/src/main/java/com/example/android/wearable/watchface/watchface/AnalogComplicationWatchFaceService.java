@@ -354,6 +354,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         }
 
         // Handler to update the time once a second in interactive mode.
+        @SuppressLint("HandlerLeak")
         private final Handler mUpdateTimeHandler =
                 new Handler() {
                     @Override
@@ -399,16 +400,8 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
 //        }
         @Override
         public void onCreate(SurfaceHolder holder) {
-//            Log.d(TAG, "onCreate");
-//            Log.d("on", "on");
             super.onCreate(holder);
-            startActivity(new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
-/**
-            SharedPreference.setPreference(getApplicationContext(),SERVICE_HANDLER,"n");
-            BackService.start_handler = false;
-            stopService(intent);**/
-//            Log.e("Service started","serviceSTarted");
+            //startActivity(new Intent(getApplicationContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
             context = getApplicationContext();
             mDate = new Date();
@@ -1419,6 +1412,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         }
 
         public void println(final String data) {
+
             handler.post(new Runnable() {
                 @Override
 
@@ -1437,7 +1431,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         e.printStackTrace();
                     }
                     why = temp;
-                    //Log.e("Json",why);
+                    Log.e("Json",why);
                 }
             });
         }

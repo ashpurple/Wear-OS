@@ -18,16 +18,20 @@ public class MainActivity extends WearableActivity {
     private static final int REQUEST_RECORD_PERMISSION = 100;
     private final static String TAG = "MAIN";
 
-    private final static String[] permissions = new String[]{Manifest.permission.BODY_SENSORS};
+    private final static String[] permissions = new String[]
+            {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "MAIN Create");
 
         // If we already have all the permissions start immediately, otherwise request permissions
         if (permissionsGranted()) {
+            Log.e(TAG, "All Permissions OK");
             //init();
         } else {
+            Log.e(TAG, "Permission needed upadate");
             Log.d(TAG, "Requesting permissions");
             ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_PERMISSION);
         }

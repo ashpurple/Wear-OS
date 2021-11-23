@@ -5,6 +5,10 @@
 
     <uses-feature android:name="android.hardware.type.watch" /> <!-- Required to act as a custom watch face. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -119,6 +123,11 @@
         <activity android:name=".watchface.MyActivity" />
         <activity android:name=".watchface.SosActivity" />
         <activity android:name=".watchface.SimpleList" />
+        <activity android:name=".watchface.AdvertiseActivity"
+            android:theme="@style/Theme.AppCompat"/>
+
+        <activity android:name=".watchface.BeaconActivity"
+            android:theme="@style/Theme.AppCompat"/>
         <activity android:name="android.support.wearable.complications.ComplicationHelperActivity" />
         <activity
             android:name=".config.AnalogComplicationConfigActivity"
