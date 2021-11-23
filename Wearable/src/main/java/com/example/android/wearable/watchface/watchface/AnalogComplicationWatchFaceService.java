@@ -354,6 +354,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         }
 
         // Handler to update the time once a second in interactive mode.
+        @SuppressLint("HandlerLeak")
         private final Handler mUpdateTimeHandler =
                 new Handler() {
                     @Override
@@ -1411,6 +1412,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
         }
 
         public void println(final String data) {
+
             handler.post(new Runnable() {
                 @Override
 
@@ -1429,7 +1431,7 @@ public class AnalogComplicationWatchFaceService extends CanvasWatchFaceService i
                         e.printStackTrace();
                     }
                     why = temp;
-                    //Log.e("Json",why);
+                    Log.e("Json",why);
                 }
             });
         }

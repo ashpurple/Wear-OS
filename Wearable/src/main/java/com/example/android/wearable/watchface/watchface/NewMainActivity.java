@@ -13,12 +13,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -197,6 +197,7 @@ public class NewMainActivity extends Activity {
         else
             amPmText.setText("PM");
     }
+
     /* Threads */
     class TimeThread extends Thread{
         @Override
@@ -233,36 +234,40 @@ public class NewMainActivity extends Activity {
         Handler handler = new Handler();
         @Override
         public void run() {
+            Log.e(MAIN_TAG, "RUN");
             try {
-                URL url = new URL(urlStr);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                if (conn != null) {
-                    conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
-                    conn.setRequestMethod("GET");
-                    conn.setDoInput(true);
-
-                    int resCode = conn.getResponseCode();
-
-                    if (resCode == HttpURLConnection.HTTP_OK) {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                        String line = null;
-                        while (true) {
-                            line = reader.readLine();
-                            if (line == null)
-                                break;
-                            println(line);
+                while(true) {
+                    URL url = new URL(urlStr);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    if (conn != null) {
+                        conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
+                        conn.setRequestMethod("GET");
+                        conn.setDoInput(true);
+                        int resCode = conn.getResponseCode();
+                        if (resCode == HttpURLConnection.HTTP_OK) {
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                            String line = null;
+                            while (true) {
+                                line = reader.readLine();
+                                if (line == null)
+                                    break;
+                                decrypt(line);
+                            }
+                            reader.close();
                         }
-                        reader.close();
+                        conn.disconnect();
 
                     }
-                    conn.disconnect();
+                    sleep(5000); // delay value
+                    handler.post(this);
                 }
             } catch (Exception e) {
+                Log.e(MAIN_TAG, "HTTP Request error");
                 e.printStackTrace();
             }
         }
-
-        public void println(final String data) {
+        public void decrypt(final String data) {
+            Log.e(MAIN_TAG, "DECRYPT");
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -278,11 +283,74 @@ public class NewMainActivity extends Activity {
                         e.printStackTrace();
                     }
                     jsonInput = temp;
+                    updateInfo();
                     Log.e(MAIN_TAG, jsonInput);
                 }
             });
         }
     }
+
+    class postThread extends Thread {
+        public String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
+        Handler handler = new Handler();
+        @Override
+        public void run() {
+            Log.e(MAIN_TAG, "RUN");
+            try {
+                while(true) {
+                    URL url = new URL(urlStr);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    if (conn != null) {
+                        conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
+                        conn.setRequestMethod("POST");
+                        conn.setDoInput(true);
+                        int resCode = conn.getResponseCode();
+                        if (resCode == HttpURLConnection.HTTP_OK) {
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                            String line = null;
+                            while (true) {
+                                line = reader.readLine();
+                                if (line == null)
+                                    break;
+                                decrypt(line);
+                            }
+                            reader.close();
+                        }
+                        conn.disconnect();
+
+                    }
+                    sleep(5000); // delay value
+                    handler.post(this);
+                }
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "HTTP Request error");
+                e.printStackTrace();
+            }
+        }
+        public void decrypt(final String data) {
+            Log.e(MAIN_TAG, "DECRYPT");
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    String temp = "";
+                    int temp2 = 0;
+                    try {
+                        for (int i = 0; i < data.length(); i++) {
+                            if (data.charAt(i) == ':')
+                                temp2 = i;
+                        }
+                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    jsonInput = temp;
+                    updateInfo();
+                    Log.e(MAIN_TAG, jsonInput);
+                }
+            });
+        }
+    }
+
     /* Permissions */
     private void setPermissions(){
         // If we already have all the permissions start immediately, otherwise request permissions
