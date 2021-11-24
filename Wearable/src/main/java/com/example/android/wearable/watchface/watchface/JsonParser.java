@@ -22,22 +22,25 @@ public class JsonParser {
 
             // timerList Array
             JSONArray jsonArray = jsonObject.getJSONArray("timerList");
-            JSONObject obj = jsonArray.getJSONObject(1); // index 1
-            userInfo.setTmrSeq(obj.getString("tmrSeq"));
-            userInfo.setBizId(obj.getString("bizId"));
-            userInfo.setSchSeq(obj.getString("schSeq"));
-            userInfo.setTmrNm(obj.getString("tmrNm"));
-            userInfo.setOnOff(obj.getString("onOff"));
-            userInfo.setIntervalSec(obj.getString("intervalSec"));
-            userInfo.setDurationSec(obj.getString("durationSec"));
-            userInfo.setTimerMillis(obj.getString("timeMillis")); // 값 변경 이슈
-            userInfo.setLoopCount(obj.getString("loopCount"));
-            userInfo.setTmrGbn(obj.getString("tmrGbn"));
-            //userInfo.setMemo(obj.getString("memo")); // 값 변경 이슈
-            userInfo.setStartDt(obj.getString("startDt"));
-            userInfo.setEndDt(obj.getString("endDt"));
-            //Log.d("Parser",userInfo.getTimerMillis());
-            return userInfo; // 여기서 return 안하면 error
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                TimerInfo timerInfo = new TimerInfo();
+                timerInfo.setTmrSeq(obj.getString("tmrSeq"));
+                timerInfo.setBizId(obj.getString("bizId"));
+                timerInfo.setSchSeq(obj.getString("schSeq"));
+                timerInfo.setTmrNm(obj.getString("tmrNm"));
+                timerInfo.setOnOff(obj.getString("onOff"));
+                timerInfo.setIntervalSec(obj.getString("intervalSec"));
+                timerInfo.setDurationSec(obj.getString("durationSec"));
+                timerInfo.setTimerMillis(obj.getString("timeMillis")); // 값 변경 이슈
+                timerInfo.setLoopCount(obj.getString("loopCount"));
+                timerInfo.setTmrGbn(obj.getString("tmrGbn"));
+                //userInfo.setMemo(obj.getString("memo")); // 값 변경 이슈
+                timerInfo.setStartDt(obj.getString("startDt"));
+                timerInfo.setEndDt(obj.getString("endDt"));
+                userInfo.setTimerList(timerInfo);
+            }
+            return userInfo; // return 안하면 error
 
         } catch (JSONException e){
             e.printStackTrace();

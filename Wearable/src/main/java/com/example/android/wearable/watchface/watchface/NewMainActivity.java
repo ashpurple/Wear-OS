@@ -3,10 +3,12 @@ package com.example.android.wearable.watchface.watchface;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -26,13 +28,20 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.android.wearable.watchface.R;
+
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,13 +51,14 @@ public class NewMainActivity extends Activity {
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
 
+    /* Info Text */
     String jsonInput = "";
     TextView userText;
     TextView hourMinuteText;
     TextView secondText;
     TextView monthDayText;
     TextView amPmText;
-
+    /* Sensor Text */
     TextView distanceText;
     TextView heartText;
     TextView stepText;
@@ -56,11 +66,9 @@ public class NewMainActivity extends Activity {
     TextView gpsText;
     TextView fatigueText;
     TextView stressText;
+    /* Buttons */
     Button scanning;
-
-    public float heartTemp = 0, stepTemp = 0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
-    UserInfo userInfo;
-    JsonParser jsonParser;
+    /* Get Info */
     String name;
     String group;
     String birthday;
@@ -68,10 +76,23 @@ public class NewMainActivity extends Activity {
     String protective;
     String maxHeartRate;
     String MAIN_TAG = "NEW MAIN";
-
-    private LocationListener locationListener;
-    private LocationManager locationManager;
+    /* Global variables */
+    public float heartTemp = 0, stepTemp = 0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
+    public float distance, calorie;
+    UserInfo userInfo;
+    ArrayList<TimerInfo> timerList;
+    JsonParser jsonParser;
     Time time;
+    Context mContext;
+    /* Interval variables */
+    int upload_battery = 0;
+    int sensor_battery = 0;
+    int upload_gps = 0;
+    int sensor_gps = 0;
+    int upload_pedometer = 0;
+    int sensor_pedometer = 0;
+    int upload_hrm = 0;
+    int sensor_hrm = 0;
 
     /* Service Binding */
     boolean isServiced = false;
@@ -98,6 +119,7 @@ public class NewMainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mContext = getApplicationContext();
         Log.e(MAIN_TAG, "onCreate");
         setPermissions(); // Permission Check
 
@@ -125,12 +147,19 @@ public class NewMainActivity extends Activity {
 
         /* Threads */
         time = new Time();
+        TimeThread timeThread = new TimeThread();
+        timeThread.start();
+
         GetInfoThread getInfoThread = new GetInfoThread();
         getInfoThread.start();
         PostWearThread postWearThread = new PostWearThread();
         postWearThread.start();
-        TimeThread timeThread = new TimeThread();
-        timeThread.start();
+        PostSensorThread postBatteryThread= new PostSensorThread("BATTERY");
+        postBatteryThread.start();
+        PostSensorThread postHrmThread= new PostSensorThread("SENSOR_HRM");
+        postHrmThread.start();
+        PostSensorThread postPedometer= new PostSensorThread("SENSOR_PEDOMETER");
+        postPedometer.start();
 
         /* input parsing */
         jsonParser = new JsonParser();
@@ -143,7 +172,8 @@ public class NewMainActivity extends Activity {
         protective = userInfo.getProtective();
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
-        scanning.setOnClickListener(new View.OnClickListener(){
+
+        scanning.setOnClickListener(new View.OnClickListener(){ // BEL SCAN
             @Override
             public void onClick(View view){
              Intent intent=new Intent(getApplicationContext(),BeaconActivity.class);
@@ -153,6 +183,16 @@ public class NewMainActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateInfo();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
@@ -170,17 +210,6 @@ public class NewMainActivity extends Activity {
         }
     }));
 
-    @Override
-    protected void onStart() {
-            super.onStart();
-            updateInfo();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     public void updateInfo(){
         try { // Parsing and Store
             userInfo = jsonParser.getUserInfo(jsonInput); // 유저 정보 객체
@@ -191,10 +220,38 @@ public class NewMainActivity extends Activity {
             skin = userInfo.getSkin();
             protective = userInfo.getProtective();
             maxHeartRate = userInfo.getMaxHeartRate();
+            timerList = userInfo.getTimerList();
+            updateTimer();
         } catch (JSONException e) {
             e.printStackTrace();
         }
         userText.setText(name);
+    }
+
+    public void updateTimer(){
+        for(TimerInfo timer : timerList){
+            String timerName = timer.getTmrNm();
+            int uploadInterval = Integer.parseInt(timer.getIntervalSec());
+            int sensorInterval = Integer.parseInt(timer.getDurationSec());
+            switch(timerName){
+                case "BATTERY":
+                    upload_battery = uploadInterval;
+                    sensor_battery = sensorInterval;
+                    break;
+                case "GPS":
+                    upload_gps = uploadInterval;
+                    sensor_gps = sensorInterval;
+                    break;
+                case "SENSOR_HRM":
+                    upload_hrm = uploadInterval;
+                    sensor_hrm = sensorInterval;
+                    break;
+                case "SENSOR_PEDOMETER":
+                    upload_pedometer = uploadInterval;
+                    sensor_pedometer = sensorInterval;
+                    break;
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -225,9 +282,9 @@ public class NewMainActivity extends Activity {
                         setTime();
                         heartText.setText(String.valueOf((int) heartTemp));
                         stepText.setText(String.valueOf((int) stepTemp));
-                        double distance= stepTemp *0.5;
+                        distance = (float) (stepTemp * 0.5);
                         distanceText.setText((int)distance+"m");
-                        double calorie=Math.round((stepTemp *388/10000)*100)/100;
+                        calorie = Math.round((stepTemp *388/10000)*100)/100;
                         calorieText.setText(String.valueOf((int)calorie));
                         int intLatitude = (int)latitude;
                         int intLongitude = (int)longitude;
@@ -244,15 +301,12 @@ public class NewMainActivity extends Activity {
         }
     }
 
-
-
     class GetInfoThread extends Thread {
-
         public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
         Handler handler = new Handler();
         @Override
         public void run() {
-            Log.e(MAIN_TAG, "RUN");
+            Log.e(MAIN_TAG, "GET");
             try {
                 while(true) {
                     URL url = new URL(urlStr);
@@ -274,20 +328,16 @@ public class NewMainActivity extends Activity {
                             reader.close();
                         }
                         conn.disconnect();
-
                     }
                     sleep(5000); // delay value
                     handler.post(this);
                 }
             } catch (Exception e) {
-                Log.e(MAIN_TAG, "HTTP Request error");
+                Log.e(MAIN_TAG, "GET Request error");
                 e.printStackTrace();
             }
         }
-
         public void decrypt(final String data) {
-            Log.e(MAIN_TAG, "DECRYPT");
-
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -304,7 +354,7 @@ public class NewMainActivity extends Activity {
                     }
                     jsonInput = temp;
                     updateInfo();
-                    Log.e(MAIN_TAG, jsonInput);
+                    //Log.e(MAIN_TAG, jsonInput);
                 }
             });
         }
@@ -314,9 +364,9 @@ public class NewMainActivity extends Activity {
         Handler handler = new Handler();
         @Override
         public void run() {
-            Log.e(MAIN_TAG, "WEAR POST RUN");
             try {
                 while(true) {
+                    sleep(30000); // delay value
                     String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
                     if(heartTemp == 0){
                         Log.e(MAIN_TAG, "OFF");
@@ -338,7 +388,6 @@ public class NewMainActivity extends Activity {
                         int resCode = conn.getResponseCode();
                         conn.disconnect();
                     }
-                    sleep(5000); // delay value
                     handler.post(this);
                 }
             } catch (Exception e) {
@@ -346,19 +395,22 @@ public class NewMainActivity extends Activity {
                 e.printStackTrace();
             }
         }
-
     }
 
     class PostSensorThread extends Thread {
+        private final String sensorType;
+        private int uploadInterval;
+        PostSensorThread(String sensorName){
+            this.sensorType = sensorName;
+        }
+
+        String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos";
         Handler handler = new Handler();
         @Override
         public void run() {
-            Log.e(MAIN_TAG, "SENSOR POST RUN");
             try {
                 while(true) {
-                    String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos/";
-                    String json = "";
-
+                    sleep(30000); // initial delay
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
@@ -369,73 +421,75 @@ public class NewMainActivity extends Activity {
                         conn.setRequestProperty("Content-Type","application/json");
                         conn.setRequestProperty("Accept","application/json");
 
-                        OutputStream os = conn.getOutputStream();
-                        os.write(json.getBytes("euc-kr"));
-                        os.flush();
+                        JsonBuilder jsonBuilder = new JsonBuilder();
+                        JSONObject jsonObj = new JSONObject();
+                        switch (sensorType){
+                            case "BATTERY":
+                                jsonObj = jsonBuilder.getBattery(getBatteryRemain(mContext), isBatteryCharging(mContext)); // battery
+                                uploadInterval = upload_battery;
+                                break;
+                            case "GPS":
+                                jsonObj = jsonBuilder.getGPS(latitude, longitude); // gps
+                                uploadInterval = upload_gps;
+                                break;
+                            case "SENSOR_HRM":
+                                jsonObj = jsonBuilder.getHRM(heartTemp); // heart
+                                uploadInterval = upload_hrm;
+                                break;
+                            case "SENSOR_PEDOMETER":
+                                jsonObj = jsonBuilder.getPedometer((int)stepTemp, (int)calorie, (int)distance); // step
+                                uploadInterval = upload_pedometer;
+                                break;
 
-                        /* Read */
+                        }
+                        Log.e(MAIN_TAG, sensorType+"&"+uploadInterval);
+                        /* Body Write */
+                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+                        bw.write(jsonObj.toString());
+                        bw.flush();
+                        bw.close();
+
+                        /* Result Read */
+                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        String returnMsg = in.readLine();
+                        Log.e(MAIN_TAG, sensorType+" "+returnMsg);
+
+                        /* Response Code */
                         int resCode = conn.getResponseCode();
                         if (resCode == HttpURLConnection.HTTP_OK) {
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                            String line = null;
-                            while (true) {
-                                line = reader.readLine();
-                                if (line == null)
-                                    break;
-                                decrypt(line);
-                            }
-                            reader.close();
-                        }
-
-                        Log.e(MAIN_TAG, "SENSOR POST REQUEST");
+                        } else { Log.e(MAIN_TAG, sensorType+" RESPONSE CODE ERROR");}
 
                         conn.disconnect();
+                        Log.e("UPLOAD_"+sensorType,String.valueOf(uploadInterval * 1000L));
+                        sleep(uploadInterval * 1000L); // delay value
                     }
-                    sleep(5000); // delay value
                     handler.post(this);
                 }
             } catch (Exception e) {
-                Log.e(MAIN_TAG, "SENSOR POST Request error");
+                Log.e(MAIN_TAG, sensorType+" Request error");
                 e.printStackTrace();
             }
         }
-        public void decrypt(final String data) {
-            Log.e(MAIN_TAG, "SENSOR POST DECRYPT");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    String temp = "";
-                    int temp2 = 0;
-                    try {
-                        for (int i = 0; i < data.length(); i++) {
-                            if (data.charAt(i) == ':')
-                                temp2 = i;
-                        }
-                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    Log.e(MAIN_TAG, "Request Result:" + temp);
-                }
-            });
+    }
+
+    public static int getBatteryRemain(Context context) {
+        Intent intentBattery = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = intentBattery.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = intentBattery.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        float batteryPct = level / (float)scale;
+
+        return (int)(batteryPct * 100);
+    }
+    public static String isBatteryCharging(Context context){
+        Intent intentBattery = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int status = intentBattery.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        String result = "";
+        if(status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL){
+            result = "Y";
+        }else if(status == BatteryManager.BATTERY_STATUS_NOT_CHARGING || status == BatteryManager.BATTERY_STATUS_DISCHARGING){
+            result = "N";
         }
-        public String encrypt(final String data) {
-            final String[] code = {""};
-            Log.e(MAIN_TAG, "SENSOR POST ENCRYPT");
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    int temp2 = 0;
-                    try {
-                        code[0] = AES256s.encrypt(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    Log.e(MAIN_TAG, "Encrypt Result:" + code[0]);
-                }
-            });
-            return code[0];
-        }
+        return result;
     }
 
     /* Permissions */

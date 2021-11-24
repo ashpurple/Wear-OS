@@ -147,11 +147,9 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.e(SENSOR_TAG, "onSensorChanged");
         // Check if a value is attached, if not we can ignore it
         if (sensorEvent.values.length > 0) {
             final float value = sensorEvent.values[0];
-
             if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE) {
                 if (mClient != null) {
                     sendMsgToActivity(value, "HEART");
@@ -163,7 +161,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
             if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
                 Log.e(SENSOR_TAG, "Step Count : " + value + "step");
                 if (mClient != null) {
-                    sendMsgToActivity(value - 10000, "STEP");
+                    sendMsgToActivity(value, "STEP");
                 }
             }
         } else {
@@ -189,9 +187,11 @@ public class BackService extends Service implements SensorEventListener, Locatio
             }
             Location l = locationManager.getLastKnownLocation(provider);
             if (l == null) {
+                Log.e(LOCATION_TAG,"Location is null");
                 continue;
             }
             if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                Log.e(LOCATION_TAG,"BestLocation");
                 bestLocation = l;
                 latitude = bestLocation.getLatitude();
                 longitude = bestLocation.getLongitude();
