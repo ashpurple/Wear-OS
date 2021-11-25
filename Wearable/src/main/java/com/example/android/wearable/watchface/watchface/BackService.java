@@ -187,11 +187,9 @@ public class BackService extends Service implements SensorEventListener, Locatio
             }
             Location l = locationManager.getLastKnownLocation(provider);
             if (l == null) {
-                Log.e(LOCATION_TAG,"Location is null");
                 continue;
             }
             if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                Log.e(LOCATION_TAG,"BestLocation");
                 bestLocation = l;
                 latitude = bestLocation.getLatitude();
                 longitude = bestLocation.getLongitude();

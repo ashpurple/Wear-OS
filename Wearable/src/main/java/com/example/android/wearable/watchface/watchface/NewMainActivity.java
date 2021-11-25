@@ -20,6 +20,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -119,6 +120,7 @@ public class NewMainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // always on
         mContext = getApplicationContext();
         Log.e(MAIN_TAG, "onCreate");
         setPermissions(); // Permission Check
@@ -329,7 +331,7 @@ public class NewMainActivity extends Activity {
                         }
                         conn.disconnect();
                     }
-                    sleep(5000); // delay value
+                    sleep(30000); // delay value
                     handler.post(this);
                 }
             } catch (Exception e) {
@@ -366,7 +368,7 @@ public class NewMainActivity extends Activity {
         public void run() {
             try {
                 while(true) {
-                    sleep(30000); // delay value
+                    sleep(60000); // delay value
                     String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
                     if(heartTemp == 0){
                         Log.e(MAIN_TAG, "OFF");
