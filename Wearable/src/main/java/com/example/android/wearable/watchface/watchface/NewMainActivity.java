@@ -120,7 +120,7 @@ public class NewMainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // always on
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // always on display
         mContext = getApplicationContext();
         Log.e(MAIN_TAG, "onCreate");
         setPermissions(); // Permission Check
@@ -162,6 +162,8 @@ public class NewMainActivity extends Activity {
         postHrmThread.start();
         PostSensorThread postPedometer= new PostSensorThread("SENSOR_PEDOMETER");
         postPedometer.start();
+        PostSensorThread postGPS= new PostSensorThread("GPS");
+        postGPS.start();
 
         /* input parsing */
         jsonParser = new JsonParser();
