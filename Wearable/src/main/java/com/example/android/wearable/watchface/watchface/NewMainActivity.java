@@ -79,7 +79,8 @@ public class NewMainActivity extends Activity {
     String maxHeartRate;
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
-    public float heartTemp = 0, stepTemp = 0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
+    public float heartTemp = 0, stepTemp = 0 , stress = 0, fatigue = 0;
+    public double latitude = 0, longitude = 0;
     public float distance, calorie;
     public boolean sosFlag = false;
     ArrayList<SensorValueInfo> heartList;
@@ -272,10 +273,10 @@ public class NewMainActivity extends Activity {
             }
             if(msg.getData().getFloat("STEP")!=0){
                 stepTemp = msg.getData().getFloat("STEP");}
-            if(msg.getData().getFloat("LATITUDE")!=0){
-                latitude = msg.getData().getFloat("LATITUDE");}
-            if(msg.getData().getFloat("LONGITUDE")!=0){
-                longitude = msg.getData().getFloat("LONGITUDE");}
+            if(msg.getData().getDouble("LATITUDE")!=0){
+                latitude = msg.getData().getDouble("LATITUDE");}
+            if(msg.getData().getDouble("LONGITUDE")!=0){
+                longitude = msg.getData().getDouble("LONGITUDE");}
             return false;
         }
     }));

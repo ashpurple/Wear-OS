@@ -57,7 +57,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // meter
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1; // milli * sec * min
     public String LOCATION_TAG = "LocationManager";
-    LocationListener locationListener;
     private FusedLocationProviderClient fusedLocationClient;
     /* Sensor Values */
     private float heart;
@@ -75,7 +74,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
         } else {
             Log.e(LOCATION_TAG, "This hardware have GPS.");
         }
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.e(LOCATION_TAG, "Location Permission Fail");
         } else {
@@ -83,6 +81,10 @@ public class BackService extends Service implements SensorEventListener, Locatio
             //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
         }
         //getLocation();
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, locationListener);
+        getLastKnownLocation();
         startSensors();
         handler = new Handler();
         runnable = new Runnable() {
@@ -123,26 +125,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
             // Start step counter
             final Sensor stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
             sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
-//            locationListener = new LocationListener() {
-//                @Override
-//                public void onLocationChanged(Location location) {
-//                    float lat = Math.round(location.getLatitude()*100)/100;
-//                    float lang = Math.round(location.getLongitude()*100)/100;
-//                    sendMsgToActivity(lat ,"LATI");
-//                    sendMsgToActivity(lang ,"LANGI");
-//                    Log.e(LOCATION_TAG,lat + " " + lang);
-//                }
-//
-//                @Override
-//                public void onStatusChanged(String provider, int status, Bundle extras) {
-//                }
-//                @Override
-//                public void onProviderEnabled(String provider) {
-//                }
-//                @Override
-//                public void onProviderDisabled(String provider) {
-//                }
-//            };
         } else {
             Log.e(SENSOR_TAG, "SensorManager is null");
         }
@@ -158,9 +140,10 @@ public class BackService extends Service implements SensorEventListener, Locatio
                 if (mClient != null) {
                     sendMsgToActivity(heart, "HEART");
                     sendMsgToActivity(step, "STEP");
+                    sendGPSToActivity(latitude ,"LATITUDE");
+                    sendGPSToActivity(longitude ,"LONGITUDE");
                 }
                 Log.e(SENSOR_TAG, "heart Rate : " + heart + "bpm");
-                getLastKnownLocation();
                 printGPS();
             }
             if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -183,8 +166,26 @@ public class BackService extends Service implements SensorEventListener, Locatio
         Log.e(LOCATION_TAG, "Latitude: " + latitude + " | Longitude: " + longitude);
     }
 
+    private final LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            latitude = location.getLongitude();
+            longitude = location.getLatitude();
+            Log.e("LOCATION_CHANGE",latitude + " : " + longitude);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+    };
+
     private void getLastKnownLocation() {
-        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         List<String> providers = locationManager.getProviders(true);
         Location bestLocation = null;
         for (String provider : providers) {
@@ -199,8 +200,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
                 bestLocation = l;
                 latitude = bestLocation.getLatitude();
                 longitude = bestLocation.getLongitude();
-                sendMsgToActivity((float)latitude ,"LATITUDE");
-                sendMsgToActivity((float)longitude ,"LONGITUDE");
             }
         }
     }
@@ -226,6 +225,18 @@ public class BackService extends Service implements SensorEventListener, Locatio
         try{
             Bundle bundle= new Bundle();
             bundle.putFloat(type,sendValue);
+            Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
+            msg.setData(bundle);
+            mClient.send(msg);
+        }
+        catch (RemoteException e){
+
+        }
+    }
+    private void sendGPSToActivity(double sendValue,String type){
+        try{
+            Bundle bundle= new Bundle();
+            bundle.putDouble(type,sendValue);
             Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
             msg.setData(bundle);
             mClient.send(msg);
