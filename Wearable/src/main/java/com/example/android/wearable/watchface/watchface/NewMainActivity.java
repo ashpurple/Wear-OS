@@ -80,6 +80,9 @@ public class NewMainActivity extends Activity {
     /* Global variables */
     public float heartTemp = 0, stepTemp = 0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
     public float distance, calorie;
+    ArrayList<SensorValueInfo> heartList;
+    ArrayList<SensorValueInfo> stepList;
+    ArrayList<SensorValueInfo> gpsList;
     UserInfo userInfo;
     ArrayList<TimerInfo> timerList;
     JsonParser jsonParser;
@@ -132,6 +135,11 @@ public class NewMainActivity extends Activity {
         Intent intent = new Intent(NewMainActivity.this, BackService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
+        /* Value List */
+        heartList = new ArrayList<>();
+        gpsList = new ArrayList<>();
+        stepList = new ArrayList<>();
+
         /* Text Views */
         userText = (TextView) findViewById(R.id.Name);
         hourMinuteText = (TextView) findViewById(R.id.HourMinute);
@@ -152,6 +160,8 @@ public class NewMainActivity extends Activity {
         TimeThread timeThread = new TimeThread();
         timeThread.start();
 
+        CollectSensorThread collectSensorThread = new CollectSensorThread();
+        collectSensorThread.start();
         GetInfoThread getInfoThread = new GetInfoThread();
         getInfoThread.start();
         PostWearThread postWearThread = new PostWearThread();
@@ -258,6 +268,13 @@ public class NewMainActivity extends Activity {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
+    private String getTimestamp() {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        return sdf.format(timestamp);
+    }
+
     @SuppressLint("SetTextI18n")
     public void setTime(){
         time.setCalendar();
@@ -302,6 +319,7 @@ public class NewMainActivity extends Activity {
                 } catch (InterruptedException e){
                     e.printStackTrace();
                 }
+
             }
         }
     }
@@ -364,7 +382,7 @@ public class NewMainActivity extends Activity {
         public void run() {
             try {
                 while(true) {
-                    sleep(60000); // delay value
+                    sleep(60000); // upload delay 1 min
                     String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
                     if(heartTemp == 0){
                         Log.e(MAIN_TAG, "OFF");
@@ -405,9 +423,9 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             try {
+
                 while(true) {
-                    int initialDelay = 30000;
-                    sleep(initialDelay); // initial delay
+                    sleep(30000); // initial delay
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
@@ -426,15 +444,15 @@ public class NewMainActivity extends Activity {
                                 uploadInterval = upload_battery;
                                 break;
                             case "GPS":
-                                jsonObj = jsonBuilder.getGPS(latitude, longitude); // gps
+                                jsonObj = jsonBuilder.getGPS(gpsList); // gps
                                 uploadInterval = upload_gps;
                                 break;
                             case "SENSOR_HRM":
-                                jsonObj = jsonBuilder.getHRM(heartTemp); // heart
+                                jsonObj = jsonBuilder.getHRM(heartList); // heart
                                 uploadInterval = upload_hrm;
                                 break;
                             case "SENSOR_PEDOMETER":
-                                jsonObj = jsonBuilder.getPedometer((int)stepTemp, (int)calorie, (int)distance); // step
+                                jsonObj = jsonBuilder.getPedometer(stepList); // step
                                 uploadInterval = upload_pedometer;
                                 break;
 
@@ -448,7 +466,23 @@ public class NewMainActivity extends Activity {
 
                         /* Result Read */
                         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                        String returnMsg = in.readLine();
+                        JSONObject jsonObject = new JSONObject(in.readLine());
+                        String returnMsg = jsonObject.getString("message");
+                        if(returnMsg.equals("success")){ // if network access success
+                            switch (sensorType){
+                                case "BATTERY":
+                                    break;
+                                case "GPS":
+                                    gpsList.clear();
+                                    break;
+                                case "SENSOR_HRM":
+                                    heartList.clear();
+                                    break;
+                                case "SENSOR_PEDOMETER":
+                                    stepList.clear();
+                                    break;
+                            }
+                        }
                         Log.e(MAIN_TAG, sensorType+" "+returnMsg);
 
                         /* Response Code */
@@ -457,12 +491,38 @@ public class NewMainActivity extends Activity {
                         } else { Log.e(MAIN_TAG, sensorType+" RESPONSE CODE ERROR");}
 
                         conn.disconnect();
-                        Log.e("UPLOAD_"+sensorType,String.valueOf(uploadInterval * 1000L));
-                        sleep(uploadInterval * 1000L - initialDelay); // delay value
+                        sleep(uploadInterval * 1000L - 30000); // upload delay
                     }
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, sensorType+" Request error");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    class CollectSensorThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                int initialDelay = 10000; // wait for 10 sec
+                sleep(initialDelay); // initial delay
+                int sec = 0;
+                while(true) {
+                    sleep(1000);
+                    sec += 1;
+                    if(sec % 10 == 0){
+                        heartList.add(new SensorValueInfo(heartTemp, getTimestamp()));
+                    }
+                    if(sec % 10 == 0){
+                        gpsList.add(new SensorValueInfo(latitude, longitude, getTimestamp()));
+                    }
+                    if(sec % 10 == 0){
+                        stepList.add(new SensorValueInfo(stepTemp, getTimestamp()));
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "Collect Sensor Error");
                 e.printStackTrace();
             }
         }

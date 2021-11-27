@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class JsonBuilder {
     private Timestamp timestamp;
@@ -19,7 +20,7 @@ public class JsonBuilder {
         sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     }
 
-    public JSONObject getHRM(float heart) throws JSONException {
+    public JSONObject getHRM(ArrayList<SensorValueInfo> heart) throws JSONException {
         setTimestamp();
 
         JSONObject jsonObj = new JSONObject();
@@ -28,10 +29,12 @@ public class JsonBuilder {
         JSONObject data = new JSONObject();
         data.put("command", "SENSOR_HRM");
         JSONArray jsonArr = new JSONArray();
-        JSONObject value = new JSONObject();
-        value.put("value",heart);
-        value.put("timeStamp",sdf.format(timestamp));
-        jsonArr.put(value);
+        for(SensorValueInfo sensorValue: heart) {
+            JSONObject value = new JSONObject();
+            value.put("value", sensorValue.getValue());
+            value.put("timeStamp", sensorValue.getTime());
+            jsonArr.put(value);
+        }
         data.put("values",jsonArr);
 
         String input = data.toString();
@@ -40,7 +43,7 @@ public class JsonBuilder {
         jsonObj.put("data",input);
         return jsonObj;
     }
-    public JSONObject getPedometer(int step, int calorie, int distance) throws JSONException {
+    public JSONObject getPedometer(ArrayList<SensorValueInfo> step) throws JSONException {
         setTimestamp();
 
         JSONObject jsonObj = new JSONObject();
@@ -49,12 +52,17 @@ public class JsonBuilder {
         JSONObject data = new JSONObject();
         data.put("command", "SENSOR_PEDOMETER");
         JSONArray jsonArr = new JSONArray();
-        JSONObject value = new JSONObject();
-        value.put("value",step);
-        value.put("calorie",calorie);
-        value.put("distance",distance);
-        value.put("timeStamp",sdf.format(timestamp));
-        jsonArr.put(value);
+        for(SensorValueInfo sensorValue: step) {
+            JSONObject value = new JSONObject();
+            float stepValue = sensorValue.getValue();
+            value.put("value", stepValue);
+            float calorie = Math.round((stepValue *388/10000)*100)/100;
+            value.put("calorie", calorie);
+            float distance = (float) (stepValue * 0.5);
+            value.put("distance", distance);
+            value.put("timeStamp", sensorValue.getTime());
+            jsonArr.put(value);
+        }
         data.put("values",jsonArr);
 
         String input = data.toString();
@@ -63,7 +71,7 @@ public class JsonBuilder {
         jsonObj.put("data",input);
         return jsonObj;
     }
-    public JSONObject getGPS(float latitude, float longitude) throws JSONException {
+    public JSONObject getGPS(ArrayList<SensorValueInfo> gps) throws JSONException {
         setTimestamp();
 
         JSONObject jsonObj = new JSONObject();
@@ -72,11 +80,13 @@ public class JsonBuilder {
         JSONObject data = new JSONObject();
         data.put("command", "GPS");
         JSONArray jsonArr = new JSONArray();
-        JSONObject value = new JSONObject();
-        value.put("latitude",latitude);
-        value.put("longitude",longitude);
-        value.put("timeStamp",sdf.format(timestamp));
-        jsonArr.put(value);
+        for(SensorValueInfo sensorValue: gps) {
+            JSONObject value = new JSONObject();
+            value.put("latitude", sensorValue.getLatitude());
+            value.put("longitude", sensorValue.getLongitude());
+            value.put("timeStamp", sensorValue.getTime());
+            jsonArr.put(value);
+        }
         data.put("values",jsonArr);
 
         String input = data.toString();
