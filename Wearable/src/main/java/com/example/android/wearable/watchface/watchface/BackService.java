@@ -59,6 +59,9 @@ public class BackService extends Service implements SensorEventListener, Locatio
     public String LOCATION_TAG = "LocationManager";
     LocationListener locationListener;
     private FusedLocationProviderClient fusedLocationClient;
+    /* Sensor Values */
+    private float heart;
+    private float step;
 
     @Override
     public void onCreate() {
@@ -79,8 +82,8 @@ public class BackService extends Service implements SensorEventListener, Locatio
             Log.e(LOCATION_TAG, "Location Permission Success");
             //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
         }
-        startSensors();
         //getLocation();
+        startSensors();
         handler = new Handler();
         runnable = new Runnable() {
             public void run() {
@@ -151,17 +154,20 @@ public class BackService extends Service implements SensorEventListener, Locatio
         if (sensorEvent.values.length > 0) {
             final float value = sensorEvent.values[0];
             if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE) {
+                heart = value;
                 if (mClient != null) {
-                    sendMsgToActivity(value, "HEART");
+                    sendMsgToActivity(heart, "HEART");
+                    sendMsgToActivity(step, "STEP");
                 }
-                Log.e(SENSOR_TAG, "heart Rate : " + value + "bpm");
+                Log.e(SENSOR_TAG, "heart Rate : " + heart + "bpm");
                 getLastKnownLocation();
                 printGPS();
             }
             if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-                Log.e(SENSOR_TAG, "Step Count : " + value + "step");
+                step = value;
+                Log.e(SENSOR_TAG, "Step Count : " + step + "step");
                 if (mClient != null) {
-                    sendMsgToActivity(value, "STEP");
+                    sendMsgToActivity(step, "STEP");
                 }
             }
         } else {
@@ -210,6 +216,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
             switch (msg.what) {
                 case MSG_REGISTER_CLIENT:
                     mClient = msg.replyTo;
+                    Log.e(SENSOR_TAG,"Binding Complete");
                     break;
             }
             return false;

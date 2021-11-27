@@ -6,8 +6,6 @@ import android.content.ComponentName;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.app.Activity;
@@ -30,21 +28,18 @@ import androidx.core.content.ContextCompat;
 
 import com.example.android.wearable.watchface.R;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 public class NewMainActivity extends Activity {
     // permission
@@ -88,15 +83,19 @@ public class NewMainActivity extends Activity {
     JsonParser jsonParser;
     Time time;
     Context mContext;
-    /* Interval variables */
+    /* Timer variables */
     int upload_battery = 0;
-    int sensor_battery = 0;
     int upload_gps = 0;
-    int sensor_gps = 0;
+    int collect_gps = 0;
     int upload_pedometer = 0;
-    int sensor_pedometer = 0;
+    int collect_pedometer = 0;
     int upload_hrm = 0;
     int sensor_hrm = 0;
+    String onOff_battery;
+    String onOff_gps;
+    String onOff_pedometer;
+    String onOff_hrm;
+
 
     /* Service Binding */
     boolean isServiced = false;
@@ -178,7 +177,7 @@ public class NewMainActivity extends Activity {
         /* input parsing */
         jsonParser = new JsonParser();
         userInfo = new UserInfo();
-        // default value -- can't be connected network
+        // set default value -> it is not connected to network yet
         name = userInfo.getName();
         group = userInfo.getGroup();
         birthday = userInfo.getBirthday();
@@ -211,7 +210,6 @@ public class NewMainActivity extends Activity {
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            Log.d(MAIN_TAG,"Messenger handler");
             if(msg.getData().getFloat("HEART")!=0){
                 heartTemp = msg.getData().getFloat("HEART");}
             if(msg.getData().getFloat("STEP")!=0){
@@ -246,23 +244,27 @@ public class NewMainActivity extends Activity {
         for(TimerInfo timer : timerList){
             String timerName = timer.getTmrNm();
             int uploadInterval = Integer.parseInt(timer.getIntervalSec());
-            int sensorInterval = Integer.parseInt(timer.getDurationSec());
+            int collectInterval = Integer.parseInt(timer.getDurationSec());
+            String onOff = timer.getOnOff();
             switch(timerName){
                 case "BATTERY":
                     upload_battery = uploadInterval;
-                    sensor_battery = sensorInterval;
+                    onOff_battery = onOff;
                     break;
                 case "GPS":
                     upload_gps = uploadInterval;
-                    sensor_gps = sensorInterval;
+                    collect_gps = collectInterval;
+                    onOff_gps = onOff;
                     break;
                 case "SENSOR_HRM":
                     upload_hrm = uploadInterval;
-                    sensor_hrm = sensorInterval;
+                    sensor_hrm = collectInterval;
+                    onOff_hrm = onOff;
                     break;
                 case "SENSOR_PEDOMETER":
                     upload_pedometer = uploadInterval;
-                    sensor_pedometer = sensorInterval;
+                    collect_pedometer = collectInterval;
+                    onOff_pedometer = onOff;
                     break;
             }
         }
@@ -271,7 +273,7 @@ public class NewMainActivity extends Activity {
     @SuppressLint("SimpleDateFormat")
     private String getTimestamp() {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(timestamp);
     }
 
@@ -415,6 +417,7 @@ public class NewMainActivity extends Activity {
     class PostSensorThread extends Thread {
         private final String sensorType;
         private int uploadInterval;
+        private String onOff;
         PostSensorThread(String sensorName){
             this.sensorType = sensorName;
         }
@@ -423,12 +426,41 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             try {
-
+                int initialDelay = 30000;
                 while(true) {
-                    sleep(30000); // initial delay
+                    sleep(initialDelay); // initial delay
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
+                        JsonBuilder jsonBuilder = new JsonBuilder();
+                        JSONObject jsonObj = new JSONObject();
+                        switch (sensorType){
+                            case "BATTERY":
+                                onOff = onOff_battery;
+                                jsonObj = jsonBuilder.getBattery(getBatteryRemain(mContext), isBatteryCharging(mContext)); // battery
+                                uploadInterval = upload_battery;
+                                break;
+                            case "GPS":
+                                onOff = onOff_gps;
+                                jsonObj = jsonBuilder.getGPS(gpsList); // gps
+                                uploadInterval = upload_gps;
+                                break;
+                            case "SENSOR_HRM":
+                                onOff = onOff_hrm;
+                                jsonObj = jsonBuilder.getHRM(heartList); // heart
+                                uploadInterval = upload_hrm;
+                                break;
+                            case "SENSOR_PEDOMETER":
+                                onOff = onOff_pedometer;
+                                jsonObj = jsonBuilder.getPedometer(stepList); // step
+                                uploadInterval = upload_pedometer;
+                                break;
+
+                        }
+                        if(!onOff.equals("O"))
+                            continue;
+                        Log.e(MAIN_TAG, sensorType+"|"+uploadInterval);
+
                         conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
                         conn.setRequestMethod("POST");
                         conn.setDoInput(true);
@@ -436,28 +468,6 @@ public class NewMainActivity extends Activity {
                         conn.setRequestProperty("Content-Type","application/json");
                         conn.setRequestProperty("Accept","application/json");
 
-                        JsonBuilder jsonBuilder = new JsonBuilder();
-                        JSONObject jsonObj = new JSONObject();
-                        switch (sensorType){
-                            case "BATTERY":
-                                jsonObj = jsonBuilder.getBattery(getBatteryRemain(mContext), isBatteryCharging(mContext)); // battery
-                                uploadInterval = upload_battery;
-                                break;
-                            case "GPS":
-                                jsonObj = jsonBuilder.getGPS(gpsList); // gps
-                                uploadInterval = upload_gps;
-                                break;
-                            case "SENSOR_HRM":
-                                jsonObj = jsonBuilder.getHRM(heartList); // heart
-                                uploadInterval = upload_hrm;
-                                break;
-                            case "SENSOR_PEDOMETER":
-                                jsonObj = jsonBuilder.getPedometer(stepList); // step
-                                uploadInterval = upload_pedometer;
-                                break;
-
-                        }
-                        Log.e(MAIN_TAG, sensorType+"&"+uploadInterval);
                         /* Body Write */
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
                         bw.write(jsonObj.toString());
@@ -469,7 +479,7 @@ public class NewMainActivity extends Activity {
                         JSONObject jsonObject = new JSONObject(in.readLine());
                         String returnMsg = jsonObject.getString("message");
                         if(returnMsg.equals("success")){ // if network access success
-                            switch (sensorType){
+                            switch (sensorType){ // initialize lists
                                 case "BATTERY":
                                     break;
                                 case "GPS":
@@ -491,7 +501,7 @@ public class NewMainActivity extends Activity {
                         } else { Log.e(MAIN_TAG, sensorType+" RESPONSE CODE ERROR");}
 
                         conn.disconnect();
-                        sleep(uploadInterval * 1000L - 30000); // upload delay
+                        sleep(uploadInterval * 1000L - initialDelay); // upload delay
                     }
                 }
             } catch (Exception e) {
@@ -509,8 +519,6 @@ public class NewMainActivity extends Activity {
                 sleep(initialDelay); // initial delay
                 int sec = 0;
                 while(true) {
-                    sleep(1000);
-                    sec += 1;
                     if(sec % 10 == 0){
                         heartList.add(new SensorValueInfo(heartTemp, getTimestamp()));
                     }
@@ -520,6 +528,8 @@ public class NewMainActivity extends Activity {
                     if(sec % 10 == 0){
                         stepList.add(new SensorValueInfo(stepTemp, getTimestamp()));
                     }
+                    sleep(1000);
+                    sec += 1;
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, "Collect Sensor Error");

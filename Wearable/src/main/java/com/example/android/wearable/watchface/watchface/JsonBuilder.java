@@ -17,7 +17,7 @@ public class JsonBuilder {
 
     private void setTimestamp() {
         timestamp = new Timestamp(System.currentTimeMillis());
-        sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
     public JSONObject getHRM(ArrayList<SensorValueInfo> heart) throws JSONException {
