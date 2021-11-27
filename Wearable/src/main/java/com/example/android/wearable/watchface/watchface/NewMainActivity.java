@@ -64,6 +64,7 @@ public class NewMainActivity extends Activity {
     TextView stressText;
     /* Buttons */
     Button scanning;
+    Button Broadcasting;
     /* Get Info */
     String name;
     String group;
@@ -91,11 +92,14 @@ public class NewMainActivity extends Activity {
     int collect_pedometer = 0;
     int upload_hrm = 0;
     int sensor_hrm = 0;
+
     String onOff_battery;
     String onOff_gps;
     String onOff_pedometer;
     String onOff_hrm;
 
+    int Broadcastingcheck=1;
+    public static Context context;
 
     /* Service Binding */
     boolean isServiced = false;
@@ -124,6 +128,7 @@ public class NewMainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // always on display
         mContext = getApplicationContext();
+        context=this;
         Log.e(MAIN_TAG, "onCreate");
         setPermissions(); // Permission Check
 
@@ -145,7 +150,7 @@ public class NewMainActivity extends Activity {
         secondText = (TextView) findViewById(R.id.Second);
         monthDayText = (TextView) findViewById(R.id.MonthDay);
         amPmText = (TextView) findViewById(R.id.AMPM);
-        scanning=(Button)findViewById(R.id.button);
+
         heartText =findViewById(R.id.HeartRateValue);
         stepText=findViewById(R.id.StepValue);
         distanceText=findViewById(R.id.DistanceValue);
@@ -153,6 +158,10 @@ public class NewMainActivity extends Activity {
         gpsText=findViewById(R.id.GPSValue);
         fatigueText=findViewById(R.id.FatigueValue);
         stressText=findViewById(R.id.StressValue);
+
+        /* Button */
+        scanning=(Button)findViewById(R.id.button);
+        Broadcasting=(Button)findViewById(R.id.buttonbroad);
 
         /* Threads */
         time = new Time();
@@ -186,7 +195,7 @@ public class NewMainActivity extends Activity {
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
 
-        scanning.setOnClickListener(new View.OnClickListener(){ // BEL SCAN
+        scanning.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
             @Override
             public void onClick(View view){
              Intent intent=new Intent(getApplicationContext(),BeaconActivity.class);
@@ -194,6 +203,22 @@ public class NewMainActivity extends Activity {
             }
 
         });
+        /*
+        Broadcasting.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
+            @Override
+            public void onClick(View view){
+                if(Broadcastingcheck==1){
+                    Intent intent=new Intent(getApplicationContext(),StartAdvertise.class);
+                    startActivity(intent);
+
+                }
+                else{
+                    Intent intent=new Intent(getApplicationContext(),StopAdvertise.class);
+                    startActivity(intent);
+                }
+            }
+
+        });*/
     }
 
     @Override
