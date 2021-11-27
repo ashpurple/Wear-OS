@@ -274,6 +274,7 @@ public class NewMainActivity extends Activity {
             amPmText.setText("PM");
     }
 
+
     /* Threads */
     class TimeThread extends Thread{
         @Override
@@ -307,7 +308,7 @@ public class NewMainActivity extends Activity {
 
     class GetInfoThread extends Thread {
         public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
-        Handler handler = new Handler();
+        //Handler handler = new Handler();
         @Override
         public void run() {
             Log.e(MAIN_TAG, "GET");
@@ -333,8 +334,8 @@ public class NewMainActivity extends Activity {
                         }
                         conn.disconnect();
                     }
-                    sleep(30000); // delay value
-                    handler.post(this);
+                    sleep(10000); // delay value
+                    //handler.post(this);
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, "GET Request error");
@@ -342,9 +343,6 @@ public class NewMainActivity extends Activity {
             }
         }
         public void decrypt(final String data) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
                     String temp = "";
                     int temp2 = 0;
                     try {
@@ -358,14 +356,10 @@ public class NewMainActivity extends Activity {
                     }
                     jsonInput = temp;
                     updateInfo();
-                    //Log.e(MAIN_TAG, jsonInput);
-                }
-            });
         }
     }
 
     class PostWearThread extends Thread {
-        Handler handler = new Handler();
         @Override
         public void run() {
             try {
@@ -392,7 +386,6 @@ public class NewMainActivity extends Activity {
                         int resCode = conn.getResponseCode();
                         conn.disconnect();
                     }
-                    handler.post(this);
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, "WEAR POST Request error");
@@ -409,12 +402,12 @@ public class NewMainActivity extends Activity {
         }
 
         String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos";
-        Handler handler = new Handler();
         @Override
         public void run() {
             try {
                 while(true) {
-                    sleep(30000); // initial delay
+                    int initialDelay = 30000;
+                    sleep(initialDelay); // initial delay
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
@@ -465,9 +458,8 @@ public class NewMainActivity extends Activity {
 
                         conn.disconnect();
                         Log.e("UPLOAD_"+sensorType,String.valueOf(uploadInterval * 1000L));
-                        sleep(uploadInterval * 1000L); // delay value
+                        sleep(uploadInterval * 1000L - initialDelay); // delay value
                     }
-                    handler.post(this);
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, sensorType+" Request error");
