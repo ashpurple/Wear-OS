@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -261,7 +262,14 @@ public class NewMainActivity extends Activity {
         @Override
         public boolean handleMessage(Message msg) {
             if(msg.getData().getFloat("HEART")!=0){
-                heartTemp = msg.getData().getFloat("HEART");}
+                heartTemp = msg.getData().getFloat("HEART");
+                if(!maxHeartRate.equals("None")) {
+                    int max = Integer.parseInt(maxHeartRate);
+                    if (heartTemp >= max) {
+                        //Toast.makeText(mContext, "심박 경고 임계치(" + max + ") 초과 ", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
             if(msg.getData().getFloat("STEP")!=0){
                 stepTemp = msg.getData().getFloat("STEP");}
             if(msg.getData().getFloat("LATITUDE")!=0){
