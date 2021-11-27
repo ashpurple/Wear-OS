@@ -9,6 +9,7 @@
     android:padding="@dimen/box_inset_layout_padding"
     tools:context=".watchface.NewMainActivity"
     android:layout_gravity="center"
+    android:id="@+id/boxLayout"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -294,7 +295,7 @@
             app:layout_constraintTop_toTopOf="@+id/button2" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/buttonSos"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginLeft="105dp"

@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.app.Activity;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.wear.widget.BoxInsetLayout;
 
 import com.example.android.wearable.watchface.R;
 
@@ -65,6 +67,8 @@ public class NewMainActivity extends Activity {
     /* Buttons */
     Button scanning;
     Button Broadcasting;
+    Button sos_button;
+    BoxInsetLayout layout;
     /* Get Info */
     String name;
     String group;
@@ -76,6 +80,7 @@ public class NewMainActivity extends Activity {
     /* Global variables */
     public float heartTemp = 0, stepTemp = 0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
     public float distance, calorie;
+    public boolean sosFlag = false;
     ArrayList<SensorValueInfo> heartList;
     ArrayList<SensorValueInfo> stepList;
     ArrayList<SensorValueInfo> gpsList;
@@ -162,6 +167,8 @@ public class NewMainActivity extends Activity {
         /* Button */
         scanning=(Button)findViewById(R.id.button);
         Broadcasting=(Button)findViewById(R.id.buttonbroad);
+        sos_button =(Button)findViewById(R.id.buttonSos);
+        layout = (BoxInsetLayout)findViewById(R.id.boxLayout);
 
         /* Threads */
         time = new Time();
@@ -200,6 +207,24 @@ public class NewMainActivity extends Activity {
             public void onClick(View view){
              Intent intent=new Intent(getApplicationContext(),BeaconActivity.class);
              startActivity(intent);
+            }
+
+        });
+        sos_button.setOnClickListener(new View.OnClickListener(){ // SOS
+            @Override
+            public void onClick(View view){
+                Log.e("SOS"," "+sosFlag);
+                if(sosFlag) {
+                    sosFlag = false;
+                    layout.setBackgroundColor(Color.BLACK);
+                }
+                else{
+                    sosFlag = true;
+                    SosThread sosThread = new SosThread();
+                    sosThread.start();
+                    layout.setBackgroundColor(Color.RED);
+                }
+
             }
 
         });
@@ -558,6 +583,39 @@ public class NewMainActivity extends Activity {
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, "Collect Sensor Error");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    class SosThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sos";
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn != null) {
+                    conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                    conn.setRequestProperty("Content-Type","application/json");
+                    conn.setRequestProperty("Accept","application/json");
+
+                    /* Result Read */
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    JSONObject jsonObject = new JSONObject(in.readLine());
+                    String returnMsg = jsonObject.getString("result");
+                    if(returnMsg.equals("success")){
+                        Log.e(MAIN_TAG, "SOS POST REQUEST");
+                    }
+                    int resCode = conn.getResponseCode();
+                    conn.disconnect();
+                }
+
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "WEAR POST Request error");
                 e.printStackTrace();
             }
         }
