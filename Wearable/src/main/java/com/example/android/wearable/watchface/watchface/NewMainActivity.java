@@ -105,7 +105,7 @@ public class NewMainActivity extends Activity {
     String onOff_gps;
     String onOff_pedometer;
     String onOff_hrm;
-
+    Messenger mServiceMessenger;
     int Broadcastingcheck=1;
     public static Context context;
 
@@ -114,7 +114,7 @@ public class NewMainActivity extends Activity {
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Messenger mServiceMessenger = new Messenger(iBinder);
+            mServiceMessenger = new Messenger(iBinder);
             try {
                 Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
                 msg.replyTo = mMessenger;
@@ -132,6 +132,23 @@ public class NewMainActivity extends Activity {
         }
     };
 
+    public void sendMessageToService(String str){
+        Log.d("in","inininin");
+        if(isServiced){
+            Log.d("in","inininin");
+            if(mServiceMessenger!=null){
+                Log.d("in","inininin");
+                try{
+                    Message msg=Message.obtain(null,BackService.MSG_SEND_TO_SERVICE,str);
+                    Log.d("in","inininin");
+                    msg.replyTo=mMessenger;
+                    mServiceMessenger.send(msg);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // always on display
@@ -144,7 +161,7 @@ public class NewMainActivity extends Activity {
         setContentView(R.layout.activity_newmainpage);
 
         // Starts Service Binding
-        Intent intent = new Intent(NewMainActivity.this, BackService.class);
+        final Intent intent = new Intent(NewMainActivity.this, BackService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         /* Value List */
@@ -231,22 +248,22 @@ public class NewMainActivity extends Activity {
             }
 
         });
-        /*
+
         Broadcasting.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
             @Override
             public void onClick(View view){
-                if(Broadcastingcheck==1){
-                    Intent intent=new Intent(getApplicationContext(),StartAdvertise.class);
-                    startActivity(intent);
 
+                if(Broadcastingcheck==1){
+                    sendMessageToService("advon");
+                    Log.d("hi","ININI");
                 }
                 else{
-                    Intent intent=new Intent(getApplicationContext(),StopAdvertise.class);
-                    startActivity(intent);
+
+                    sendMessageToService("advoff");
                 }
             }
 
-        });*/
+        });
     }
 
     @Override
@@ -278,6 +295,8 @@ public class NewMainActivity extends Activity {
                 latitude = msg.getData().getDouble("LATITUDE");}
             if(msg.getData().getDouble("LONGITUDE")!=0){
                 longitude = msg.getData().getDouble("LONGITUDE");}
+            if(msg.getData().getFloat("Advertise")!=0){
+                }
             return false;
         }
     }));
@@ -683,5 +702,4 @@ public class NewMainActivity extends Activity {
             }
         }
     }
-
 }

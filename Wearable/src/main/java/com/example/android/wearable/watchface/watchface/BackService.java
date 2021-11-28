@@ -1,7 +1,16 @@
 package com.example.android.wearable.watchface.watchface;
 
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.AdvertiseCallback;
+import android.bluetooth.le.AdvertiseData;
+import android.bluetooth.le.AdvertiseSettings;
+import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.location.LocationListener;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +36,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -62,6 +74,16 @@ public class BackService extends Service implements SensorEventListener, Locatio
     /* Sensor Values */
     private float heart;
     private float step;
+    /** BLE Declaration **/
+    private BluetoothManager mBluetoothManager;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
+
+    /** layout Variables Declaration **/
+    private EditText mEdit;
+    private Button Start_Adv;
+    private Button Stop_Adv;
+    private boolean BLE_status = FALSE;
 
     @Override
     public void onCreate() {
@@ -212,11 +234,25 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
+            if(msg.obj=="advon"){
+                startAdvertising();
+               
+                ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=0;
+
+            }
+            if(msg.obj=="advoff"){
+
+                stopAdvertising();
+
+                ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=1;
+
+            }
             switch (msg.what) {
                 case MSG_REGISTER_CLIENT:
                     mClient = msg.replyTo;
                     Log.e(SENSOR_TAG,"Binding Complete");
                     break;
+
             }
             return false;
         }
@@ -266,4 +302,54 @@ public class BackService extends Service implements SensorEventListener, Locatio
     @Override
     public void onProviderDisabled(String s) {
     }
+    /** BLE Advertising **/
+    public void startAdvertising(){
+        /** BLE Settings **/
+        mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+        mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
+        if (mBluetoothLeAdvertiser == null) return;
+
+        AdvertiseSettings settings = new AdvertiseSettings.Builder()
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY) //3 modes: LOW_POWER, BALANCED, LOW_LATENCY
+                .setConnectable(true)
+                .setTimeout(0)
+                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH) // ULTRA_LOW, LOW, MEDIUM, HIGH
+                .build();
+
+        AdvertiseData data = new AdvertiseData.Builder()
+                .setIncludeDeviceName(true)
+                .build();
+
+        mBluetoothLeAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
+
+        ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=0;
+
+        Log.i("ADSTART", "LE Advertise Start."+ ((NewMainActivity) NewMainActivity.context).Broadcastingcheck);
+    }
+
+
+    public void stopAdvertising() {
+        if (mBluetoothLeAdvertiser == null) return;
+        mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
+        Log.i("ADSTOP", "LE Advertise Stopped.");
+        BLE_status = FALSE;
+        Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
+        ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=1;
+    }
+
+    private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
+        @Override
+        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+          
+            Log.i("ADSTART", "LE Advertise Started.");
+            BLE_status = TRUE;
+        }
+        @Override
+        public void onStartFailure(int errorCode) {
+            Log.w("ADFAIL", "LE Advertise Failed: " + errorCode);
+            BLE_status = FALSE;
+        }
+    };
+
 }
