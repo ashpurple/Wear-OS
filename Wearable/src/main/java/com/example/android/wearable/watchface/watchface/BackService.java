@@ -236,7 +236,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
         public boolean handleMessage(Message msg) {
             if(msg.obj=="advon"){
                 startAdvertising();
-                Log.e("ININNIN","IININI");
+               
                 ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=0;
 
             }
@@ -244,7 +244,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
                 stopAdvertising();
 
-                Log.e("ININNIN","IININIasfsafas");
                 ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=1;
 
             }
@@ -342,7 +341,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-            Log.d("hihi:",settingsInEffect.toString());
+          
             Log.i("ADSTART", "LE Advertise Started.");
             BLE_status = TRUE;
         }
