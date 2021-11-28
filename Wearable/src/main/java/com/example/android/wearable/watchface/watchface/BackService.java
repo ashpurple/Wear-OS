@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 
@@ -138,8 +139,8 @@ public class BackService extends Service implements SensorEventListener, Locatio
             if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE) {
                 heart = value;
                 if (mClient != null) {
-                    sendMsgToActivity(heart, "HEART");
-                    sendMsgToActivity(step, "STEP");
+                    sendMsgToActivity((int) heart, "HEART");
+                    sendMsgToActivity((int) step, "STEP");
                     sendGPSToActivity(latitude ,"LATITUDE");
                     sendGPSToActivity(longitude ,"LONGITUDE");
                 }
@@ -150,7 +151,7 @@ public class BackService extends Service implements SensorEventListener, Locatio
                 step = value;
                 Log.e(SENSOR_TAG, "Step Count : " + step + "step");
                 if (mClient != null) {
-                    sendMsgToActivity(step, "STEP");
+                    sendMsgToActivity((int)step, "STEP");
                 }
             }
         } else {
@@ -169,9 +170,8 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private final LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            latitude = location.getLongitude();
-            longitude = location.getLatitude();
-            Log.e("LOCATION_CHANGE",latitude + " : " + longitude);
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
         }
 
         @Override
@@ -221,10 +221,10 @@ public class BackService extends Service implements SensorEventListener, Locatio
             return false;
         }
     }));
-    private void sendMsgToActivity(float sendValue,String type){
+    private void sendMsgToActivity(int sendValue,String type){
         try{
             Bundle bundle= new Bundle();
-            bundle.putFloat(type,sendValue);
+            bundle.putInt(type,sendValue);
             Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
             msg.setData(bundle);
             mClient.send(msg);

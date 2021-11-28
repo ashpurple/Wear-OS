@@ -1,7 +1,7 @@
 package com.example.android.wearable.watchface.watchface;
 
 public class SensorValueInfo {
-    private float value;
+    private int value;
     private String time;
     private double latitude;
     private double longitude;
@@ -11,7 +11,7 @@ public class SensorValueInfo {
         this.longitude = longitude;
         this.time = time;
     }
-    SensorValueInfo(float value, String time){
+    SensorValueInfo(int value, String time){
         this.value = value;
         this.time = time;
     }
@@ -23,7 +23,7 @@ public class SensorValueInfo {
         return this.longitude;
     }
 
-    public float getValue() {
+    public int getValue() {
         return this.value;
     }
     public String getTime() {

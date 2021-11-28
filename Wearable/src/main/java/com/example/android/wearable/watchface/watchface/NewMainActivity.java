@@ -79,7 +79,8 @@ public class NewMainActivity extends Activity {
     String maxHeartRate;
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
-    public float heartTemp = 0, stepTemp = 0 , stress = 0, fatigue = 0;
+    public float  stress = 0, fatigue = 0;
+    public int heartTemp = 0, stepTemp = 0;
     public double latitude = 0, longitude = 0;
     public float distance, calorie;
     public boolean sosFlag = false;
@@ -262,17 +263,17 @@ public class NewMainActivity extends Activity {
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            if(msg.getData().getFloat("HEART")!=0){
-                heartTemp = msg.getData().getFloat("HEART");
+            if(msg.getData().getInt("HEART")!=0){
+                heartTemp = msg.getData().getInt("HEART");
                 if(!maxHeartRate.equals("None")) {
-                    int max = Integer.parseInt(maxHeartRate);
+                    float max = Float.parseFloat(maxHeartRate);
                     if (heartTemp >= max) {
-                        //Toast.makeText(mContext, "심박 경고 임계치(" + max + ") 초과 ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "심박 경고 임계치(" + max + ") 초과", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
-            if(msg.getData().getFloat("STEP")!=0){
-                stepTemp = msg.getData().getFloat("STEP");}
+            if(msg.getData().getInt("STEP")!=0){
+                stepTemp = msg.getData().getInt("STEP");}
             if(msg.getData().getDouble("LATITUDE")!=0){
                 latitude = msg.getData().getDouble("LATITUDE");}
             if(msg.getData().getDouble("LONGITUDE")!=0){
@@ -363,8 +364,8 @@ public class NewMainActivity extends Activity {
                     @Override
                     public void run() {
                         setTime();
-                        heartText.setText(String.valueOf((int) heartTemp));
-                        stepText.setText(String.valueOf((int) stepTemp));
+                        heartText.setText(String.valueOf(heartTemp));
+                        stepText.setText(String.valueOf(stepTemp));
                         distance = (float) (stepTemp * 0.5);
                         distanceText.setText((int)distance+"m");
                         calorie = Math.round((stepTemp *388/10000)*100)/100;
