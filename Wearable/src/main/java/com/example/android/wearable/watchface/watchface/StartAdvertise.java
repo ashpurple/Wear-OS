@@ -48,13 +48,13 @@ public class StartAdvertise extends AppCompatActivity {
         BLE_status = FALSE;
         Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
         ((NewMainActivity)NewMainActivity.context).Broadcastingcheck=0;
-        Log.e("sssss","SSSSSSSSSSSSSSS");
+   
         finish();
     }
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-            Log.d("hihi:",settingsInEffect.toString());
+      
             Log.i("StartAdvertise", "LE Advertise Started.");
             BLE_status = TRUE;
         }
