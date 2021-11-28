@@ -30,7 +30,7 @@ public class UserInfo {
     UserInfo(){
         // User
         this.name = "홍길동";
-        this.group = "가천대";
+        this.group = "SB";
         this.birthday = "None";
         this.skin = "None";
         this.protective = "None";

@@ -1,7 +1,16 @@
 package com.example.android.wearable.watchface.watchface;
 
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.AdvertiseCallback;
+import android.bluetooth.le.AdvertiseData;
+import android.bluetooth.le.AdvertiseSettings;
+import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.location.LocationListener;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +36,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 
@@ -57,8 +70,20 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // meter
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1; // milli * sec * min
     public String LOCATION_TAG = "LocationManager";
-    LocationListener locationListener;
     private FusedLocationProviderClient fusedLocationClient;
+    /* Sensor Values */
+    private float heart;
+    private float step;
+    /** BLE Declaration **/
+    private BluetoothManager mBluetoothManager;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
+
+    /** layout Variables Declaration **/
+    private EditText mEdit;
+    private Button Start_Adv;
+    private Button Stop_Adv;
+    private boolean BLE_status = FALSE;
 
     @Override
     public void onCreate() {
@@ -72,15 +97,18 @@ public class BackService extends Service implements SensorEventListener, Locatio
         } else {
             Log.e(LOCATION_TAG, "This hardware have GPS.");
         }
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.e(LOCATION_TAG, "Location Permission Fail");
         } else {
             Log.e(LOCATION_TAG, "Location Permission Success");
             //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
         }
-        startSensors();
         //getLocation();
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 1, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 1, locationListener);
+        getLastKnownLocation();
+        startSensors();
         handler = new Handler();
         runnable = new Runnable() {
             public void run() {
@@ -120,26 +148,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
             // Start step counter
             final Sensor stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
             sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
-//            locationListener = new LocationListener() {
-//                @Override
-//                public void onLocationChanged(Location location) {
-//                    float lat = Math.round(location.getLatitude()*100)/100;
-//                    float lang = Math.round(location.getLongitude()*100)/100;
-//                    sendMsgToActivity(lat ,"LATI");
-//                    sendMsgToActivity(lang ,"LANGI");
-//                    Log.e(LOCATION_TAG,lat + " " + lang);
-//                }
-//
-//                @Override
-//                public void onStatusChanged(String provider, int status, Bundle extras) {
-//                }
-//                @Override
-//                public void onProviderEnabled(String provider) {
-//                }
-//                @Override
-//                public void onProviderDisabled(String provider) {
-//                }
-//            };
         } else {
             Log.e(SENSOR_TAG, "SensorManager is null");
         }
@@ -151,17 +159,21 @@ public class BackService extends Service implements SensorEventListener, Locatio
         if (sensorEvent.values.length > 0) {
             final float value = sensorEvent.values[0];
             if (sensorEvent.sensor.getType() == Sensor.TYPE_HEART_RATE) {
+                heart = value;
                 if (mClient != null) {
-                    sendMsgToActivity(value, "HEART");
+                    sendMsgToActivity((int) heart, "HEART");
+                    sendMsgToActivity((int) step, "STEP");
+                    sendGPSToActivity(latitude ,"LATITUDE");
+                    sendGPSToActivity(longitude ,"LONGITUDE");
                 }
-                Log.e(SENSOR_TAG, "heart Rate : " + value + "bpm");
-                getLastKnownLocation();
+                Log.e(SENSOR_TAG, "heart Rate : " + heart + "bpm");
                 printGPS();
             }
             if (sensorEvent.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-                Log.e(SENSOR_TAG, "Step Count : " + value + "step");
+                step = value;
+                Log.e(SENSOR_TAG, "Step Count : " + step + "step");
                 if (mClient != null) {
-                    sendMsgToActivity(value, "STEP");
+                    sendMsgToActivity((int)step, "STEP");
                 }
             }
         } else {
@@ -177,8 +189,25 @@ public class BackService extends Service implements SensorEventListener, Locatio
         Log.e(LOCATION_TAG, "Latitude: " + latitude + " | Longitude: " + longitude);
     }
 
+    private final LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+    };
+
     private void getLastKnownLocation() {
-        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         List<String> providers = locationManager.getProviders(true);
         Location bestLocation = null;
         for (String provider : providers) {
@@ -187,16 +216,12 @@ public class BackService extends Service implements SensorEventListener, Locatio
             }
             Location l = locationManager.getLastKnownLocation(provider);
             if (l == null) {
-                Log.e(LOCATION_TAG,"Location is null");
                 continue;
             }
             if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                Log.e(LOCATION_TAG,"BestLocation");
                 bestLocation = l;
                 latitude = bestLocation.getLatitude();
                 longitude = bestLocation.getLongitude();
-                sendMsgToActivity((float)latitude ,"LATITUDE");
-                sendMsgToActivity((float)longitude ,"LONGITUDE");
             }
         }
     }
@@ -209,18 +234,45 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
+            if(msg.obj=="advon"){
+                startAdvertising();
+               
+                ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=0;
+
+            }
+            if(msg.obj=="advoff"){
+
+                stopAdvertising();
+
+                ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=1;
+
+            }
             switch (msg.what) {
                 case MSG_REGISTER_CLIENT:
                     mClient = msg.replyTo;
+                    Log.e(SENSOR_TAG,"Binding Complete");
                     break;
+
             }
             return false;
         }
     }));
-    private void sendMsgToActivity(float sendValue,String type){
+    private void sendMsgToActivity(int sendValue,String type){
         try{
             Bundle bundle= new Bundle();
-            bundle.putFloat(type,sendValue);
+            bundle.putInt(type,sendValue);
+            Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
+            msg.setData(bundle);
+            mClient.send(msg);
+        }
+        catch (RemoteException e){
+
+        }
+    }
+    private void sendGPSToActivity(double sendValue,String type){
+        try{
+            Bundle bundle= new Bundle();
+            bundle.putDouble(type,sendValue);
             Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
             msg.setData(bundle);
             mClient.send(msg);
@@ -250,4 +302,54 @@ public class BackService extends Service implements SensorEventListener, Locatio
     @Override
     public void onProviderDisabled(String s) {
     }
+    /** BLE Advertising **/
+    public void startAdvertising(){
+        /** BLE Settings **/
+        mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+        mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
+        if (mBluetoothLeAdvertiser == null) return;
+
+        AdvertiseSettings settings = new AdvertiseSettings.Builder()
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY) //3 modes: LOW_POWER, BALANCED, LOW_LATENCY
+                .setConnectable(true)
+                .setTimeout(0)
+                .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH) // ULTRA_LOW, LOW, MEDIUM, HIGH
+                .build();
+
+        AdvertiseData data = new AdvertiseData.Builder()
+                .setIncludeDeviceName(true)
+                .build();
+
+        mBluetoothLeAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
+
+        ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=0;
+
+        Log.i("ADSTART", "LE Advertise Start."+ ((NewMainActivity) NewMainActivity.context).Broadcastingcheck);
+    }
+
+
+    public void stopAdvertising() {
+        if (mBluetoothLeAdvertiser == null) return;
+        mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
+        Log.i("ADSTOP", "LE Advertise Stopped.");
+        BLE_status = FALSE;
+        Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
+        ((NewMainActivity) NewMainActivity.context).Broadcastingcheck=1;
+    }
+
+    private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
+        @Override
+        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
+          
+            Log.i("ADSTART", "LE Advertise Started.");
+            BLE_status = TRUE;
+        }
+        @Override
+        public void onStartFailure(int errorCode) {
+            Log.w("ADFAIL", "LE Advertise Failed: " + errorCode);
+            BLE_status = FALSE;
+        }
+    };
+
 }

@@ -41,14 +41,13 @@ public class AdvertiseActivity extends AppCompatActivity {
     private EditText mEdit;
     private Button Start_Adv;
     private Button Stop_Adv;
-
+    public static Context context;
     private boolean BLE_status = FALSE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.advertise_page);
-
+        context=this;
         /** Check BT Permission **/
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -74,12 +73,12 @@ public class AdvertiseActivity extends AppCompatActivity {
             Log.v(TAG, String.valueOf(mEdit.getText().toString().length()));
 
                 if (BLE_status == FALSE){
-                    startAdvertising(mEdit.getText().toString().getBytes());
+                    startAdvertising();
                     Toast.makeText(getApplicationContext(),"BLE Advertising started!",Toast.LENGTH_SHORT).show();
                     Log.e("hi",String.valueOf(mEdit.getText().toString().getBytes()));
                 }else{
                     stopAdvertising();
-                    startAdvertising(mEdit.getText().toString().getBytes());
+                    startAdvertising();
                     Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
                 }
 
@@ -94,7 +93,7 @@ public class AdvertiseActivity extends AppCompatActivity {
     };
 
     /** BLE Advertising **/
-    public void startAdvertising(byte[] payload){
+    public void startAdvertising(){
         mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
         if (mBluetoothLeAdvertiser == null) return;
 
@@ -110,6 +109,8 @@ public class AdvertiseActivity extends AppCompatActivity {
                 .build();
 
         mBluetoothLeAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
+        Toast.makeText(getApplicationContext(),"BLE Advertising started!",Toast.LENGTH_SHORT).show();
+
     }
 
 
@@ -118,6 +119,8 @@ public class AdvertiseActivity extends AppCompatActivity {
         mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
         Log.i(TAG, "LE Advertise Stopped.");
         BLE_status = FALSE;
+        Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
+
     }
 
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {

@@ -9,6 +9,7 @@
     android:padding="@dimen/box_inset_layout_padding"
     tools:context=".watchface.NewMainActivity"
     android:layout_gravity="center"
+    android:id="@+id/boxLayout"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -249,7 +250,17 @@
             android:id="@+id/button"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginLeft="105dp"
+            android:layout_marginLeft="85dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/blt"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/buttonbroad"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="110dp"
             android:layout_marginTop="25dp"
             android:background="@drawable/blt"
             app:layout_constraintStart_toStartOf="parent"
@@ -284,7 +295,7 @@
             app:layout_constraintTop_toTopOf="@+id/button2" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/buttonSos"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginLeft="105dp"

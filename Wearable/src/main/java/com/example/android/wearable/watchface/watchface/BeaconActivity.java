@@ -44,6 +44,7 @@ import androidx.core.app.ActivityCompat;
 import com.example.android.wearable.watchface.R;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +70,7 @@ public class BeaconActivity extends AppCompatActivity {
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.KOREAN);
 
+    ArrayList<String> Mac=new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +84,7 @@ public class BeaconActivity extends AppCompatActivity {
         mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
         beacon = new Vector<>();
         mScanSettings=new ScanSettings.Builder();
-        mScanSettings.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
+        mScanSettings.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
         ScanSettings scanSettings = mScanSettings.build();
 
         scanFilters=new Vector<>();
@@ -91,7 +93,7 @@ public class BeaconActivity extends AppCompatActivity {
         ScanFilter scan=scanFilter.build();
         scanFilters.add(scan);
 
-
+        Mac.add("1");
         context=this;
         mBluetoothLeScanner.startScan(scanFilters,scanSettings,mScanCallback);
 
@@ -107,8 +109,14 @@ public class BeaconActivity extends AppCompatActivity {
                 Log.d("onScanResult()", result.getDevice().getAddress() + "\n" + result.getRssi() + "\n" + result.getDevice().getName()
                         + "\n" + result.getDevice().getBondState() + "\n" + result.getDevice().getType()+"\n");
 
-                if(result.getDevice().getName()!=null) {
-
+                int check=0;
+                for(int i=0; i<Mac.size(); i++) {
+                    if(Mac.get(i)==result.getDevice().getAddress()){
+                        check=1;
+                    }
+                }
+                if(result.getDevice().getName()!=null&&check==0) {
+                    Mac.add(result.getDevice().getAddress());
                     name=result.getDevice().getName();
                     final ScanResult scanResult = result;
                     new Thread(new Runnable() {

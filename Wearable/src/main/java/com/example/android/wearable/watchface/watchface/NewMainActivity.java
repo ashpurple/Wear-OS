@@ -6,8 +6,7 @@ import android.content.ComponentName;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.app.Activity;
@@ -20,30 +19,30 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.wear.widget.BoxInsetLayout;
 
 import com.example.android.wearable.watchface.R;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 public class NewMainActivity extends Activity {
     // permission
@@ -68,6 +67,9 @@ public class NewMainActivity extends Activity {
     TextView stressText;
     /* Buttons */
     Button scanning;
+    Button Broadcasting;
+    Button sos_button;
+    BoxInsetLayout layout;
     /* Get Info */
     String name;
     String group;
@@ -77,29 +79,42 @@ public class NewMainActivity extends Activity {
     String maxHeartRate;
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
-    public float heartTemp = 0, stepTemp = 0 , latitude = 0, longitude = 0, stress = 0, fatigue = 0;
+    public float  stress = 0, fatigue = 0;
+    public int heartTemp = 0, stepTemp = 0;
+    public double latitude = 0, longitude = 0;
     public float distance, calorie;
+    public boolean sosFlag = false;
+    ArrayList<SensorValueInfo> heartList;
+    ArrayList<SensorValueInfo> stepList;
+    ArrayList<SensorValueInfo> gpsList;
     UserInfo userInfo;
     ArrayList<TimerInfo> timerList;
     JsonParser jsonParser;
     Time time;
     Context mContext;
-    /* Interval variables */
+    /* Timer variables */
     int upload_battery = 0;
-    int sensor_battery = 0;
     int upload_gps = 0;
-    int sensor_gps = 0;
+    int collect_gps = 0;
     int upload_pedometer = 0;
-    int sensor_pedometer = 0;
+    int collect_pedometer = 0;
     int upload_hrm = 0;
     int sensor_hrm = 0;
+
+    String onOff_battery;
+    String onOff_gps;
+    String onOff_pedometer;
+    String onOff_hrm;
+    Messenger mServiceMessenger;
+    int Broadcastingcheck=1;
+    public static Context context;
 
     /* Service Binding */
     boolean isServiced = false;
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Messenger mServiceMessenger = new Messenger(iBinder);
+            mServiceMessenger = new Messenger(iBinder);
             try {
                 Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
                 msg.replyTo = mMessenger;
@@ -117,9 +132,28 @@ public class NewMainActivity extends Activity {
         }
     };
 
+    public void sendMessageToService(String str){
+        Log.d("in","inininin");
+        if(isServiced){
+            Log.d("in","inininin");
+            if(mServiceMessenger!=null){
+                Log.d("in","inininin");
+                try{
+                    Message msg=Message.obtain(null,BackService.MSG_SEND_TO_SERVICE,str);
+                    Log.d("in","inininin");
+                    msg.replyTo=mMessenger;
+                    mServiceMessenger.send(msg);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // always on display
         mContext = getApplicationContext();
+        context=this;
         Log.e(MAIN_TAG, "onCreate");
         setPermissions(); // Permission Check
 
@@ -127,8 +161,13 @@ public class NewMainActivity extends Activity {
         setContentView(R.layout.activity_newmainpage);
 
         // Starts Service Binding
-        Intent intent = new Intent(NewMainActivity.this, BackService.class);
+        final Intent intent = new Intent(NewMainActivity.this, BackService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+        /* Value List */
+        heartList = new ArrayList<>();
+        gpsList = new ArrayList<>();
+        stepList = new ArrayList<>();
 
         /* Text Views */
         userText = (TextView) findViewById(R.id.Name);
@@ -136,7 +175,7 @@ public class NewMainActivity extends Activity {
         secondText = (TextView) findViewById(R.id.Second);
         monthDayText = (TextView) findViewById(R.id.MonthDay);
         amPmText = (TextView) findViewById(R.id.AMPM);
-        scanning=(Button)findViewById(R.id.button);
+
         heartText =findViewById(R.id.HeartRateValue);
         stepText=findViewById(R.id.StepValue);
         distanceText=findViewById(R.id.DistanceValue);
@@ -145,11 +184,19 @@ public class NewMainActivity extends Activity {
         fatigueText=findViewById(R.id.FatigueValue);
         stressText=findViewById(R.id.StressValue);
 
+        /* Button */
+        scanning=(Button)findViewById(R.id.button);
+        Broadcasting=(Button)findViewById(R.id.buttonbroad);
+        sos_button =(Button)findViewById(R.id.buttonSos);
+        layout = (BoxInsetLayout)findViewById(R.id.boxLayout);
+
         /* Threads */
         time = new Time();
         TimeThread timeThread = new TimeThread();
         timeThread.start();
 
+        CollectSensorThread collectSensorThread = new CollectSensorThread();
+        collectSensorThread.start();
         GetInfoThread getInfoThread = new GetInfoThread();
         getInfoThread.start();
         PostWearThread postWearThread = new PostWearThread();
@@ -160,11 +207,13 @@ public class NewMainActivity extends Activity {
         postHrmThread.start();
         PostSensorThread postPedometer= new PostSensorThread("SENSOR_PEDOMETER");
         postPedometer.start();
+        PostSensorThread postGPS= new PostSensorThread("GPS");
+        postGPS.start();
 
         /* input parsing */
         jsonParser = new JsonParser();
         userInfo = new UserInfo();
-        // default value -- can't be connected network
+        // set default value -> it is not connected to network yet
         name = userInfo.getName();
         group = userInfo.getGroup();
         birthday = userInfo.getBirthday();
@@ -173,11 +222,45 @@ public class NewMainActivity extends Activity {
         maxHeartRate = userInfo.getMaxHeartRate();
         updateInfo();
 
-        scanning.setOnClickListener(new View.OnClickListener(){ // BEL SCAN
+        scanning.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
             @Override
             public void onClick(View view){
              Intent intent=new Intent(getApplicationContext(),BeaconActivity.class);
              startActivity(intent);
+            }
+
+        });
+        sos_button.setOnClickListener(new View.OnClickListener(){ // SOS
+            @Override
+            public void onClick(View view){
+                Log.e("SOS"," "+sosFlag);
+                if(sosFlag) {
+                    sosFlag = false;
+                    layout.setBackgroundColor(Color.BLACK);
+                }
+                else{
+                    sosFlag = true;
+                    SosThread sosThread = new SosThread();
+                    sosThread.start();
+                    layout.setBackgroundColor(Color.RED);
+                }
+
+            }
+
+        });
+
+        Broadcasting.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
+            @Override
+            public void onClick(View view){
+
+                if(Broadcastingcheck==1){
+                    sendMessageToService("advon");
+                    Log.d("hi","ININI");
+                }
+                else{
+
+                    sendMessageToService("advoff");
+                }
             }
 
         });
@@ -197,15 +280,23 @@ public class NewMainActivity extends Activity {
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            Log.d(MAIN_TAG,"Messenger handler");
-            if(msg.getData().getFloat("HEART")!=0){
-                heartTemp = msg.getData().getFloat("HEART");}
-            if(msg.getData().getFloat("STEP")!=0){
-                stepTemp = msg.getData().getFloat("STEP");}
-            if(msg.getData().getFloat("LATITUDE")!=0){
-                latitude = msg.getData().getFloat("LATITUDE");}
-            if(msg.getData().getFloat("LONGITUDE")!=0){
-                longitude = msg.getData().getFloat("LONGITUDE");}
+            if(msg.getData().getInt("HEART")!=0){
+                heartTemp = msg.getData().getInt("HEART");
+                if(!maxHeartRate.equals("None")) {
+                    float max = Float.parseFloat(maxHeartRate);
+                    if (heartTemp >= max) {
+                        Toast.makeText(getApplicationContext(), "심박 경고 임계치(" + max + ") 초과", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+            if(msg.getData().getInt("STEP")!=0){
+                stepTemp = msg.getData().getInt("STEP");}
+            if(msg.getData().getDouble("LATITUDE")!=0){
+                latitude = msg.getData().getDouble("LATITUDE");}
+            if(msg.getData().getDouble("LONGITUDE")!=0){
+                longitude = msg.getData().getDouble("LONGITUDE");}
+            if(msg.getData().getFloat("Advertise")!=0){
+                }
             return false;
         }
     }));
@@ -232,26 +323,37 @@ public class NewMainActivity extends Activity {
         for(TimerInfo timer : timerList){
             String timerName = timer.getTmrNm();
             int uploadInterval = Integer.parseInt(timer.getIntervalSec());
-            int sensorInterval = Integer.parseInt(timer.getDurationSec());
+            int collectInterval = Integer.parseInt(timer.getDurationSec());
+            String onOff = timer.getOnOff();
             switch(timerName){
                 case "BATTERY":
                     upload_battery = uploadInterval;
-                    sensor_battery = sensorInterval;
+                    onOff_battery = onOff;
                     break;
                 case "GPS":
                     upload_gps = uploadInterval;
-                    sensor_gps = sensorInterval;
+                    collect_gps = collectInterval;
+                    onOff_gps = onOff;
                     break;
                 case "SENSOR_HRM":
                     upload_hrm = uploadInterval;
-                    sensor_hrm = sensorInterval;
+                    sensor_hrm = collectInterval;
+                    onOff_hrm = onOff;
                     break;
                 case "SENSOR_PEDOMETER":
                     upload_pedometer = uploadInterval;
-                    sensor_pedometer = sensorInterval;
+                    collect_pedometer = collectInterval;
+                    onOff_pedometer = onOff;
                     break;
             }
         }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private String getTimestamp() {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(timestamp);
     }
 
     @SuppressLint("SetTextI18n")
@@ -270,6 +372,7 @@ public class NewMainActivity extends Activity {
             amPmText.setText("PM");
     }
 
+
     /* Threads */
     class TimeThread extends Thread{
         @Override
@@ -280,8 +383,8 @@ public class NewMainActivity extends Activity {
                     @Override
                     public void run() {
                         setTime();
-                        heartText.setText(String.valueOf((int) heartTemp));
-                        stepText.setText(String.valueOf((int) stepTemp));
+                        heartText.setText(String.valueOf(heartTemp));
+                        stepText.setText(String.valueOf(stepTemp));
                         distance = (float) (stepTemp * 0.5);
                         distanceText.setText((int)distance+"m");
                         calorie = Math.round((stepTemp *388/10000)*100)/100;
@@ -297,13 +400,14 @@ public class NewMainActivity extends Activity {
                 } catch (InterruptedException e){
                     e.printStackTrace();
                 }
+
             }
         }
     }
 
     class GetInfoThread extends Thread {
         public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
-        Handler handler = new Handler();
+        //Handler handler = new Handler();
         @Override
         public void run() {
             Log.e(MAIN_TAG, "GET");
@@ -329,8 +433,8 @@ public class NewMainActivity extends Activity {
                         }
                         conn.disconnect();
                     }
-                    sleep(5000); // delay value
-                    handler.post(this);
+                    sleep(10000); // delay value
+                    //handler.post(this);
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, "GET Request error");
@@ -338,9 +442,6 @@ public class NewMainActivity extends Activity {
             }
         }
         public void decrypt(final String data) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
                     String temp = "";
                     int temp2 = 0;
                     try {
@@ -354,19 +455,15 @@ public class NewMainActivity extends Activity {
                     }
                     jsonInput = temp;
                     updateInfo();
-                    //Log.e(MAIN_TAG, jsonInput);
-                }
-            });
         }
     }
 
     class PostWearThread extends Thread {
-        Handler handler = new Handler();
         @Override
         public void run() {
             try {
                 while(true) {
-                    sleep(30000); // delay value
+                    sleep(60000); // upload delay 1 min
                     String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
                     if(heartTemp == 0){
                         Log.e(MAIN_TAG, "OFF");
@@ -388,7 +485,6 @@ public class NewMainActivity extends Activity {
                         int resCode = conn.getResponseCode();
                         conn.disconnect();
                     }
-                    handler.post(this);
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, "WEAR POST Request error");
@@ -400,20 +496,50 @@ public class NewMainActivity extends Activity {
     class PostSensorThread extends Thread {
         private final String sensorType;
         private int uploadInterval;
+        private String onOff;
         PostSensorThread(String sensorName){
             this.sensorType = sensorName;
         }
 
         String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos";
-        Handler handler = new Handler();
         @Override
         public void run() {
             try {
+                int initialDelay = 30000;
                 while(true) {
-                    sleep(30000); // initial delay
+                    sleep(initialDelay); // initial delay
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
+                        JsonBuilder jsonBuilder = new JsonBuilder();
+                        JSONObject jsonObj = new JSONObject();
+                        switch (sensorType){
+                            case "BATTERY":
+                                onOff = onOff_battery;
+                                jsonObj = jsonBuilder.getBattery(getBatteryRemain(mContext), isBatteryCharging(mContext)); // battery
+                                uploadInterval = upload_battery;
+                                break;
+                            case "GPS":
+                                onOff = onOff_gps;
+                                jsonObj = jsonBuilder.getGPS(gpsList); // gps
+                                uploadInterval = upload_gps;
+                                break;
+                            case "SENSOR_HRM":
+                                onOff = onOff_hrm;
+                                jsonObj = jsonBuilder.getHRM(heartList); // heart
+                                uploadInterval = upload_hrm;
+                                break;
+                            case "SENSOR_PEDOMETER":
+                                onOff = onOff_pedometer;
+                                jsonObj = jsonBuilder.getPedometer(stepList); // step
+                                uploadInterval = upload_pedometer;
+                                break;
+
+                        }
+                        if(!onOff.equals("O"))
+                            continue;
+                        Log.e(MAIN_TAG, sensorType+"|"+uploadInterval);
+
                         conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
                         conn.setRequestMethod("POST");
                         conn.setDoInput(true);
@@ -421,28 +547,6 @@ public class NewMainActivity extends Activity {
                         conn.setRequestProperty("Content-Type","application/json");
                         conn.setRequestProperty("Accept","application/json");
 
-                        JsonBuilder jsonBuilder = new JsonBuilder();
-                        JSONObject jsonObj = new JSONObject();
-                        switch (sensorType){
-                            case "BATTERY":
-                                jsonObj = jsonBuilder.getBattery(getBatteryRemain(mContext), isBatteryCharging(mContext)); // battery
-                                uploadInterval = upload_battery;
-                                break;
-                            case "GPS":
-                                jsonObj = jsonBuilder.getGPS(latitude, longitude); // gps
-                                uploadInterval = upload_gps;
-                                break;
-                            case "SENSOR_HRM":
-                                jsonObj = jsonBuilder.getHRM(heartTemp); // heart
-                                uploadInterval = upload_hrm;
-                                break;
-                            case "SENSOR_PEDOMETER":
-                                jsonObj = jsonBuilder.getPedometer((int)stepTemp, (int)calorie, (int)distance); // step
-                                uploadInterval = upload_pedometer;
-                                break;
-
-                        }
-                        Log.e(MAIN_TAG, sensorType+"&"+uploadInterval);
                         /* Body Write */
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
                         bw.write(jsonObj.toString());
@@ -451,7 +555,23 @@ public class NewMainActivity extends Activity {
 
                         /* Result Read */
                         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                        String returnMsg = in.readLine();
+                        JSONObject jsonObject = new JSONObject(in.readLine());
+                        String returnMsg = jsonObject.getString("message");
+                        if(returnMsg.equals("success")){ // if network access success
+                            switch (sensorType){ // initialize lists
+                                case "BATTERY":
+                                    break;
+                                case "GPS":
+                                    gpsList.clear();
+                                    break;
+                                case "SENSOR_HRM":
+                                    heartList.clear();
+                                    break;
+                                case "SENSOR_PEDOMETER":
+                                    stepList.clear();
+                                    break;
+                            }
+                        }
                         Log.e(MAIN_TAG, sensorType+" "+returnMsg);
 
                         /* Response Code */
@@ -460,13 +580,71 @@ public class NewMainActivity extends Activity {
                         } else { Log.e(MAIN_TAG, sensorType+" RESPONSE CODE ERROR");}
 
                         conn.disconnect();
-                        Log.e("UPLOAD_"+sensorType,String.valueOf(uploadInterval * 1000L));
-                        sleep(uploadInterval * 1000L); // delay value
+                        sleep(uploadInterval * 1000L - initialDelay); // upload delay
                     }
-                    handler.post(this);
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, sensorType+" Request error");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    class CollectSensorThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                int initialDelay = 10000; // wait for 10 sec
+                sleep(initialDelay); // initial delay
+                int sec = 0;
+                while(true) {
+                    if(sec % 10 == 0){
+                        heartList.add(new SensorValueInfo(heartTemp, getTimestamp()));
+                    }
+                    if(sec % 10 == 0){
+                        gpsList.add(new SensorValueInfo(latitude, longitude, getTimestamp()));
+                    }
+                    if(sec % 10 == 0){
+                        stepList.add(new SensorValueInfo(stepTemp, getTimestamp()));
+                    }
+                    sleep(1000);
+                    sec += 1;
+                }
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "Collect Sensor Error");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    class SosThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sos";
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn != null) {
+                    conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                    conn.setRequestProperty("Content-Type","application/json");
+                    conn.setRequestProperty("Accept","application/json");
+
+                    /* Result Read */
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    JSONObject jsonObject = new JSONObject(in.readLine());
+                    String returnMsg = jsonObject.getString("result");
+                    if(returnMsg.equals("success")){
+                        Log.e(MAIN_TAG, "SOS POST REQUEST");
+                    }
+                    int resCode = conn.getResponseCode();
+                    conn.disconnect();
+                }
+
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "WEAR POST Request error");
                 e.printStackTrace();
             }
         }
@@ -524,5 +702,4 @@ public class NewMainActivity extends Activity {
             }
         }
     }
-
 }

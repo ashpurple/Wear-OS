@@ -17,7 +17,7 @@ public class JsonParser {
             userInfo.setName(jsonObject.getString("name"));
             userInfo.setProtective(jsonObject.getString("protective"));
             userInfo.setSkin(jsonObject.getString("skin"));
-            userInfo.setSkin(jsonObject.getString("maxHeartRate"));
+            userInfo.setMaxHeartRate(jsonObject.getString("maxHeartRate"));
             userInfo.setGroup(jsonObject.getString("group"));
 
             // timerList Array
