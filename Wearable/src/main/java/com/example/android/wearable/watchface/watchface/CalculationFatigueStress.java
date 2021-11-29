@@ -1,14 +1,35 @@
 package com.example.android.wearable.watchface.watchface;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class CalculationFatigueStress {
+
+    private ArrayList<SensorValueInfo> input = null;
+    private ArrayList<Integer> heart_list = null;
+    private ArrayList hrf = new ArrayList<Double>();
+    private ArrayList hrl = new ArrayList<Double>();
+    private ArrayList rr_interval = new ArrayList<Double>();
+
+    CalculationFatigueStress(ArrayList<SensorValueInfo> Input){
+        heart_list = new ArrayList<Integer>();
+        for(SensorValueInfo sensorValueInfo: Input){
+            int heartValue = sensorValueInfo.getValue();
+            heart_list.add(heartValue);
+        }
+        Collections.sort(heart_list, Collections.<Integer>reverseOrder());
+        for(int i = 0; i < 10; i++){
+            hrf.add(heart_list.get(i));
+        }
+        Collections.sort(heart_list);
+        for(int i = 0; i < 10; i++){
+            hrl.add(heart_list.get(i));
+        }
+
+        CalculateFatigue();
+    }
+
     // Fatigue And Stress Calculation -------------------------------------------------
-    ArrayList HRF = new ArrayList<Double>();
-    ArrayList HRL = new ArrayList<Double>();
-    ArrayList RR_interval = new ArrayList<Double>();
-
-
     public double slope(final double x1, final double y1, final double x2, final double y2) {
         double m = 0;
         double b = x2 - x1;
@@ -19,31 +40,6 @@ public class CalculationFatigueStress {
         return m;
     }
 
-    public void getHRF(){
-        HRF.add(78);
-        HRF.add(79);
-        HRF.add(78);
-        HRF.add(80);
-        HRF.add(81);
-        HRF.add(82);
-        HRF.add(82);
-        HRF.add(82);
-        HRF.add(83);
-        HRF.add(84);
-    }
-
-    public void getHRL(){
-        HRL.add(64);
-        HRL.add(63);
-        HRL.add(63);
-        HRL.add(62);
-        HRL.add(62);
-        HRL.add(62);
-        HRL.add(61);
-        HRL.add(61);
-        HRL.add(60);
-        HRL.add(60);
-    }
 
     public double getMean(ArrayList list){
         double avg;
@@ -81,7 +77,7 @@ public class CalculationFatigueStress {
         int LastTired = 0;
         int CurrentTired;
 
-        CurrentTired = (int)slope(0, getMean(HRF), Timeline, getMean(HRL)*100);
+        CurrentTired = (int)slope(0, getMean(hrf), Timeline, getMean(hrl)*100);
         if(CurrentTired > 0){
             if(CurrentTired > MaxTiredUp){
                 MaxTiredUp = (int)CurrentTired;
@@ -129,19 +125,19 @@ public class CalculationFatigueStress {
     }
 
     public void getRRInterval(){
-        RR_interval.add((int)1772.89);
-        RR_interval.add((int)1770.01);
-        RR_interval.add((int)1760.22);
-        RR_interval.add((int)1810.88);
-        RR_interval.add((int)1690.02);
-        RR_interval.add((int)1700.28);
+        rr_interval.add((int)1772.89);
+        rr_interval.add((int)1770.01);
+        rr_interval.add((int)1760.22);
+        rr_interval.add((int)1810.88);
+        rr_interval.add((int)1690.02);
+        rr_interval.add((int)1700.28);
     }
 
     public void CalculateStress(){
         double MinStress = 25.0;
         double MaxStress = 75.0;
 
-        double Measure = getStdev(RR_interval);
+        double Measure = getStdev(rr_interval);
         if(MinStress > Measure){
             MinStress = Measure;
         }
