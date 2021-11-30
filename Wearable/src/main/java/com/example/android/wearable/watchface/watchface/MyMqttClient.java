@@ -12,6 +12,7 @@ import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MyMqttClient implements MqttCallback, Runnable {
 
@@ -53,7 +54,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		this.p_topics = new ArrayList();
 		this.subscriber = false;
 		this.msgCount = 0;
-		this.msg = "Hello World";
+		this.msg = "Hello World!";
 	}
 
 	@Override
@@ -162,7 +163,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		
 		// Connect to Broker
 		try {
-			myClient = new MqttClient(BROKER_URL, from_id);
+			myClient = new MqttClient(BROKER_URL, from_id, new MemoryPersistence());
 			myClient.setCallback(this);
 			myClient.connect(connOpt);
 		} catch (MqttException e) {
@@ -172,7 +173,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		
 		System.out.println("Connected to " + BROKER_URL);
 		
-		if (myClient.isConnected() == true) {
+		if (myClient.isConnected()) {
 			System.out.println("Successfully connected");
 			subscriber = true;
 		}
@@ -188,7 +189,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 				int subQoS = 1;
 				myClient.subscribe(s_topic, subQoS);
 				myClient.subscribe(s_topic2, subQoS);
-				System.out.println(s_topic + "\n" + s_topic2 + " are subscirbed" );
+				System.out.println(s_topic + "\n" + s_topic2 + " are subscribed" );
 				
 			} catch (Exception e) {
 				e.printStackTrace();
