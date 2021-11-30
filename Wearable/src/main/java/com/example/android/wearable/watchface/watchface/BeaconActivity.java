@@ -137,7 +137,6 @@ public class BeaconActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
 
 

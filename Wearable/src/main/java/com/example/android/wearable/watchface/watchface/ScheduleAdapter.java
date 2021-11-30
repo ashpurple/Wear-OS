@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 public class ScheduleAdapter extends BaseAdapter {
-    // private Vector<Beacon> beacons; Schedule 받아오는 객체
+
     private LayoutInflater layoutInflater;
     private ArrayList<Schedule> schedules;
 
@@ -21,7 +21,6 @@ public class ScheduleAdapter extends BaseAdapter {
         this.schedules = schedules;
         this.layoutInflater = layoutInflater;
     }
-    private Schedule schedule;
 
     @Override
     public int getCount() {
