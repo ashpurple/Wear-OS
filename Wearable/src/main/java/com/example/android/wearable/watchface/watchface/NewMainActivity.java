@@ -767,7 +767,9 @@ public class NewMainActivity extends Activity {
             for(Schedule schedule : scheduleList){
                 System.out.println(schedule.getContents());
             }
+
             Intent intent=new Intent(getApplicationContext(),ScheduleActivity.class);
+            intent.putExtra("schedule" , scheduleList );
             startActivity(intent);
         }
     }

@@ -39,24 +39,24 @@ public class ScheduleAdapter extends BaseAdapter {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertview2, ViewGroup parent) {
 
         ScheduleAdapter.ScheduleHolder scheduleHolder;
-        if (convertView == null) {
+        if (convertview2 == null) {
             scheduleHolder = new ScheduleHolder();
-            convertView = layoutInflater.inflate(R.layout.item_schedule, parent, false);
-            scheduleHolder.company_name= convertView.findViewById(R.id.company_name);
-            scheduleHolder.biz_name = convertView.findViewById(R.id.biz_name);
-            scheduleHolder.title = convertView.findViewById(R.id.title);
-            scheduleHolder.location=convertView.findViewById(R.id.schedule_location);
-            scheduleHolder.contents= convertView.findViewById(R.id.contents);
-            scheduleHolder.start_date = convertView.findViewById(R.id.start_date);
-            scheduleHolder.end_date = convertView.findViewById(R.id.end_date);
-            scheduleHolder.start_time=convertView.findViewById(R.id.start_time);
-            scheduleHolder.end_time=convertView.findViewById(R.id.end_time);
-            convertView.setTag(scheduleHolder);
+            convertview2 = layoutInflater.inflate(R.layout.item_schedule, parent, false);
+            scheduleHolder.company_name= convertview2.findViewById(R.id.company_name);
+            scheduleHolder.biz_name = convertview2.findViewById(R.id.biz_name);
+            scheduleHolder.title = convertview2.findViewById(R.id.title);
+            scheduleHolder.location=convertview2.findViewById(R.id.schedule_location);
+            scheduleHolder.contents= convertview2.findViewById(R.id.contents);
+            scheduleHolder.start_date = convertview2.findViewById(R.id.start_date);
+            scheduleHolder.end_date = convertview2.findViewById(R.id.end_date);
+            scheduleHolder.start_time=convertview2.findViewById(R.id.start_time);
+            scheduleHolder.end_time=convertview2.findViewById(R.id.end_time);
+            convertview2.setTag(scheduleHolder);
         } else {
-            scheduleHolder = (ScheduleAdapter.ScheduleHolder)convertView.getTag();
+            scheduleHolder = (ScheduleAdapter.ScheduleHolder)convertview2.getTag();
         }
         if(scheduleHolder.company_name!=null) {
             scheduleHolder.company_name.setText("회사 이름 : " + schedules.get(position).getCompany_name());
@@ -69,7 +69,7 @@ public class ScheduleAdapter extends BaseAdapter {
             scheduleHolder.start_time.setText("시작 시간 : " + schedules.get(position).getStart_time());
             scheduleHolder.end_time.setText("종료 시간 : " + schedules.get(position).getEnd_time());
         }
-        return convertView;
+        return convertview2;
     }
 
     private static class ScheduleHolder {

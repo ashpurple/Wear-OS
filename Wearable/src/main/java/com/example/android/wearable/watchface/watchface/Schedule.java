@@ -1,6 +1,8 @@
 package com.example.android.wearable.watchface.watchface;
 
-public class Schedule {
+import java.io.Serializable;
+
+public class Schedule implements Serializable {
 
     private String company_name;
     private String biz_name;
