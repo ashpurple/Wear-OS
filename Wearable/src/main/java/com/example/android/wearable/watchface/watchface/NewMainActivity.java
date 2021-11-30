@@ -72,6 +72,8 @@ public class NewMainActivity extends Activity {
     Button scanning;
     Button Broadcasting;
     Button sos_button;
+    Button schedule_button;
+    Button message_button;
     ConstraintLayout layout;
     /* Get Info */
     String name;
@@ -200,6 +202,8 @@ public class NewMainActivity extends Activity {
         Broadcasting=(Button)findViewById(R.id.buttonbroad);
         sos_button =(Button)findViewById(R.id.buttonSos);
         layout = (ConstraintLayout) findViewById(R.id.const_layout);
+        schedule_button = (Button)findViewById(R.id.schedule_btn);
+        message_button = (Button)findViewById(R.id.message_btn);
 
         /* Threads */
         time = new Time();
@@ -279,6 +283,23 @@ public class NewMainActivity extends Activity {
 
             }
 
+        });
+
+        schedule_button.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
+            @Override
+            public void onClick(View view){
+                ScheduleThread scheduleThread = new ScheduleThread();
+                scheduleThread.start();
+            }
+
+        });
+
+        message_button.setOnClickListener(new View.OnClickListener(){ // MESSAGE
+            @Override
+            public void onClick(View view){
+                MessageThread messageThread = new MessageThread();
+                messageThread.start();
+            }
         });
     }
 
@@ -685,9 +706,91 @@ public class NewMainActivity extends Activity {
                 }
 
             } catch (Exception e) {
-                Log.e(MAIN_TAG, "WEAR POST Request error");
+                Log.e(MAIN_TAG, "SOS POST Request error");
                 e.printStackTrace();
             }
+        }
+    }
+
+    class ScheduleThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/schedules";
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn != null) {
+                    conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
+                    conn.setRequestMethod("GET");
+                    conn.setDoInput(true);
+                    conn.setRequestProperty("Content-Type","application/json");
+                    conn.setRequestProperty("Accept","application/json");
+
+                    /* Result Read */
+                    int resCode = conn.getResponseCode();
+                    if (resCode == HttpURLConnection.HTTP_OK) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        JSONObject jsonObject = new JSONObject(in.readLine());
+                        String returnMsg = jsonObject.getString("data");
+                        decrypt(returnMsg);
+                    }
+                    conn.disconnect();
+                }
+
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "Schedule Request error");
+                e.printStackTrace();
+            }
+        }
+        public void decrypt(final String data) {
+            String scheduleJson = "";
+            try {
+                scheduleJson = AES256s.decryptToString(data, MAC);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.e("SCHEDULE: ",scheduleJson);
+        }
+    }
+
+    class MessageThread extends Thread {
+        @Override
+        public void run() {
+            try {
+                String urlStr = "http://15.164.45.229:8889/messages/"+DUID+"=/senders";
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn != null) {
+                    conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
+                    conn.setRequestMethod("GET");
+                    conn.setDoInput(true);
+                    conn.setRequestProperty("Content-Type","application/json");
+                    conn.setRequestProperty("Accept","application/json");
+
+                    /* Result Read */
+                    int resCode = conn.getResponseCode();
+                    if (resCode == HttpURLConnection.HTTP_OK) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        JSONObject jsonObject = new JSONObject(in.readLine());
+                        String returnMsg = jsonObject.getString("data");
+                        decrypt(returnMsg);
+                    }
+                    conn.disconnect();
+                }
+
+            } catch (Exception e) {
+                Log.e(MAIN_TAG, "Message Request error");
+                e.printStackTrace();
+            }
+        }
+        public void decrypt(final String data) {
+            String scheduleJson = "";
+            try {
+                scheduleJson = AES256s.decryptToString(data, MAC);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.e("Message: ",scheduleJson);
         }
     }
 
