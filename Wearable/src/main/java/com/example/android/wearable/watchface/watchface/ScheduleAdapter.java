@@ -11,14 +11,14 @@ import com.example.android.wearable.watchface.R;
 import java.util.Vector;
 
 public class ScheduleAdapter extends BaseAdapter {
-    // private Vector<Beacon> beacons; Schedule 받아오는 객체
-    private LayoutInflater layoutInflater;
 
-    public ScheduleAdapter(/*Vector<Beacon> beacons,*/LayoutInflater layoutInflater) {
-        //this.beacons = beacons;
+    private LayoutInflater layoutInflater;
+    private Schedule schedule;
+
+    public ScheduleAdapter(Schedule schedule, LayoutInflater layoutInflater) {
+        this.schedule = schedule;
         this.layoutInflater = layoutInflater;
     }
-    private Schedule schedule;
 
     @Override
     public int getCount() {
