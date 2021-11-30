@@ -50,7 +50,8 @@ public class NewMainActivity extends Activity {
     private final static String[] permissions = new String[]
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
-
+    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE"; // user's input
+    static final String MAC = "08:97:98:0E:E6:DA"; // user's input
     /* Info Text */
     String jsonInput = "";
     TextView userText;
@@ -81,13 +82,15 @@ public class NewMainActivity extends Activity {
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
     public float  stress = 0, fatigue = 0;
-    public int heartTemp = 0, stepTemp = 0;
+    public int heartTemp = 0, stepTemp = 0, fatigueTemp = 0;
     public double latitude = 0, longitude = 0;
     public float distance, calorie;
     public boolean sosFlag = false;
     ArrayList<SensorValueInfo> heartList;
     ArrayList<SensorValueInfo> stepList;
     ArrayList<SensorValueInfo> gpsList;
+    ArrayList<SensorValueInfo> fatigueList;
+    ArrayList<SensorValueInfo> heartForFatigueList;
     UserInfo userInfo;
     ArrayList<TimerInfo> timerList;
     JsonParser jsonParser;
@@ -100,14 +103,17 @@ public class NewMainActivity extends Activity {
     int upload_pedometer = 0;
     int collect_pedometer = 0;
     int upload_hrm = 0;
-    int sensor_hrm = 0;
+    int collect_hrm = 0;
+    int upload_fatigue = 0;
+    int collect_fatigue = 0;
 
     String onOff_battery;
     String onOff_gps;
     String onOff_pedometer;
     String onOff_hrm;
+    String onOff_fatigue;
     Messenger mServiceMessenger;
-    int Broadcastingcheck=1;
+    int broadcastingCheck = 1;
     public static Context context;
 
     /* Service Binding */
@@ -169,6 +175,8 @@ public class NewMainActivity extends Activity {
         heartList = new ArrayList<>();
         gpsList = new ArrayList<>();
         stepList = new ArrayList<>();
+        heartForFatigueList = new ArrayList<>();
+        fatigueList = new ArrayList<>();
 
         /* Text Views */
         userText = (TextView) findViewById(R.id.Name);
@@ -210,6 +218,8 @@ public class NewMainActivity extends Activity {
         postPedometer.start();
         PostSensorThread postGPS= new PostSensorThread("GPS");
         postGPS.start();
+        PostSensorThread postFatigue= new PostSensorThread("FATIGUE");
+        postFatigue.start();
 
         /* input parsing */
         jsonParser = new JsonParser();
@@ -231,6 +241,23 @@ public class NewMainActivity extends Activity {
             }
 
         });
+
+        Broadcasting.setOnClickListener(new View.OnClickListener(){ // BLE Broadcasting
+            @Override
+            public void onClick(View view){
+
+                if(broadcastingCheck ==1){
+                    sendMessageToService("advon");
+                    Log.d("hi","ININI");
+                }
+                else{
+
+                    sendMessageToService("advoff");
+                }
+            }
+
+        });
+
         sos_button.setOnClickListener(new View.OnClickListener(){ // SOS
             @Override
             public void onClick(View view){
@@ -246,22 +273,6 @@ public class NewMainActivity extends Activity {
                     layout.setBackgroundColor(Color.RED);
                 }
 
-            }
-
-        });
-
-        Broadcasting.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
-            @Override
-            public void onClick(View view){
-
-                if(Broadcastingcheck==1){
-                    sendMessageToService("advon");
-                    Log.d("hi","ININI");
-                }
-                else{
-
-                    sendMessageToService("advoff");
-                }
             }
 
         });
@@ -338,13 +349,18 @@ public class NewMainActivity extends Activity {
                     break;
                 case "SENSOR_HRM":
                     upload_hrm = uploadInterval;
-                    sensor_hrm = collectInterval;
+                    collect_hrm = collectInterval;
                     onOff_hrm = onOff;
                     break;
                 case "SENSOR_PEDOMETER":
                     upload_pedometer = uploadInterval;
                     collect_pedometer = collectInterval;
                     onOff_pedometer = onOff;
+                    break;
+                case "FATIGUE":
+                    upload_fatigue = uploadInterval;
+                    collect_fatigue = collectInterval;
+                    onOff_fatigue = onOff;
                     break;
             }
         }
@@ -373,7 +389,6 @@ public class NewMainActivity extends Activity {
             amPmText.setText("PM");
     }
 
-
     /* Threads */
     class TimeThread extends Thread{
         @Override
@@ -393,6 +408,7 @@ public class NewMainActivity extends Activity {
                         int intLatitude = (int)latitude;
                         int intLongitude = (int)longitude;
                         gpsText.setText(intLatitude+"."+intLongitude);
+                        fatigueText.setText(String.valueOf(fatigueTemp));
                         //secondText.setText(second);
                     }
                 });
@@ -407,7 +423,8 @@ public class NewMainActivity extends Activity {
     }
 
     class GetInfoThread extends Thread {
-        public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
+        public String urlStr = "http://15.164.45.229:8889/users/"+DUID+"=";
+
         //Handler handler = new Handler();
         @Override
         public void run() {
@@ -450,7 +467,7 @@ public class NewMainActivity extends Activity {
                             if (data.charAt(i) == ':')
                                 temp2 = i;
                         }
-                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
+                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), MAC);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -465,7 +482,7 @@ public class NewMainActivity extends Activity {
             try {
                 while(true) {
                     sleep(60000); // upload delay 1 min
-                    String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
+                    String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/wear/";
                     if(heartTemp == 0){
                         Log.e(MAIN_TAG, "OFF");
                         urlStr += "off";
@@ -502,7 +519,7 @@ public class NewMainActivity extends Activity {
             this.sensorType = sensorName;
         }
 
-        String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos";
+        String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/sensorInfos";
         @Override
         public void run() {
             try {
@@ -512,7 +529,7 @@ public class NewMainActivity extends Activity {
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
-                        JsonBuilder jsonBuilder = new JsonBuilder();
+                        JsonBuilder jsonBuilder = new JsonBuilder(MAC);
                         JSONObject jsonObj = new JSONObject();
                         switch (sensorType){
                             case "BATTERY":
@@ -535,11 +552,15 @@ public class NewMainActivity extends Activity {
                                 jsonObj = jsonBuilder.getPedometer(stepList); // step
                                 uploadInterval = upload_pedometer;
                                 break;
-
+                            case "FATIGUE":
+                                onOff = onOff_fatigue;
+                                jsonObj = jsonBuilder.getFatigue(fatigueList); // fatigue
+                                uploadInterval = upload_fatigue;
+                                break;
                         }
-                        if(!onOff.equals("O"))
+                        if(!onOff.equals("O")) // if setting is off
                             continue;
-                        Log.e(MAIN_TAG, sensorType+"|"+uploadInterval);
+                        Log.e(MAIN_TAG, sensorType+"| Upload Interval: "+uploadInterval);
 
                         conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
                         conn.setRequestMethod("POST");
@@ -571,6 +592,9 @@ public class NewMainActivity extends Activity {
                                 case "SENSOR_PEDOMETER":
                                     stepList.clear();
                                     break;
+                                case "FATIGUE":
+                                    fatigueList.clear();
+                                    break;
                             }
                         }
                         Log.e(MAIN_TAG, sensorType+" "+returnMsg);
@@ -599,6 +623,7 @@ public class NewMainActivity extends Activity {
                 sleep(initialDelay); // initial delay
                 int sec = 0;
                 while(true) {
+                    sec += 1;
                     if(sec % 10 == 0){
                         heartList.add(new SensorValueInfo(heartTemp, getTimestamp()));
                     }
@@ -608,8 +633,18 @@ public class NewMainActivity extends Activity {
                     if(sec % 10 == 0){
                         stepList.add(new SensorValueInfo(stepTemp, getTimestamp()));
                     }
+                    if(sec % 2 == 0){
+                        heartForFatigueList.add(new SensorValueInfo(heartTemp, getTimestamp()));
+                    }
+                    if(sec % 20 == 0){
+                        CalculationFatigueStress calculationFatigueStress = new CalculationFatigueStress(heartForFatigueList);
+                        int fatigueValue = calculationFatigueStress.calculateFatigue();
+                        fatigueTemp = fatigueValue;
+                        fatigueList.add(new SensorValueInfo(fatigueValue, getTimestamp()));
+                        heartForFatigueList.clear();
+                    }
                     sleep(1000);
-                    sec += 1;
+
                 }
             } catch (Exception e) {
                 Log.e(MAIN_TAG, "Collect Sensor Error");
@@ -622,7 +657,7 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             try {
-                String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sos";
+                String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/sos";
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn != null) {

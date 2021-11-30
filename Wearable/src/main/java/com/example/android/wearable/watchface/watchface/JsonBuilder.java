@@ -13,7 +13,12 @@ import java.util.ArrayList;
 public class JsonBuilder {
     private Timestamp timestamp;
     private SimpleDateFormat sdf;
+    private String MAC;
     @SuppressLint("SimpleDateFormat")
+
+    JsonBuilder(String MAC){
+        this.MAC = MAC;
+    }
 
     private void setTimestamp() {
         timestamp = new Timestamp(System.currentTimeMillis());
@@ -108,6 +113,7 @@ public class JsonBuilder {
         value.put("value",stress);
         value.put("timeStamp",sdf.format(timestamp));
         jsonArr.put(value);
+
         data.put("values",jsonArr);
 
         String input = data.toString();
@@ -116,7 +122,7 @@ public class JsonBuilder {
         jsonObj.put("data",input);
         return jsonObj;
     }
-    public JSONObject getFatigue(float fatigue) throws JSONException {
+    public JSONObject getFatigue(ArrayList<SensorValueInfo> fatigue) throws JSONException {
         setTimestamp();
 
         JSONObject jsonObj = new JSONObject();
@@ -125,12 +131,13 @@ public class JsonBuilder {
         JSONObject data = new JSONObject();
         data.put("command", "FATIGUE");
         JSONArray jsonArr = new JSONArray();
-        JSONObject value = new JSONObject();
-        value.put("value",fatigue);
-        value.put("timeStamp",sdf.format(timestamp));
-        jsonArr.put(value);
-        data.put("values",jsonArr);
-
+        for(SensorValueInfo sensorValue: fatigue) {
+            JSONObject value = new JSONObject();
+            value.put("value", sensorValue.getValue());
+            value.put("timeStamp", sensorValue.getTime());
+            jsonArr.put(value);
+        }
+        data.put("values", jsonArr);
         String input = data.toString();
         input = encrypt(input);
 
@@ -187,7 +194,7 @@ public class JsonBuilder {
         String encrypted = "";
         //Log.e(MAIN_TAG, "SENSOR POST ENCRYPT");
         try {
-            encrypted = AES256s.encrypt(data, "08:97:98:0E:E6:DA");
+            encrypted = AES256s.encrypt(data, MAC);
         } catch (Exception e) {
             e.printStackTrace();
         }
