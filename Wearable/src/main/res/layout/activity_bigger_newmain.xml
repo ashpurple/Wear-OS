@@ -9,7 +9,7 @@
     android:padding="@dimen/box_inset_layout_padding"
     tools:context=".watchface.NewMainActivity"
     android:layout_gravity="center"
-    android:id="@+id/const_layout"
+    android:id="@+id/boxLayout"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -241,7 +241,7 @@
             android:id="@+id/Company"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="70dp"
+            android:layout_marginStart="60dp"
             android:layout_marginTop="180dp"
             android:gravity="center"
             android:text="에스비시스템즈"

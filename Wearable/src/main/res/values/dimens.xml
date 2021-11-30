@@ -14,6 +14,10 @@
  limitations under the License.
 -->
 <resources>
+    <dimen name="header_start_padding">36dp</dimen>
+    <dimen name="header_end_padding">22dp</dimen>
+    <dimen name="list_start_padding">36dp</dimen>
+    <dimen name="list_end_padding">22dp</dimen>
     <dimen name="digital_text_size">40dp</dimen>
     <dimen name="digital_text_size_round">45dp</dimen>
     <dimen name="digital_date_text_size">20dp</dimen>

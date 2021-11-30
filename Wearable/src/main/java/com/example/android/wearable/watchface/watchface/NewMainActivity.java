@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.wear.widget.BoxInsetLayout;
@@ -69,7 +70,7 @@ public class NewMainActivity extends Activity {
     Button scanning;
     Button Broadcasting;
     Button sos_button;
-    BoxInsetLayout layout;
+    ConstraintLayout layout;
     /* Get Info */
     String name;
     String group;
@@ -188,7 +189,7 @@ public class NewMainActivity extends Activity {
         scanning=(Button)findViewById(R.id.button);
         Broadcasting=(Button)findViewById(R.id.buttonbroad);
         sos_button =(Button)findViewById(R.id.buttonSos);
-        layout = (BoxInsetLayout)findViewById(R.id.boxLayout);
+        layout = (ConstraintLayout) findViewById(R.id.const_layout);
 
         /* Threads */
         time = new Time();
