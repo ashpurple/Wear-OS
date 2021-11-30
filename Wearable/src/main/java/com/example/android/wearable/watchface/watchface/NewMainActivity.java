@@ -55,6 +55,7 @@ public class NewMainActivity extends Activity {
     /* Info Text */
     String jsonInput = "";
     TextView userText;
+    TextView groupText;
     TextView hourMinuteText;
     TextView secondText;
     TextView monthDayText;
@@ -86,6 +87,7 @@ public class NewMainActivity extends Activity {
     public double latitude = 0, longitude = 0;
     public float distance, calorie;
     public boolean sosFlag = false;
+    public boolean broadcastingFlag = false;
     ArrayList<SensorValueInfo> heartList;
     ArrayList<SensorValueInfo> stepList;
     ArrayList<SensorValueInfo> gpsList;
@@ -113,7 +115,6 @@ public class NewMainActivity extends Activity {
     String onOff_hrm;
     String onOff_fatigue;
     Messenger mServiceMessenger;
-    int broadcastingCheck = 1;
     public static Context context;
 
     /* Service Binding */
@@ -184,6 +185,7 @@ public class NewMainActivity extends Activity {
         secondText = (TextView) findViewById(R.id.Second);
         monthDayText = (TextView) findViewById(R.id.MonthDay);
         amPmText = (TextView) findViewById(R.id.AMPM);
+        groupText = (TextView) findViewById(R.id.group);
 
         heartText =findViewById(R.id.HeartRateValue);
         stepText=findViewById(R.id.StepValue);
@@ -246,13 +248,15 @@ public class NewMainActivity extends Activity {
             @Override
             public void onClick(View view){
 
-                if(broadcastingCheck ==1){
-                    sendMessageToService("advon");
-                    Log.d("hi","ININI");
+                if(broadcastingFlag){
+                    broadcastingFlag = false;
+                    sendMessageToService("advoff");
+                    layout.setBackgroundColor(Color.BLACK);
                 }
                 else{
-
-                    sendMessageToService("advoff");
+                    broadcastingFlag = true;
+                    sendMessageToService("advon");
+                    layout.setBackgroundColor(Color.BLUE);
                 }
             }
 
@@ -261,7 +265,7 @@ public class NewMainActivity extends Activity {
         sos_button.setOnClickListener(new View.OnClickListener(){ // SOS
             @Override
             public void onClick(View view){
-                Log.e("SOS"," "+sosFlag);
+
                 if(sosFlag) {
                     sosFlag = false;
                     layout.setBackgroundColor(Color.BLACK);
@@ -329,6 +333,7 @@ public class NewMainActivity extends Activity {
             e.printStackTrace();
         }
         userText.setText(name);
+        groupText.setText(group);
     }
 
     public void updateTimer(){

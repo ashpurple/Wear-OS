@@ -235,16 +235,9 @@ public class BackService extends Service implements SensorEventListener, Locatio
         public boolean handleMessage(Message msg) {
             if(msg.obj=="advon"){
                 startAdvertising();
-               
-                ((NewMainActivity) NewMainActivity.context).broadcastingCheck =0;
-
             }
             if(msg.obj=="advoff"){
-
                 stopAdvertising();
-
-                ((NewMainActivity) NewMainActivity.context).broadcastingCheck =1;
-
             }
             switch (msg.what) {
                 case MSG_REGISTER_CLIENT:
@@ -321,10 +314,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
                 .build();
 
         mBluetoothLeAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
-
-        ((NewMainActivity) NewMainActivity.context).broadcastingCheck =0;
-
-        Log.i("ADSTART", "LE Advertise Start."+ ((NewMainActivity) NewMainActivity.context).broadcastingCheck);
     }
 
 
@@ -334,7 +323,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
         Log.i("ADSTOP", "LE Advertise Stopped.");
         BLE_status = FALSE;
         Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
-        ((NewMainActivity) NewMainActivity.context).broadcastingCheck =1;
     }
 
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
