@@ -125,7 +125,7 @@
         <activity android:name=".watchface.SimpleList" />
         <activity android:name=".watchface.AdvertiseActivity"
             android:theme="@style/Theme.AppCompat"/>
-
+       
         <activity android:name=".watchface.BeaconActivity"
             android:theme="@style/Theme.AppCompat"/>
         <activity android:name=".watchface.StopAdvertise"

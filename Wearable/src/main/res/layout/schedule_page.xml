@@ -7,15 +7,12 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
-    tools:context=".watchface.BeaconActivity">
+    tools:context=".watchface.Schedule">
 
     <ListView
-        android:id="@+id/beaconListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-
-        />
+        android:id="@+id/ScheduleListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 
 </RelativeLayout>
