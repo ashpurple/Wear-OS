@@ -13,7 +13,12 @@ import java.util.ArrayList;
 public class JsonBuilder {
     private Timestamp timestamp;
     private SimpleDateFormat sdf;
+    private String MAC;
     @SuppressLint("SimpleDateFormat")
+
+    JsonBuilder(String MAC){
+        this.MAC = MAC;
+    }
 
     private void setTimestamp() {
         timestamp = new Timestamp(System.currentTimeMillis());
@@ -189,7 +194,7 @@ public class JsonBuilder {
         String encrypted = "";
         //Log.e(MAIN_TAG, "SENSOR POST ENCRYPT");
         try {
-            encrypted = AES256s.encrypt(data, "08:97:98:0E:E6:DA");
+            encrypted = AES256s.encrypt(data, MAC);
         } catch (Exception e) {
             e.printStackTrace();
         }

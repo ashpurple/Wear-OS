@@ -49,7 +49,8 @@ public class NewMainActivity extends Activity {
     private final static String[] permissions = new String[]
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
-
+    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE"; // user's input
+    static final String MAC = "08:97:98:0E:E6:DA"; // user's input
     /* Info Text */
     String jsonInput = "";
     TextView userText;
@@ -421,7 +422,8 @@ public class NewMainActivity extends Activity {
     }
 
     class GetInfoThread extends Thread {
-        public String urlStr = "http://15.164.45.229:8889/users/MDg6OTc6OTg6MEU6RTY6REE=";
+        public String urlStr = "http://15.164.45.229:8889/users/"+DUID+"=";
+
         //Handler handler = new Handler();
         @Override
         public void run() {
@@ -464,7 +466,7 @@ public class NewMainActivity extends Activity {
                             if (data.charAt(i) == ':')
                                 temp2 = i;
                         }
-                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), "08:97:98:0E:E6:DA");
+                        temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), MAC);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -479,7 +481,7 @@ public class NewMainActivity extends Activity {
             try {
                 while(true) {
                     sleep(60000); // upload delay 1 min
-                    String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/wear/";
+                    String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/wear/";
                     if(heartTemp == 0){
                         Log.e(MAIN_TAG, "OFF");
                         urlStr += "off";
@@ -516,7 +518,7 @@ public class NewMainActivity extends Activity {
             this.sensorType = sensorName;
         }
 
-        String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sensorInfos";
+        String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/sensorInfos";
         @Override
         public void run() {
             try {
@@ -526,7 +528,7 @@ public class NewMainActivity extends Activity {
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
-                        JsonBuilder jsonBuilder = new JsonBuilder();
+                        JsonBuilder jsonBuilder = new JsonBuilder(MAC);
                         JSONObject jsonObj = new JSONObject();
                         switch (sensorType){
                             case "BATTERY":
@@ -557,7 +559,7 @@ public class NewMainActivity extends Activity {
                         }
                         if(!onOff.equals("O")) // if setting is off
                             continue;
-                        Log.e(MAIN_TAG, sensorType+"|"+uploadInterval);
+                        Log.e(MAIN_TAG, sensorType+"| Upload Interval: "+uploadInterval);
 
                         conn.setConnectTimeout(10000); // 10초 동안 기다린 후 응답이 없으면 종료
                         conn.setRequestMethod("POST");
@@ -654,7 +656,7 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             try {
-                String urlStr = "http://15.164.45.229:8889/managers/MDg6OTc6OTg6MEU6RTY6REE=/sos";
+                String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/sos";
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn != null) {
