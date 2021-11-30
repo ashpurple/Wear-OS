@@ -86,6 +86,7 @@ public class NewMainActivity extends Activity {
     public double latitude = 0, longitude = 0;
     public float distance, calorie;
     public boolean sosFlag = false;
+    public boolean broadcastingFlag = false;
     ArrayList<SensorValueInfo> heartList;
     ArrayList<SensorValueInfo> stepList;
     ArrayList<SensorValueInfo> gpsList;
@@ -113,7 +114,6 @@ public class NewMainActivity extends Activity {
     String onOff_hrm;
     String onOff_fatigue;
     Messenger mServiceMessenger;
-    int broadcastingCheck = 1;
     public static Context context;
 
     /* Service Binding */
@@ -246,13 +246,15 @@ public class NewMainActivity extends Activity {
             @Override
             public void onClick(View view){
 
-                if(broadcastingCheck ==1){
-                    sendMessageToService("advon");
-                    Log.d("hi","ININI");
+                if(broadcastingFlag){
+                    broadcastingFlag = false;
+                    sendMessageToService("advoff");
+                    layout.setBackgroundColor(Color.BLACK);
                 }
                 else{
-
-                    sendMessageToService("advoff");
+                    broadcastingFlag = true;
+                    sendMessageToService("advon");
+                    layout.setBackgroundColor(Color.BLUE);
                 }
             }
 
@@ -261,7 +263,7 @@ public class NewMainActivity extends Activity {
         sos_button.setOnClickListener(new View.OnClickListener(){ // SOS
             @Override
             public void onClick(View view){
-                Log.e("SOS"," "+sosFlag);
+
                 if(sosFlag) {
                     sosFlag = false;
                     layout.setBackgroundColor(Color.BLACK);

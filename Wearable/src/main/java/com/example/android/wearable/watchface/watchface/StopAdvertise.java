@@ -33,7 +33,7 @@ public class StopAdvertise extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(((NewMainActivity)NewMainActivity.context).broadcastingCheck ==1)
+        if(((NewMainActivity)NewMainActivity.context).broadcastingFlag == false)
             finish();
         mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
         if (mBluetoothLeAdvertiser == null) return;
@@ -51,7 +51,6 @@ public class StopAdvertise extends AppCompatActivity {
 
         mBluetoothLeAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
         Toast.makeText(getApplicationContext(),"BLE Advertising started!",Toast.LENGTH_SHORT).show();
-        ((NewMainActivity)NewMainActivity.context).broadcastingCheck =1;
         Log.e("sssss","SSSSSSSSSSSSSSS");
         finish();
     }

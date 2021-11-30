@@ -38,7 +38,6 @@ public class StartAdvertise extends AppCompatActivity {
         Log.i("STOP", "LE Advertise Stopped.");
         BLE_status = FALSE;
         Toast.makeText(getApplicationContext(),"Restart advertising with new UserID..",Toast.LENGTH_SHORT).show();
-        ((NewMainActivity)NewMainActivity.context).broadcastingCheck =0;
    
         finish();
     }
