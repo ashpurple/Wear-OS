@@ -74,14 +74,15 @@ public class CalculationFatigueStress {
         int Timeline = 300;
         int Tired = 0;
         int LastTired = 0;
-        int CurrentTired;
+        double CurrentTired;
 
 
         System.out.println("HRF:"+hrf);
         System.out.println("HRL:"+hrl);
 
 
-        CurrentTired = (int)slope(0, getMean(hrf), Timeline, getMean(hrl)*100);
+        CurrentTired = slope(0, getMean(hrf), Timeline, getMean(hrl)*100);
+
         if(CurrentTired > 0){
             if(CurrentTired > MaxTiredUp){
                 MaxTiredUp = (int)CurrentTired;
