@@ -5,28 +5,27 @@ import java.util.Collections;
 
 public class CalculationFatigueStress {
 
-    private ArrayList<SensorValueInfo> input = null;
-    private ArrayList<Integer> heart_list = null;
-    private ArrayList hrf = new ArrayList<Double>();
-    private ArrayList hrl = new ArrayList<Double>();
+    private final ArrayList<SensorValueInfo> input = null;
+    private final ArrayList<Integer> hrf;
+    private final ArrayList<Integer> hrl;
     private ArrayList rr_interval = new ArrayList<Double>();
 
     CalculationFatigueStress(ArrayList<SensorValueInfo> Input){
-        heart_list = new ArrayList<Integer>();
+        ArrayList<Integer> heart_list = new ArrayList<Integer>();
         for(SensorValueInfo sensorValueInfo: Input){
             int heartValue = sensorValueInfo.getValue();
             heart_list.add(heartValue);
         }
+        hrf = new ArrayList<Integer>();
         Collections.sort(heart_list, Collections.<Integer>reverseOrder());
         for(int i = 0; i < 10; i++){
             hrf.add(heart_list.get(i));
         }
+        hrl = new ArrayList<Integer>();
         Collections.sort(heart_list);
         for(int i = 0; i < 10; i++){
             hrl.add(heart_list.get(i));
         }
-
-        CalculateFatigue();
     }
 
     // Fatigue And Stress Calculation -------------------------------------------------
@@ -67,7 +66,7 @@ public class CalculationFatigueStress {
         return Stdev;
     }
 
-    public int CalculateFatigue() {
+    public int calculateFatigue() {
         int MinTiredUp = 10;
         int MaxTiredUp = 50;
         int MinTiredDn = 10;
@@ -76,6 +75,11 @@ public class CalculationFatigueStress {
         int Tired = 0;
         int LastTired = 0;
         int CurrentTired;
+
+
+        System.out.println("HRF:"+hrf);
+        System.out.println("HRL:"+hrl);
+
 
         CurrentTired = (int)slope(0, getMean(hrf), Timeline, getMean(hrl)*100);
         if(CurrentTired > 0){
@@ -95,7 +99,7 @@ public class CalculationFatigueStress {
                 MinTiredDn = (int)CurrentTired;
             }
         }
-        // 약간 이상한데?
+
         if(CurrentTired > 0){
             Tired = (int)((CurrentTired/(MaxTiredUp - MinTiredUp)) * 100);
             if (Tired > LastTired) {

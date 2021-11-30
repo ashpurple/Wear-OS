@@ -108,6 +108,7 @@ public class JsonBuilder {
         value.put("value",stress);
         value.put("timeStamp",sdf.format(timestamp));
         jsonArr.put(value);
+
         data.put("values",jsonArr);
 
         String input = data.toString();
@@ -116,7 +117,7 @@ public class JsonBuilder {
         jsonObj.put("data",input);
         return jsonObj;
     }
-    public JSONObject getFatigue(float fatigue) throws JSONException {
+    public JSONObject getFatigue(ArrayList<SensorValueInfo> fatigue) throws JSONException {
         setTimestamp();
 
         JSONObject jsonObj = new JSONObject();
@@ -125,12 +126,13 @@ public class JsonBuilder {
         JSONObject data = new JSONObject();
         data.put("command", "FATIGUE");
         JSONArray jsonArr = new JSONArray();
-        JSONObject value = new JSONObject();
-        value.put("value",fatigue);
-        value.put("timeStamp",sdf.format(timestamp));
-        jsonArr.put(value);
-        data.put("values",jsonArr);
-
+        for(SensorValueInfo sensorValue: fatigue) {
+            JSONObject value = new JSONObject();
+            value.put("value", sensorValue.getValue());
+            value.put("timeStamp", sensorValue.getTime());
+            jsonArr.put(value);
+        }
+        data.put("values", jsonArr);
         String input = data.toString();
         input = encrypt(input);
 

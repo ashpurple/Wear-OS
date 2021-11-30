@@ -8,23 +8,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.AdvertiseCallback;
-import android.bluetooth.le.AdvertiseData;
-import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-
-import com.example.android.wearable.watchface.R;
 
 public class StopAdvertise extends AppCompatActivity {
     /** BLE Declaration **/
@@ -41,7 +33,7 @@ public class StopAdvertise extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(((NewMainActivity)NewMainActivity.context).Broadcastingcheck==1)
+        if(((NewMainActivity)NewMainActivity.context).broadcastingCheck ==1)
             finish();
         mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
         if (mBluetoothLeAdvertiser == null) return;
@@ -59,7 +51,7 @@ public class StopAdvertise extends AppCompatActivity {
 
         mBluetoothLeAdvertiser.startAdvertising(settings, data, mAdvertiseCallback);
         Toast.makeText(getApplicationContext(),"BLE Advertising started!",Toast.LENGTH_SHORT).show();
-        ((NewMainActivity)NewMainActivity.context).Broadcastingcheck=1;
+        ((NewMainActivity)NewMainActivity.context).broadcastingCheck =1;
         Log.e("sssss","SSSSSSSSSSSSSSS");
         finish();
     }
