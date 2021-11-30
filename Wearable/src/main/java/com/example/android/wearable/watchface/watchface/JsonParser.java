@@ -1,12 +1,10 @@
 package com.example.android.wearable.watchface.watchface;
 
-import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class JsonParser {
 
@@ -75,6 +73,27 @@ public class JsonParser {
             e.printStackTrace();
         }
         return schedules;
+    }
+
+    public ArrayList <Sender> getMessage(String input) throws JSONException {
+        JSONArray jsonArray = new JSONArray(input);
+        ArrayList<Sender> messages = new ArrayList<>();
+        try {
+            for(int i = 0; i < jsonArray.length(); i++) {
+                Sender message = new Sender();
+                JSONObject obj = jsonArray.getJSONObject(i);
+                message.setUser_name(obj.getString("userName"));
+                message.setUser_id(obj.getInt("userId"));
+                message.setGroup_name(obj.getString("groupName"));
+                message.setGroup_code(obj.getInt("groupCode"));
+                messages.add(message);
+            }
+            return messages; // return 안하면 error
+
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+        return messages;
     }
 
 

@@ -28,7 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.wear.widget.BoxInsetLayout;
 
 import com.example.android.wearable.watchface.R;
 
@@ -755,11 +754,12 @@ public class NewMainActivity extends Activity {
 
             ArrayList<Schedule> scheduleList = new ArrayList<>();
             try { // parsing
-                scheduleList = jsonParser.getSchedule(scheduleInput);
+                scheduleList = jsonParser.getSchedule(scheduleJson);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             System.out.println("SCHEDULE!");
+            System.out.println(scheduleJson);
             for(Schedule schedule : scheduleList){
                 System.out.println(schedule.getContents());
             }
@@ -799,13 +799,24 @@ public class NewMainActivity extends Activity {
             }
         }
         public void decrypt(final String data) {
-            String scheduleJson = "";
+            String messageJson = "";
             try {
-                scheduleJson = AES256s.decryptToString(data, MAC);
+                messageJson = AES256s.decryptToString(data, MAC);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.e("Message: ",scheduleJson);
+
+            ArrayList<Sender> messageList = new ArrayList<>();
+            try { // parsing
+                messageList = jsonParser.getMessage(messageJson);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Message!");
+            System.out.println(messageJson);
+            for(Sender message : messageList){
+                System.out.println(message.getUser_id());
+            }
         }
     }
 

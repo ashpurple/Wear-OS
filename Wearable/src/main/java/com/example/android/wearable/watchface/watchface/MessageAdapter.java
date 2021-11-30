@@ -8,12 +8,12 @@ import android.widget.TextView;
 
 import com.example.android.wearable.watchface.R;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class MessageAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
-    private Message message;
-    public MessageAdapter( Message message, LayoutInflater layoutInflater) {
+    private ArrayList<Sender> message;
+    public MessageAdapter(ArrayList<Sender> message, LayoutInflater layoutInflater) {
         this.message = message;
         this.layoutInflater = layoutInflater;
     }
