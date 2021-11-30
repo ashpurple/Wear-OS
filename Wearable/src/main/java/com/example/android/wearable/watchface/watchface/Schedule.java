@@ -2,30 +2,16 @@ package com.example.android.wearable.watchface.watchface;
 
 public class Schedule {
 
-    private final String company_name;
-    private final String biz_name;
-    private final String title;
-    private final String location;
-    private final String contents;
-    private final String start_date;
-    private final String end_date;
-    private final String start_time;
-    private final String end_time;
-
-    public Schedule(String company_name, String biz_name, String title, String location, String contents,
-                    String start_date, String end_date, String start_time, String end_time) {
-
-        this.company_name = company_name;
-        this.biz_name = biz_name;
-        this.title = title;
-        this.location = location;
-        this.contents = contents;
-        this.start_date = start_date;
-        this.end_date = end_date;
-        this.start_time = start_time;
-        this.end_time = end_time;
-
-    }
+    private String company_name;
+    private String biz_name;
+    private String title;
+    private String location;
+    private String contents;
+    private String start_date;
+    private String end_date;
+    private String start_time;
+    private String end_time;
+    private String dept_name;
 
     public String getCompany_name() {
         return company_name;
@@ -54,7 +40,41 @@ public class Schedule {
     public String getEnd_time() {
         return end_time;
     }
+    public String getDept_name() {
+        return dept_name;
+    }
 
+
+    public void setCompany_name(String company_name) {
+        this.company_name = company_name;
+    }
+    public void setBiz_name(String biz_name) {
+        this.biz_name = biz_name;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+    public void setStart_date(String start_date) {
+        this.start_date = start_date;
+    }
+    public void setEnd_date(String end_date) {
+        this.end_date = end_date;
+    }
+    public void setStart_time(String start_time) {
+        this.start_time = start_time;
+    }
+    public void setEnd_time(String end_time) {
+        this.end_time = end_time;
+    }
+    public void setDept_name(String dept_name) {
+        this.dept_name = dept_name;
+    }
 
 
 }

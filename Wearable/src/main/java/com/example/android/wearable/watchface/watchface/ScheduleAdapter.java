@@ -1,5 +1,6 @@
 package com.example.android.wearable.watchface.watchface;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,26 +9,28 @@ import android.widget.TextView;
 
 import com.example.android.wearable.watchface.R;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class ScheduleAdapter extends BaseAdapter {
     // private Vector<Beacon> beacons; Schedule 받아오는 객체
     private LayoutInflater layoutInflater;
+    private ArrayList<Schedule> schedules;
 
-    public ScheduleAdapter(/*Vector<Beacon> beacons,*/LayoutInflater layoutInflater) {
-        //this.beacons = beacons;
+    public ScheduleAdapter(ArrayList<Schedule> schedules, LayoutInflater layoutInflater) {
+        this.schedules = schedules;
         this.layoutInflater = layoutInflater;
     }
     private Schedule schedule;
 
     @Override
     public int getCount() {
-        return schedule.size();
+        return schedules.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return schedule.get(position);
+        return schedules.get(position);
     }
 
     @Override
@@ -35,12 +38,13 @@ public class ScheduleAdapter extends BaseAdapter {
         return 0;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ScheduleAdapter.ScheduleHolder scheduleHolder;
         if (convertView == null) {
-            scheduleHolder = new ScheduleAdapter.ScheduleHolder();
+            scheduleHolder = new ScheduleHolder();
             convertView = layoutInflater.inflate(R.layout.item_schedule, parent, false);
             scheduleHolder.company_name= convertView.findViewById(R.id.company_name);
             scheduleHolder.biz_name = convertView.findViewById(R.id.biz_name);
@@ -56,20 +60,20 @@ public class ScheduleAdapter extends BaseAdapter {
             scheduleHolder = (ScheduleAdapter.ScheduleHolder)convertView.getTag();
         }
         if(scheduleHolder.company_name!=null) {
-            scheduleHolder.company_name.setText("회사 이름 : " + schedule.get(position).getCompany_name());
-            scheduleHolder.biz_name.setText("업무 이름 : " + schedule.get(position).getBiz_name());
-            scheduleHolder.title.setText("제목 :" + schedule.get(position).getTitle());
-            scheduleHolder.location.setText("위치 : " + schedule.get(position).getLocation() + "dBm");
-            scheduleHolder.contents.setText("내용 : " + schedule.get(position).getContents());
-            scheduleHolder.start_date.setText("시작 일자 : " + schedule.get(position).getStart_date());
-            scheduleHolder.end_date.setText("종료 일자 : " + schedule.get(position).getEnd_date());
-            scheduleHolder.start_time.setText("시작 시간 : " + schedule.get(position).getStart_time());
-            scheduleHolder.end_time.setText("종료 시간 : " + schedule.get(position).getEnd_time());
+            scheduleHolder.company_name.setText("회사 이름 : " + schedules.get(position).getCompany_name());
+            scheduleHolder.biz_name.setText("업무 이름 : " + schedules.get(position).getBiz_name());
+            scheduleHolder.title.setText("제목 :" + schedules.get(position).getTitle());
+            scheduleHolder.location.setText("위치 : " + schedules.get(position).getLocation() + "dBm");
+            scheduleHolder.contents.setText("내용 : " + schedules.get(position).getContents());
+            scheduleHolder.start_date.setText("시작 일자 : " + schedules.get(position).getStart_date());
+            scheduleHolder.end_date.setText("종료 일자 : " + schedules.get(position).getEnd_date());
+            scheduleHolder.start_time.setText("시작 시간 : " + schedules.get(position).getStart_time());
+            scheduleHolder.end_time.setText("종료 시간 : " + schedules.get(position).getEnd_time());
         }
         return convertView;
     }
 
-    private class ScheduleHolder {
+    private static class ScheduleHolder {
         TextView company_name;
         TextView biz_name;
         TextView title;

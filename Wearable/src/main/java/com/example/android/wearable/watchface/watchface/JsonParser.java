@@ -4,6 +4,8 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class JsonParser {
@@ -45,9 +47,35 @@ public class JsonParser {
         } catch (JSONException e){
             e.printStackTrace();
         }
-
         return userInfo;
-
     }
+
+    public ArrayList <Schedule> getSchedule(String input) throws JSONException {
+        JSONArray jsonArray = new JSONArray(input);
+        ArrayList<Schedule> schedules = new ArrayList<>();
+        try {
+            for(int i = 0; i < jsonArray.length(); i++) {
+                Schedule schedule = new Schedule();
+                JSONObject obj = jsonArray.getJSONObject(i);
+                schedule.setBiz_name(obj.getString("bizNm"));
+                schedule.setCompany_name(obj.getString("companyNm"));
+                schedule.setStart_date(obj.getString("startDt"));
+                schedule.setEnd_date(obj.getString("endDt"));
+                schedule.setLocation(obj.getString("location"));
+                schedule.setStart_time(obj.getString("startTime"));
+                schedule.setEnd_time(obj.getString("endTime"));
+                schedule.setTitle(obj.getString("title"));
+                schedule.setDept_name(obj.getString("deptNm"));
+                schedule.setContents(obj.getString("content"));
+                schedules.add(schedule);
+            }
+            return schedules; // return 안하면 error
+
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+        return schedules;
+    }
+
 
 }

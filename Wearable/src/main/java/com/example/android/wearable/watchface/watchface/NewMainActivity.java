@@ -84,6 +84,7 @@ public class NewMainActivity extends Activity {
     String maxHeartRate;
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
+    String scheduleInput;
     public float  stress = 0, fatigue = 0;
     public int heartTemp = 0, stepTemp = 0, fatigueTemp = 0;
     public double latitude = 0, longitude = 0;
@@ -715,6 +716,7 @@ public class NewMainActivity extends Activity {
     class ScheduleThread extends Thread {
         @Override
         public void run() {
+            String schedule;
             try {
                 String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/schedules";
                 URL url = new URL(urlStr);
@@ -749,7 +751,20 @@ public class NewMainActivity extends Activity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.e("SCHEDULE: ",scheduleJson);
+            scheduleInput = scheduleJson;
+
+            ArrayList<Schedule> scheduleList = new ArrayList<>();
+            try { // parsing
+                scheduleList = jsonParser.getSchedule(scheduleInput);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            System.out.println("SCHEDULE!");
+            for(Schedule schedule : scheduleList){
+                System.out.println(schedule.getContents());
+            }
+//                Intent intent=new Intent(getApplicationContext(),ScheduleAdapter.class);
+//                startActivity(intent);
         }
     }
 
