@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.android.wearable.watchface" >
+    package="com.example.android.wearable.watchface">
 
     <uses-feature android:name="android.hardware.type.watch" /> <!-- Required to act as a custom watch face. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -25,7 +25,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:usesCleartextTraffic="true" >
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".watchface.NewMainActivity"
             android:exported="true" />
@@ -47,7 +47,7 @@
         <service
             android:name=".watchface.OpenGLWatchFaceService"
             android:label="@string/opengl_name"
-            android:permission="android.permission.BIND_WALLPAPER" >
+            android:permission="android.permission.BIND_WALLPAPER">
 
             <!--
             By default, Watchfaces on rectangular devices will be run in a emulation mode where they
@@ -86,7 +86,7 @@
             android:name=".watchface.AnalogComplicationWatchFaceService"
             android:enabled="true"
             android:label="@string/analog_complication"
-            android:permission="android.permission.BIND_WALLPAPER" >
+            android:permission="android.permission.BIND_WALLPAPER">
 
             <!--
             By default, Watchfaces on rectangular devices will be run in a emulation mode where they
@@ -123,6 +123,8 @@
         <activity android:name=".watchface.MyActivity" />
         <activity android:name=".watchface.SosActivity" />
         <activity android:name=".watchface.SimpleList" />
+        <activity android:name=".watchface.ScheduleActivity"
+            android:theme="@style/Theme.AppCompat"/>
         <activity
             android:name=".watchface.AdvertiseActivity"
             android:theme="@style/Theme.AppCompat" />
@@ -138,7 +140,7 @@
         <activity android:name="android.support.wearable.complications.ComplicationHelperActivity" />
         <activity
             android:name=".config.AnalogComplicationConfigActivity"
-            android:label="@string/analog_complication_config" >
+            android:label="@string/analog_complication_config">
             <intent-filter>
                 <action android:name="com.example.android.wearable.watchface.CONFIG_COMPLICATION_SIMPLE" />
 
@@ -150,7 +152,7 @@
         <service
             android:name=".watchface.InteractiveWatchFaceService"
             android:label="@string/interactive_name"
-            android:permission="android.permission.BIND_WALLPAPER" >
+            android:permission="android.permission.BIND_WALLPAPER">
 
             <!--
             By default, Watchfaces on rectangular devices will be run in a emulation mode where they
@@ -239,7 +241,7 @@
             android:name=".provider.IncrementingNumberComplicationProviderService"
             android:icon="@drawable/icn_complications"
             android:label="@string/complications_provider_incrementing_number"
-            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER" >
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER">
             <intent-filter>
                 <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
             </intent-filter>

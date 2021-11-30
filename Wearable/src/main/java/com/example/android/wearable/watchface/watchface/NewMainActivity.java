@@ -74,6 +74,7 @@ public class NewMainActivity extends Activity {
     Button sos_button;
     Button schedule_button;
     Button message_button;
+    Button schedule;
     ConstraintLayout layout;
     /* Get Info */
     String name;
@@ -206,6 +207,7 @@ public class NewMainActivity extends Activity {
         schedule_button = (Button)findViewById(R.id.schedule_btn);
         message_button = (Button)findViewById(R.id.message_btn);
 
+
         /* Threads */
         time = new Time();
         TimeThread timeThread = new TimeThread();
@@ -248,6 +250,7 @@ public class NewMainActivity extends Activity {
             }
 
         });
+
 
         Broadcasting.setOnClickListener(new View.OnClickListener(){ // BLE Broadcasting
             @Override
@@ -759,12 +762,13 @@ public class NewMainActivity extends Activity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
             System.out.println("SCHEDULE!");
             for(Schedule schedule : scheduleList){
                 System.out.println(schedule.getContents());
             }
-//                Intent intent=new Intent(getApplicationContext(),ScheduleAdapter.class);
-//                startActivity(intent);
+            Intent intent=new Intent(getApplicationContext(),ScheduleActivity.class);
+            startActivity(intent);
         }
     }
 
