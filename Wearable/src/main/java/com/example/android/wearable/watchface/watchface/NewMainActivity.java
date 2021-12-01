@@ -88,6 +88,8 @@ public class NewMainActivity extends Activity {
     String scheduleInput;
     public float  stress = 0, fatigue = 0;
     public int heartTemp = 0, stepTemp = 0, fatigueTemp = 0;
+    public int previousStep = 0, currentStep =0;
+    public boolean stepFlag = false;
     public double latitude = 0, longitude = 0;
     public ArrayList<String> blelist=new ArrayList<String>();
     public float distance, calorie;
@@ -342,7 +344,17 @@ public class NewMainActivity extends Activity {
                 }
             }
             if(msg.getData().getInt("STEP")!=0){
-                stepTemp = msg.getData().getInt("STEP");}
+                if(!stepFlag) {
+                    stepTemp = msg.getData().getInt("STEP");
+                    previousStep = stepTemp;
+                    currentStep = stepTemp;
+                } else{
+                    previousStep = stepTemp;
+                    stepTemp = msg.getData().getInt("STEP");
+                    currentStep = stepTemp;
+                }
+                stepFlag = true;
+            }
             if(msg.getData().getDouble("LATITUDE")!=0){
                 latitude = msg.getData().getDouble("LATITUDE");}
             if(msg.getData().getDouble("LONGITUDE")!=0){
@@ -572,7 +584,7 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             try {
-                int initialDelay = 30000;
+                int initialDelay = 60000;
                 while(true) {
                     sleep(initialDelay); // initial delay
                     URL url = new URL(urlStr);
@@ -685,19 +697,19 @@ public class NewMainActivity extends Activity {
                 int sec = 0;
                 while(true) {
                     sec += 1;
-                    if(sec % 10 == 0){
+                    if(sec % 30 == 0){
                         heartList.add(new SensorValueInfo(heartTemp, getTimestamp()));
                     }
-                    if(sec % 10 == 0){
+                    if(sec % 30 == 0){
                         gpsList.add(new SensorValueInfo(latitude, longitude, getTimestamp()));
                     }
-                    if(sec % 10 == 0){
-                        stepList.add(new SensorValueInfo(stepTemp, getTimestamp()));
+                    if(sec % 30 == 0){
+                        stepList.add(new SensorValueInfo(currentStep - previousStep, getTimestamp()));
                     }
                     if(sec % 2 == 0){
                         heartForFatigueList.add(new SensorValueInfo(heartTemp, getTimestamp()));
                     }
-                    if(sec % 20 == 0){
+                    if(sec % 40 == 0){
                         CalculationFatigueStress calculationFatigueStress = new CalculationFatigueStress(heartForFatigueList);
                         int fatigueValue = calculationFatigueStress.calculateFatigue();
                         fatigueTemp = fatigueValue;
