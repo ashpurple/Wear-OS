@@ -137,7 +137,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		runThread.start();
 		System.out.println("Finish initializing MyMqttClient");
 		Timer m_timer = new Timer();
-		TimerTask m_task = new TimerTask() {
+		if(((MessageActivity)MessageActivity.context).presscheck==0) {
+			msg = "1번이다";
+			((MessageActivity)MessageActivity.context).presscheck = 1;
+		}TimerTask m_task = new TimerTask() {
 
 			@Override
 			public void run() {

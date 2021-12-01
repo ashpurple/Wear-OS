@@ -316,6 +316,8 @@ public class NewMainActivity extends Activity {
             public void onClick(View view){
                 MessageThread messageThread = new MessageThread();
                 messageThread.start();
+                Intent intent=new Intent(getApplicationContext(),MessageActivity.class);
+                startActivity(intent);
             }
         });
     }
