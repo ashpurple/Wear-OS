@@ -129,7 +129,6 @@ public class BackService extends Service implements SensorEventListener, Locatio
 
 
         context=this;
-        mBluetoothLeScanner.startScan(scanFilters,scanSettings,mScanCallback);
 
         //Sensor Manager shit
         sensorManager = getSystemService(SensorManager.class); // sensor (heart rate, step)

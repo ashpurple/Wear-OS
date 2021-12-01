@@ -1,5 +1,7 @@
 package com.example.android.wearable.watchface.watchface;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
