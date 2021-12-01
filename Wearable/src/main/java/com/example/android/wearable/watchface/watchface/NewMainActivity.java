@@ -50,9 +50,9 @@ public class NewMainActivity extends Activity {
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
     /* 세훈 */
- //   static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
- //   static final String MAC = "08:97:98:0E:E6:DA";
-  //  static final String userId = "2103";
+  //  static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
+  //  static final String MAC = "08:97:98:0E:E6:DA";
+  // public String userId = "2103";
     /* 찬빈 */
  //   static final String DUID = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
   //  static final String MAC = "9C:5A:44:B7:B9:8E";
@@ -97,6 +97,7 @@ public class NewMainActivity extends Activity {
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
     String scheduleInput;
+    ArrayList<Sender> messageList;
     public float  stress = 0, fatigue = 0;
     public int heartTemp = 0, stepTemp = 0, fatigueTemp = 0, stressTemp = 0;
     public int previousStep = 0, currentStep =0;
@@ -166,14 +167,10 @@ public class NewMainActivity extends Activity {
     };
 
     public void sendMessageToService(String str){
-        Log.d("in","inininin");
         if(isServiced){
-            Log.d("in","inininin");
             if(mServiceMessenger!=null){
-                Log.d("in","inininin");
                 try{
                     Message msg=Message.obtain(null,BackService.MSG_SEND_TO_SERVICE,str);
-                    Log.d("in","inininin");
                     msg.replyTo=mMessenger;
                     mServiceMessenger.send(msg);
                 } catch (RemoteException e) {
@@ -336,8 +333,6 @@ public class NewMainActivity extends Activity {
             public void onClick(View view){
                 MessageThread messageThread = new MessageThread();
                 messageThread.start();
-                Intent intent=new Intent(getApplicationContext(),MessageActivity.class);
-                startActivity(intent);
             }
         });
     }
@@ -444,7 +439,6 @@ public class NewMainActivity extends Activity {
                     onOff_stress = onOff;
                     break;
                 case "BLE_SCAN":
-                    Log.e("HI","HI");
                     onOff_ble = onOff;
                     break;
             }
@@ -898,7 +892,7 @@ public class NewMainActivity extends Activity {
                 e.printStackTrace();
             }
 
-            ArrayList<Sender> messageList = new ArrayList<>();
+            messageList = new ArrayList<>();
             try { // parsing
                 messageList = jsonParser.getMessage(messageJson);
             } catch (JSONException e) {
@@ -909,9 +903,8 @@ public class NewMainActivity extends Activity {
             for(Sender message : messageList){
                 System.out.println(message.getUser_id());
             }
-            MyMqttClient myMqttClient = new MyMqttClient();
-            String[] args = {"2103","2106"};
-            myMqttClient.main(args);
+            Intent intent=new Intent(getApplicationContext(),MessageActivity.class);
+            startActivity(intent);
         }
     }
 

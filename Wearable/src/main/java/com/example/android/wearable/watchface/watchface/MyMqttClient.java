@@ -16,8 +16,9 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MyMqttClient implements MqttCallback, Runnable {
 
-   MqttClient myClient;
-   MqttConnectOptions connOpt;
+
+	MqttClient myClient;
+    MqttConnectOptions connOpt;
    static final int MAX_QUEUE_LEN = 10;
 	static String BROKER_URL = "tcp://15.164.45.229:1883";
 //	static final String SBSYS_USERNAME = "";
@@ -31,11 +32,12 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	String s_topic2;
 	static String msg;
     Boolean subscriber;
-
+	public static String ans="";
 	
     
 	static ArrayList<String> p_topics;
-	
+	static ArrayList<String> p_msgs;
+
 	MqttTopic topic;
 	
 
@@ -52,9 +54,9 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		this.s_topic2 = "/sbsys/+/+/" + from_id + "/request";
 		//System.out.println("s_topic2: " + s_topic2);
 		this.p_topics = new ArrayList();
+		this.p_msgs=new ArrayList();
 		this.subscriber = false;
 		this.msgCount = 0;
-		this.msg = "Hello World!";
 	}
 
 	@Override
@@ -74,13 +76,14 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	}
 	
 	
-	public void insertNewTopic() {
+	public void insertNewTopic(String msg) {
 		String p_topic;
 		msgCount = (msgCount + 1) % 1000;
 		p_topic = "/sbsys/" + from_id + "/msg" + msgCount + "/" + to_id + "/request";
 		if (p_topics.size()>= MAX_QUEUE_LEN)
 			p_topics.remove(0);
-		p_topics.add(p_topic);	
+		p_topics.add(p_topic);
+		p_msgs.add(msg);
 	}
 	
 	
@@ -99,7 +102,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		} catch (Exception e) {
 			System.out.println("Error in onPublish()!");
 			e.printStackTrace();
-		}			
+		}
 	}
 
 
@@ -138,15 +141,17 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Finish initializing MyMqttClient");
 		Timer m_timer = new Timer();
 		if(((MessageActivity)MessageActivity.context).presscheck==0) {
-			msg = "1번이다";
 			((MessageActivity)MessageActivity.context).presscheck = 1;
-		}TimerTask m_task = new TimerTask() {
+		}
+		TimerTask m_task = new TimerTask() {
 
 			@Override
 			public void run() {
 				System.out.println("Called Timer");
+				int tmp=0;
 				for (String p_topic : p_topics) {
-					smc.myPublish(p_topic, msg);
+					smc.myPublish(p_topic, p_msgs.get(tmp));
+					tmp++;
 				}
 			}
 			
@@ -203,7 +208,12 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				insertNewTopic();
+				if(((MessageActivity)MessageActivity.context).sendcheck==0) {
+
+					msg=((MessageActivity)MessageActivity.context).selectedanswer;
+					insertNewTopic(msg);
+					((MessageActivity)MessageActivity.context).sendcheck=1;
+				}
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				System.out.println("Error in sleep()!");
