@@ -24,7 +24,31 @@ public class JsonBuilder {
         timestamp = new Timestamp(System.currentTimeMillis());
         sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
+    public JSONObject getBLE(ArrayList<String> ble) throws JSONException {
+        setTimestamp();
 
+        JSONObject jsonObj = new JSONObject();
+        jsonObj.put("isEncrypted","true");
+
+        JSONObject data = new JSONObject();
+        data.put("command", "BLE");
+        JSONArray jsonArr = new JSONArray();
+        for(int i=1; i<ble.size(); i=i+4) {
+            JSONObject value = new JSONObject();
+            value.put("remoteAddress",ble.get(i));
+            value.put("deviceName",ble.get(i+1));
+            value.put("rssi",ble.get(i+2));
+            value.put("timeStamp",ble.get(i+3));
+            jsonArr.put(value);
+        }
+        data.put("values",jsonArr);
+
+        String input = data.toString();
+        input = encrypt(input);
+
+        jsonObj.put("data",input);
+        return jsonObj;
+    }
     public JSONObject getHRM(ArrayList<SensorValueInfo> heart) throws JSONException {
         setTimestamp();
 

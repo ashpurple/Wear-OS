@@ -11,6 +11,12 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanRecord;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.location.LocationListener;
 import android.content.Context;
 import android.content.Intent;
@@ -38,11 +44,17 @@ import android.Manifest;
 
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Vector;
 
 
 public class BackService extends Service implements SensorEventListener, LocationListener {
@@ -83,14 +95,45 @@ public class BackService extends Service implements SensorEventListener, Locatio
     private Button Start_Adv;
     private Button Stop_Adv;
     private boolean BLE_status = FALSE;
+    BluetoothLeScanner mBluetoothLeScanner;
+
+    private static final int PERMISSIONS = 100;
+    ScanSettings.Builder mScanSettings;
+    Vector<Beacon> beacon;
+
+    BeaconAdapter beaconAdapter;
+    ListView beaconListView;
+
+    List<ScanFilter> scanFilters;
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss", Locale.KOREAN);
+    /** layout Variables Declaration **/
+    ArrayList<String> Mac=new ArrayList<String>();
 
     @Override
     public void onCreate() {
         Log.e(SENSOR_TAG, "onCreate");
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
+        beacon = new Vector<>();
+        mScanSettings=new ScanSettings.Builder();
+        mScanSettings.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+        ScanSettings scanSettings = mScanSettings.build();
+
+        scanFilters=new Vector<>();
+        ScanFilter.Builder scanFilter=new ScanFilter.Builder();
+
+        ScanFilter scan=scanFilter.build();
+        scanFilters.add(scan);
+
+
+        context=this;
+        mBluetoothLeScanner.startScan(scanFilters,scanSettings,mScanCallback);
 
         //Sensor Manager shit
         sensorManager = getSystemService(SensorManager.class); // sensor (heart rate, step)
-
+        Mac.add("1");
         if (!hasGps()) {
             Log.e(LOCATION_TAG, "This hardware doesn't have GPS.");
         } else {
@@ -239,6 +282,15 @@ public class BackService extends Service implements SensorEventListener, Locatio
             if(msg.obj=="advoff"){
                 stopAdvertising();
             }
+            if(msg.obj=="scanon"){
+                ScanSettings scanSettings = mScanSettings.build();
+                mBluetoothLeScanner.startScan(scanFilters,scanSettings,mScanCallback);
+            }
+            if(msg.obj=="scanoff"){
+                onDestroy();
+                Log.e("GO",String.valueOf(Mac));
+                sendBLEToActivity(Mac,"MAC");
+            }
             switch (msg.what) {
                 case MSG_REGISTER_CLIENT:
                     mClient = msg.replyTo;
@@ -249,6 +301,18 @@ public class BackService extends Service implements SensorEventListener, Locatio
             return false;
         }
     }));
+    private void sendBLEToActivity(ArrayList<String> sendValue,String type){
+        try{
+            Bundle bundle= new Bundle();
+            bundle.putStringArrayList(type,sendValue);
+            Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
+            msg.setData(bundle);
+            mClient.send(msg);
+        }
+        catch (RemoteException e){
+
+        }
+    }
     private void sendMsgToActivity(int sendValue,String type){
         try{
             Bundle bundle= new Bundle();
@@ -338,5 +402,69 @@ public class BackService extends Service implements SensorEventListener, Locatio
             BLE_status = FALSE;
         }
     };
+    ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            super.onScanResult(callbackType, result);
+            try {
+                ScanRecord scanRecord = result.getScanRecord();
 
+                int check=0;
+                if(Mac!=null) {
+                    for (int i = 0; i < Mac.size(); i++) {
+                        if(i%4==0||i==0){
+                            if (Mac.get(i) == result.getDevice().getAddress()) {
+                                check = 1;
+                            }
+                        }
+
+                    }
+                }
+                if(result.getDevice().getName()!=null&&check==0) {
+                    Log.d("getTxPowerLevel()",scanRecord.getTxPowerLevel()+"");
+                    Log.d("onScanResult()", result.getDevice().getAddress() + "\n" + result.getRssi() + "\n" + result.getDevice().getName()
+                            + "\n" + result.getDevice().getBondState() + "\n" + result.getDevice().getType()+"\n");
+
+                    Mac.add(result.getDevice().getAddress());
+                    Mac.add(result.getDevice().getName());
+                    Mac.add(String.valueOf(result.getRssi()));
+                    Mac.add(simpleDateFormat.format(new Date()));
+
+                    final ScanResult scanResult = result;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            beacon.add(0, new Beacon(scanResult.getDevice().getAddress(), scanResult.getRssi(), simpleDateFormat.format(new Date()),scanResult.getDevice().getName()));
+                            //beaconAdapter.notifyDataSetChanged();
+                        }
+                    }).start();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            super.onBatchScanResults(results);
+            Log.d("onBatchScanResults", results.size() + "");
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            super.onScanFailed(errorCode);
+            Log.d("onScanFailed()", errorCode+"");
+        }
+
+
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBluetoothLeScanner.stopScan(mScanCallback);
+    }
 }
