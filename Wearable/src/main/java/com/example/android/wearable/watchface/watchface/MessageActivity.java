@@ -41,20 +41,21 @@ public class MessageActivity extends Activity {
     MqttTopic topic;
     public int presscheck=1;
     public String[] user;
-    final String[] answerlist={"안녕하세요","감사합니다","전화주세요"};
+    final String[] answerlist={"안녕하세요","감사합니다","전화주세요","나중에 연락 드리겠습니다","사랑합니다"};
     String touser;
     String selectedanswer;
     public int sendcheck=1;
+    ArrayList<Sender> receivers;
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        ArrayList<Sender> receivers=((NewMainActivity)NewMainActivity.context).messageList;
+        receivers=((NewMainActivity)NewMainActivity.context).messageList;
         final String userID=((NewMainActivity)NewMainActivity.context).userId;
         int n = receivers.size();
         user = new String[n];
         int i = 0;
         for(Sender receiver : receivers){
-            user[i++] = String.valueOf(receiver.getUser_id());
+            user[i++] = String.valueOf(receiver.getUser_name());
             System.out.println(receiver.getUser_id());
         }
 
@@ -87,17 +88,20 @@ public class MessageActivity extends Activity {
         name.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                touser= String.valueOf(name.getItemAtPosition(position));
+                String userName = String.valueOf(name.getItemAtPosition(position));
+                String uid = "";
+                for(Sender receiver : receivers){
+                    if(userName.equals(receiver.getUser_name())){
+                        uid = String.valueOf(receiver.getUser_id());
+                    }
+                }
+                touser= uid;
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
         });
-
-        System.out.println("!!!!!!!!!!!!"+selectedanswer);
-
-        System.out.println("!!!!!!!!!!!!"+touser);
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
             public void onClick(View view){
