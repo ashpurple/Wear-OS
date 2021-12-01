@@ -665,7 +665,7 @@ public class NewMainActivity extends Activity {
                     if(sec % 2 == 0){
                         heartForFatigueList.add(new SensorValueInfo(heartTemp, getTimestamp()));
                     }
-                    if(sec % 20 == 0){
+                    if(sec % 40 == 0){
                         CalculationFatigueStress calculationFatigueStress = new CalculationFatigueStress(heartForFatigueList);
                         int fatigueValue = calculationFatigueStress.calculateFatigue();
                         fatigueTemp = fatigueValue;

@@ -8,14 +8,17 @@ public class CalculationFatigueStress {
     private final ArrayList<SensorValueInfo> input = null;
     private final ArrayList<Integer> hrf;
     private final ArrayList<Integer> hrl;
-    private ArrayList rr_interval = new ArrayList<Double>();
+    private final ArrayList<Double> rr_interval;
 
     CalculationFatigueStress(ArrayList<SensorValueInfo> Input){
+        rr_interval = new ArrayList<Double>();
         ArrayList<Integer> heart_list = new ArrayList<Integer>();
         for(SensorValueInfo sensorValueInfo: Input){
             int heartValue = sensorValueInfo.getValue();
             heart_list.add(heartValue);
+            rr_interval.add((double)heartValue);
         }
+
         hrf = new ArrayList<Integer>();
         Collections.sort(heart_list, Collections.<Integer>reverseOrder());
         for(int i = 0; i < 10; i++){
@@ -26,6 +29,11 @@ public class CalculationFatigueStress {
         for(int i = 0; i < 10; i++){
             hrl.add(heart_list.get(i));
         }
+
+        for(int i = 0; i < rr_interval.size(); i++){
+            rr_interval.set(i, 60/rr_interval.get(i)*2000);
+        }
+
     }
 
     // Fatigue And Stress Calculation -------------------------------------------------
@@ -129,16 +137,7 @@ public class CalculationFatigueStress {
         return LastTired;
     }
 
-    public void getRRInterval(){
-        rr_interval.add((int)1772.89);
-        rr_interval.add((int)1770.01);
-        rr_interval.add((int)1760.22);
-        rr_interval.add((int)1810.88);
-        rr_interval.add((int)1690.02);
-        rr_interval.add((int)1700.28);
-    }
-
-    public void CalculateStress(){
+        public int CalculateStress(){
         double MinStress = 25.0;
         double MaxStress = 75.0;
 
@@ -153,7 +152,34 @@ public class CalculationFatigueStress {
         System.out.println("측정 RR-Interval 표준편차 : " + Measure);
         System.out.println("개인 최대 스트레스(%) : " + MaxStress + ", 개인 최소 스트레스(%) : " + MinStress);
         System.out.println("현재 스트레스 : " + (int)CurrentStress + "%");
+        return (int)CurrentStress;
     }
+
+//    public void getRRInterval(){
+//        rr_interval.add((int)1772.89);
+//        rr_interval.add((int)1770.01);
+//        rr_interval.add((int)1760.22);
+//        rr_interval.add((int)1810.88);
+//        rr_interval.add((int)1690.02);
+//        rr_interval.add((int)1700.28);
+//    }
+//
+//    public void CalculateStress(){
+//        double MinStress = 25.0;
+//        double MaxStress = 75.0;
+//
+//        double Measure = getStdev(rr_interval);
+//        if(MinStress > Measure){
+//            MinStress = Measure;
+//        }
+//        if(MaxStress < Measure){
+//            MaxStress = Measure;
+//        }
+//        double CurrentStress = ((Measure-MinStress)/(MaxStress - MinStress))*100;
+//        System.out.println("측정 RR-Interval 표준편차 : " + Measure);
+//        System.out.println("개인 최대 스트레스(%) : " + MaxStress + ", 개인 최소 스트레스(%) : " + MinStress);
+//        System.out.println("현재 스트레스 : " + (int)CurrentStress + "%");
+//    }
 
 
     // ----------------------------------------------------------------------------
