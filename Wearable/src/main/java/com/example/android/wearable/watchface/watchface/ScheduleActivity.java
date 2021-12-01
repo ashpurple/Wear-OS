@@ -21,15 +21,13 @@ public class ScheduleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.schedule_page);
         scheduleListView = (ListView) findViewById(R.id.ScheduleListView);
-        System.out.println("Clear1\n");
         schedules = (ArrayList<Schedule>)getIntent().getSerializableExtra("schedule");
-        System.out.println("Clear2\n");
         for(Schedule schedule : schedules){
             System.out.println(schedule.getContents());
         }
         scheduleAdapter = new ScheduleAdapter(schedules, getLayoutInflater());
         scheduleListView.setAdapter(scheduleAdapter);
-        System.out.println("Clear3\n");
+
     }
     @Override
     protected void onDestroy() {

@@ -60,8 +60,8 @@ public class ScheduleAdapter extends BaseAdapter {
         }
         if(scheduleHolder.company_name!=null) {
             scheduleHolder.company_name.setText("회사 이름 : " + schedules.get(position).getCompany_name());
-            scheduleHolder.biz_name.setText("업무 이름 : " + schedules.get(position).getBiz_name());
-            scheduleHolder.title.setText("제목 :" + schedules.get(position).getTitle());
+            scheduleHolder.biz_name.setText("업체 이름 : " + schedules.get(position).getBiz_name());
+            scheduleHolder.title.setText("일정 :" + schedules.get(position).getTitle());
             scheduleHolder.location.setText("위치 : " + schedules.get(position).getLocation() + "dBm");
             scheduleHolder.contents.setText("내용 : " + schedules.get(position).getContents());
             scheduleHolder.start_date.setText("시작 일자 : " + schedules.get(position).getStart_date());
