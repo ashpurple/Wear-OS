@@ -132,12 +132,6 @@
         <activity
             android:name=".watchface.BeaconActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity
-            android:name=".watchface.StopAdvertise"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".watchface.StartAdvertise"
-            android:theme="@style/Theme.AppCompat" />
         <activity android:name="android.support.wearable.complications.ComplicationHelperActivity" />
         <activity
             android:name=".config.AnalogComplicationConfigActivity"
