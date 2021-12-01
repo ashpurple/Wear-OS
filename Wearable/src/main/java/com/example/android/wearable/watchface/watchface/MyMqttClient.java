@@ -139,7 +139,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 	public static void main(String[] args) {
 		String user_id = args[0];
-		to_id = ((MessageActivity)MessageActivity.context).touser;
 		//String user_id = "user001";
 		final MyMqttClient smc = new MyMqttClient(user_id);
 		Thread runThread = new Thread(smc);
@@ -153,6 +152,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 			@Override
 			public void run() {
+				to_id = ((MessageActivity)MessageActivity.context).touser;
 				System.out.println("Called Timer");
 				int tmp=0;
 				for (String p_topic : p_topics) {
