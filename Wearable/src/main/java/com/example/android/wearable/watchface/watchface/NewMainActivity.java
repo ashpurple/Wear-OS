@@ -908,7 +908,7 @@ public class NewMainActivity extends Activity {
                 System.out.println(message.getUser_id());
             }
             MyMqttClient myMqttClient = new MyMqttClient();
-            String[] args = {"2103","2106"};
+            String[] args = {userId,"2106"};
             myMqttClient.main(args);
         }
     }
