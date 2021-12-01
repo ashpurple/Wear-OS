@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -47,20 +48,19 @@ public class MessageActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         ArrayList<Sender> receivers=((NewMainActivity)NewMainActivity.context).messageList;
-        String userID=((NewMainActivity)NewMainActivity.context).userId;
+        final String userID=((NewMainActivity)NewMainActivity.context).userId;
         int n = receivers.size();
         user = new String[n];
         int i = 0;
         for(Sender receiver : receivers){
             user[i++] = String.valueOf(receiver.getUser_id());
             System.out.println(receiver.getUser_id());
-
         }
 
         setContentView(R.layout.messagetmp);
         Button send =findViewById(R.id.bu);
         context=this;
-        MyMqttClient myMqttClient = new MyMqttClient();
+        final MyMqttClient myMqttClient = new MyMqttClient();
 
         final Spinner name=(Spinner)findViewById(R.id.spinner);
         ArrayAdapter adapter=new ArrayAdapter(
@@ -73,22 +73,46 @@ public class MessageActivity extends Activity {
                 getApplicationContext(),R.layout.spinner,answerlist);
         adapter.setDropDownViewResource(R.layout.spinner_down);
         answer.setAdapter(adapter2);
-        selectedanswer = answer.getSelectedItem().toString();
+        answer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedanswer = String.valueOf(answer.getItemAtPosition(position));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        name.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                touser= String.valueOf(name.getItemAtPosition(position));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         System.out.println("!!!!!!!!!!!!"+selectedanswer);
-        touser=name.getSelectedItem().toString();
+
         System.out.println("!!!!!!!!!!!!"+touser);
-        String[] args = {userID,touser};
-        myMqttClient.main(args,selectedanswer);
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
             public void onClick(View view){
-                if(presscheck==1)
+                if(presscheck==1){
+                    final String[] args = {userID,touser};
+                    myMqttClient.main(args,selectedanswer);
                     presscheck=0;
+            }
             }
 
         });
     }
-    public void myPublish(String p_topic, String pubMsg) {
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+        public void myPublish(String p_topic, String pubMsg) {
         topic = myClient.getTopic(p_topic);
         int pubQoS = 0;
         MqttMessage message = new MqttMessage(pubMsg.getBytes());
