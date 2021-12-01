@@ -1,5 +1,8 @@
 package com.example.android.wearable.watchface.watchface;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,13 +42,16 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	static ArrayList<String> p_msgs;
 
 	MqttTopic topic;
-	
+	Context context;
 
 	public MyMqttClient() {
 		super();
 	}
 	
-	
+	public MyMqttClient(Context context){
+		
+		this.context=context;
+	}
 	public MyMqttClient(String from_id) {
 		super();
 		this.from_id = from_id;
@@ -57,6 +63,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		this.p_msgs=new ArrayList();
 		this.subscriber = false;
 		this.msgCount = 0;
+
 	}
 
 	@Override
@@ -112,7 +119,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Topic:" + revTopic);
 		revMsg = new String(message.getPayload());
 		System.out.println("Message: " + revMsg);
-		
+		//Toast.makeText(context.getApplicationContext(), revTopic.substring(7,11)+" : "+revMsg,Toast.LENGTH_SHORT).show();
 		if (revTopic.contains("/reply")) {
 			String reply_topic = revTopic;
 			reply_topic = reply_topic.replace("/reply", "");
