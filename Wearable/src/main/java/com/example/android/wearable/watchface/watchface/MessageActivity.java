@@ -25,8 +25,8 @@ public class MessageActivity extends Activity {
     MqttConnectOptions connOpt;
     static final int MAX_QUEUE_LEN = 10;
     static String BROKER_URL = "tcp://15.164.45.229:1883";
-    //	static final String SBSYS_USERNAME = "";
-//	static final String SBSYS_PASSWORD = "";
+    //   static final String SBSYS_USERNAME = "";
+//   static final String SBSYS_PASSWORD = "";
     int msgCount;
     String from_id;
     static String to_id;
@@ -111,10 +111,10 @@ public class MessageActivity extends Activity {
                     final String[] args = {userID};
                     myMqttClient.main(args);
                     presscheck=0;
-            }
+                }
                 if(sendcheck==1){
-                sendcheck=0;
-            }
+                    sendcheck=0;
+                }
             }
 
         });
@@ -122,7 +122,7 @@ public class MessageActivity extends Activity {
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
     }
-        public void myPublish(String p_topic, String pubMsg) {
+    public void myPublish(String p_topic, String pubMsg) {
         topic = myClient.getTopic(p_topic);
         int pubQoS = 0;
         MqttMessage message = new MqttMessage(pubMsg.getBytes());

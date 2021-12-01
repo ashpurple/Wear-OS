@@ -22,11 +22,11 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 
 	MqttClient myClient;
-    MqttConnectOptions connOpt;
-   static final int MAX_QUEUE_LEN = 10;
+	MqttConnectOptions connOpt;
+	static final int MAX_QUEUE_LEN = 10;
 	static String BROKER_URL = "tcp://15.164.45.229:1883";
-//	static final String SBSYS_USERNAME = "";
-//	static final String SBSYS_PASSWORD = "";
+	//   static final String SBSYS_USERNAME = "";
+//   static final String SBSYS_PASSWORD = "";
 	int msgCount;
 	String from_id;
 	static String to_id;
@@ -35,10 +35,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	// receive from other users
 	String s_topic2;
 	static String msg;
-    Boolean subscriber;
+	Boolean subscriber;
 	public static String ans="";
-	
-    
+
+
 	static ArrayList<String> p_topics;
 	static ArrayList<String> p_msgs;
 
@@ -48,7 +48,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	public MyMqttClient() {
 		super();
 	}
-	
+
 	public MyMqttClient(Context context){
 		this.context=context;
 	}
@@ -81,8 +81,8 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	public void insertNewTopic(String msg) {
 		String p_topic;
 		msgCount = (msgCount + 1) % 1000;
@@ -92,19 +92,19 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		p_topics.add(p_topic);
 		p_msgs.add(msg);
 	}
-	
-	
+
+
 	public void myPublish(String p_topic, String pubMsg) {
-		topic = myClient.getTopic(p_topic);		
+		topic = myClient.getTopic(p_topic);
 		int pubQoS = 0;
 		MqttMessage message = new MqttMessage(pubMsg.getBytes());
-    	message.setQos(pubQoS);
-    	message.setRetained(false);
+		message.setQos(pubQoS);
+		message.setRetained(false);
 
-    	// Publish the message
-    	System.out.println("Publishing to topic \"" + p_topic + "\" qos " + pubQoS);
-    	MqttDeliveryToken token = null;
-    	try {
+		// Publish the message
+		System.out.println("Publishing to topic \"" + p_topic + "\" qos " + pubQoS);
+		MqttDeliveryToken token = null;
+		try {
 			token = topic.publish(message);
 		} catch (Exception e) {
 			System.out.println("Error in onPublish()!");
@@ -131,10 +131,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			System.out.println("Publish " + p_topic + " topic");
 			myPublish(p_topic, "OK");
 		}
-		
+
 		else
 			System.out.println("Not proper message!");
-			
+
 	}
 
 
@@ -162,21 +162,21 @@ public class MyMqttClient implements MqttCallback, Runnable {
 					tmp++;
 				}
 			}
-			
+
 		};
 		m_timer.schedule(m_task, 5000, 5000);
-		
+
 	}
-	
+
 	@Override
 	public void run() {
 		connOpt = new MqttConnectOptions();
-		
+
 		connOpt.setCleanSession(true);
 		connOpt.setKeepAliveInterval(30);
 		//connOpt.setUserName(SBSYS_USERNAME);
 		//connOpt.setPassword(SBSYS_PASSWORD.toCharArray());
-		
+
 		// Connect to Broker
 		try {
 			myClient = new MqttClient(BROKER_URL, from_id, new MemoryPersistence());
@@ -186,9 +186,9 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		
+
 		System.out.println("Connected to " + BROKER_URL);
-		
+
 		if (myClient.isConnected()) {
 			System.out.println("Successfully connected");
 			subscriber = true;
@@ -196,9 +196,9 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		else {
 			System.out.println("Error to connect!");
 		}
-		
-		
-		
+
+
+
 		// subscribe to topic if subscriber
 		if (subscriber) {
 			try {
@@ -206,13 +206,13 @@ public class MyMqttClient implements MqttCallback, Runnable {
 				myClient.subscribe(s_topic, subQoS);
 				myClient.subscribe(s_topic2, subQoS);
 				System.out.println(s_topic + "\n" + s_topic2 + " are subscribed" );
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-	
-		while (subscriber) {	
+
+		while (subscriber) {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
@@ -235,7 +235,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			System.out.println("Error in disconnect()!");
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }
