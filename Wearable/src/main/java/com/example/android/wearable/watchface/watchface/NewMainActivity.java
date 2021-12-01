@@ -50,13 +50,13 @@ public class NewMainActivity extends Activity {
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
     /* 세훈 */
- //   static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
- //   static final String MAC = "08:97:98:0E:E6:DA";
-  //  static final String userId = "2103";
-    /* 찬빈 */
-    static final String DUID = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
-    static final String MAC = "9C:5A:44:B7:B9:8E";
-    static final String userId = "2106";
+    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
+    static final String MAC = "08:97:98:0E:E6:DA";
+    static final String userId = "2103";
+//    /* 찬빈 */
+//    static final String DUID = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
+//    static final String MAC = "9C:5A:44:B7:B9:8E";
+//    static final String userId = "2106";
 //    /* 건 */
 //    static final String DUID = "MjA6MjA6MDg6Mjc6MDU6MDA";
 //    static final String MAC = "20:20:08:27:05:00";
@@ -166,14 +166,10 @@ public class NewMainActivity extends Activity {
     };
 
     public void sendMessageToService(String str){
-        Log.d("in","inininin");
         if(isServiced){
-            Log.d("in","inininin");
             if(mServiceMessenger!=null){
-                Log.d("in","inininin");
                 try{
                     Message msg=Message.obtain(null,BackService.MSG_SEND_TO_SERVICE,str);
-                    Log.d("in","inininin");
                     msg.replyTo=mMessenger;
                     mServiceMessenger.send(msg);
                 } catch (RemoteException e) {
@@ -444,7 +440,6 @@ public class NewMainActivity extends Activity {
                     onOff_stress = onOff;
                     break;
                 case "BLE_SCAN":
-                    Log.e("HI","HI");
                     onOff_ble = onOff;
                     break;
             }
@@ -909,9 +904,9 @@ public class NewMainActivity extends Activity {
             for(Sender message : messageList){
                 System.out.println(message.getUser_id());
             }
-            MyMqttClient myMqttClient = new MyMqttClient();
-            String[] args = {"2103","2106"};
-            myMqttClient.main(args);
+//            MyMqttClient myMqttClient = new MyMqttClient();
+//            String[] args = {"2103","2106"};
+//            myMqttClient.main(args);
         }
     }
 
