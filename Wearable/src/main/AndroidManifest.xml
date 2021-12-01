@@ -121,6 +121,7 @@
 
         <activity android:name=".watchface.MainActivity" />
         <activity android:name=".watchface.MyActivity" />
+        <activity android:name=".watchface.MessageActivity" />
         <activity android:name=".watchface.SosActivity" />
         <activity android:name=".watchface.SimpleList" />
         <activity android:name=".watchface.ScheduleActivity"
