@@ -71,7 +71,7 @@ public class MessageActivity extends Activity {
                 getApplicationContext(),R.layout.spinner,user);
         adapter.setDropDownViewResource(R.layout.spinner_down);
         name.setAdapter(adapter);
-
+//
         final Spinner answer=(Spinner)findViewById(R.id.spinner2);
         ArrayAdapter adapter2=new ArrayAdapter(
                 getApplicationContext(),R.layout.spinner,answerlist);
