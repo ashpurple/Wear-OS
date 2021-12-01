@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="my_array">
+        <item>2013</item>
+        <item>2014</item>
+        <item>2016</item>
+        <item>아이템3</item>
+        <item>아이템4</item>
+    </string-array>
+</resources>
