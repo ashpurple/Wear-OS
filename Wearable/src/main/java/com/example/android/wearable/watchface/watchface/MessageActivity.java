@@ -104,8 +104,8 @@ public class MessageActivity extends Activity {
 
             }
         });
-        String[] tmp={userID,"0000"};
-        myMqttClient.main(tmp);
+      //  String[] tmp={userID,"0000"};
+      //  myMqttClient.main(tmp);
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
             public void onClick(View view){
