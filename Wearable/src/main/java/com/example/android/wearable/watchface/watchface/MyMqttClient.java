@@ -99,7 +99,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		} catch (Exception e) {
 			System.out.println("Error in onPublish()!");
 			e.printStackTrace();
-		}			
+		}
 	}
 
 
@@ -128,7 +128,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args, final String ans) {
 		String user_id = args[0];
 		to_id = args[1];
 		//String user_id = "user001";
@@ -137,13 +137,16 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		runThread.start();
 		System.out.println("Finish initializing MyMqttClient");
 		Timer m_timer = new Timer();
-		TimerTask m_task = new TimerTask() {
+		if(((MessageActivity)MessageActivity.context).presscheck==0) {
+			msg = "1번이다";
+			((MessageActivity)MessageActivity.context).presscheck = 1;
+		}TimerTask m_task = new TimerTask() {
 
 			@Override
 			public void run() {
 				System.out.println("Called Timer");
 				for (String p_topic : p_topics) {
-					smc.myPublish(p_topic, msg);
+					smc.myPublish(p_topic, ans);
 				}
 			}
 			

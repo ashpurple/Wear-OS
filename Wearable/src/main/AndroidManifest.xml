@@ -121,6 +121,7 @@
 
         <activity android:name=".watchface.MainActivity" />
         <activity android:name=".watchface.MyActivity" />
+        <activity android:name=".watchface.MessageActivity" />
         <activity android:name=".watchface.SosActivity" />
         <activity android:name=".watchface.SimpleList" />
         <activity android:name=".watchface.ScheduleActivity"
@@ -131,12 +132,6 @@
         <activity
             android:name=".watchface.BeaconActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity
-            android:name=".watchface.StopAdvertise"
-            android:theme="@style/Theme.AppCompat" />
-        <activity
-            android:name=".watchface.StartAdvertise"
-            android:theme="@style/Theme.AppCompat" />
         <activity android:name="android.support.wearable.complications.ComplicationHelperActivity" />
         <activity
             android:name=".config.AnalogComplicationConfigActivity"
