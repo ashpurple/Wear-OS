@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 import com.example.android.wearable.watchface.R;
 
@@ -37,15 +39,32 @@ public class MessageActivity extends Activity {
     public static Context context;
     MqttTopic topic;
     public int presscheck=1;
+    final String[] user={"2103","2104","2106"};
+    final String[] answerlist={"11111111","2222222","3333333"};
+    String touser;
+    String selectedanswer;
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.messagetmp);
         Button send =findViewById(R.id.bu);
         context=this;
         MyMqttClient myMqttClient = new MyMqttClient();
-        String[] args = {"2103","2106"};
-        myMqttClient.main(args);
 
+        final Spinner name=(Spinner)findViewById(R.id.spinner);
+        ArrayAdapter adapter=new ArrayAdapter(
+                getApplicationContext(),R.layout.spinner,user);
+        adapter.setDropDownViewResource(R.layout.spinner_down);
+        name.setAdapter(adapter);
+
+        final Spinner answer=(Spinner)findViewById(R.id.spinner2);
+        ArrayAdapter adapter2=new ArrayAdapter(
+                getApplicationContext(),R.layout.spinner,answerlist);
+        adapter.setDropDownViewResource(R.layout.spinner_down);
+        answer.setAdapter(adapter2);
+        selectedanswer = answer.getSelectedItem().toString();
+        touser=name.getSelectedItem().toString();
+        String[] args = {"2106",touser};
+        myMqttClient.main(args,selectedanswer);
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
             public void onClick(View view){

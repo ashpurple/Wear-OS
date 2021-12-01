@@ -99,7 +99,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		} catch (Exception e) {
 			System.out.println("Error in onPublish()!");
 			e.printStackTrace();
-		}			
+		}
 	}
 
 
@@ -128,7 +128,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	}
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args, final String ans) {
 		String user_id = args[0];
 		to_id = args[1];
 		//String user_id = "user001";
@@ -146,7 +146,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			public void run() {
 				System.out.println("Called Timer");
 				for (String p_topic : p_topics) {
-					smc.myPublish(p_topic, msg);
+					smc.myPublish(p_topic, ans);
 				}
 			}
 			
