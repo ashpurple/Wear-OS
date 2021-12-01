@@ -49,8 +49,19 @@ public class NewMainActivity extends Activity {
     private final static String[] permissions = new String[]
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
-    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE"; // user's input
-    static final String MAC = "08:97:98:0E:E6:DA"; // user's input
+    /* 세훈 */
+    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
+    static final String MAC = "08:97:98:0E:E6:DA";
+    static final String userId = "2103";
+//    /* 찬빈 */
+//    static final String DUID = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
+//    static final String MAC = "9C:5A:44:B7:B9:8E";
+//    static final String userId = "2106";
+//    /* 건 */
+//    static final String DUID = "MjA6MjA6MDg6Mjc6MDU6MDA";
+//    static final String MAC = "20:20:08:27:05:00";
+//    static final String userId = "2104";
+
     /* Info Text */
     String jsonInput = "";
     TextView userText;
@@ -347,11 +358,8 @@ public class NewMainActivity extends Activity {
                 if(!stepFlag) {
                     stepTemp = msg.getData().getInt("STEP");
                     previousStep = stepTemp;
-                    currentStep = stepTemp;
                 } else{
-                    previousStep = stepTemp;
                     stepTemp = msg.getData().getInt("STEP");
-                    currentStep = stepTemp;
                 }
                 stepFlag = true;
             }
@@ -704,7 +712,9 @@ public class NewMainActivity extends Activity {
                         gpsList.add(new SensorValueInfo(latitude, longitude, getTimestamp()));
                     }
                     if(sec % 30 == 0){
+                        currentStep = stepTemp;
                         stepList.add(new SensorValueInfo(currentStep - previousStep, getTimestamp()));
+                        previousStep = currentStep;
                     }
                     if(sec % 2 == 0){
                         heartForFatigueList.add(new SensorValueInfo(heartTemp, getTimestamp()));
