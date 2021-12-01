@@ -203,7 +203,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				insertNewTopic();
+				if(((MessageActivity)MessageActivity.context).sendcheck==0) {
+					insertNewTopic();
+					((MessageActivity)MessageActivity.context).sendcheck=1;
+				}
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				System.out.println("Error in sleep()!");

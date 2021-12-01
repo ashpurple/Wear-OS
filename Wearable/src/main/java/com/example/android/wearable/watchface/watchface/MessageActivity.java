@@ -44,6 +44,7 @@ public class MessageActivity extends Activity {
     final String[] answerlist={"안녕하세요","감사합니다","전화주세요"};
     String touser;
     String selectedanswer;
+    public int sendcheck=1;
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
@@ -104,6 +105,7 @@ public class MessageActivity extends Activity {
                     final String[] args = {userID,touser};
                     myMqttClient.main(args,selectedanswer);
                     presscheck=0;
+                    sendcheck=0;
             }
             }
 
