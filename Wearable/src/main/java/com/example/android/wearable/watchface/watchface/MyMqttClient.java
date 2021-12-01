@@ -1,6 +1,10 @@
 package com.example.android.wearable.watchface.watchface;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.widget.Toast;
 
 
@@ -20,7 +24,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MyMqttClient implements MqttCallback, Runnable {
 
-
+	private Messenger mClient = null;
+	public static final int MSG_REGISTER_CLIENT = 1;
+	public static final int MSG_SEND_TO_SERVICE = 3;
+	public static final int MSG_SEND_TO_ACTIVITY = 4;
 	MqttClient myClient;
     MqttConnectOptions connOpt;
    static final int MAX_QUEUE_LEN = 10;
@@ -37,7 +44,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	static String msg;
     Boolean subscriber;
 	public static String ans="";
-	
+	public String revMsg;
     
 	static ArrayList<String> p_topics;
 	static ArrayList<String> p_msgs;
@@ -112,11 +119,22 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			e.printStackTrace();
 		}
 	}
+	private void sendMsgToActivity(String sendValue,String type){
+		try{
+			Bundle bundle= new Bundle();
+			bundle.putString(type,sendValue);
+			Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
+			msg.setData(bundle);
+			mClient.send(msg);
+		}
+		catch (RemoteException e){
 
+		}
+	}
 
 	@Override
 	public void messageArrived(String revTopic, MqttMessage message) throws Exception {
-		String revMsg;
+
 		System.out.println("Topic:" + revTopic);
 		revMsg = new String(message.getPayload());
 		System.out.println("Message: " + revMsg);
@@ -136,10 +154,12 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			System.out.println("Publish " + p_topic + " topic");
 			myPublish(p_topic, "OK");
 		}
-		
+
 		else
 			System.out.println("Not proper message!");
-			
+
+
+		//sendMsgToActivity(revMsg,"messages");
 	}
 
 
