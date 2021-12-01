@@ -16,7 +16,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MyMqttClient implements MqttCallback, Runnable {
 
-   MqttClient myClient;
+
+	MqttClient myClient;
    MqttConnectOptions connOpt;
    static final int MAX_QUEUE_LEN = 10;
 	static String BROKER_URL = "tcp://15.164.45.229:1883";
@@ -31,7 +32,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	String s_topic2;
 	static String msg;
     Boolean subscriber;
-
+	public static String ans="";
 	
     
 	static ArrayList<String> p_topics;
@@ -54,7 +55,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		this.p_topics = new ArrayList();
 		this.subscriber = false;
 		this.msgCount = 0;
-		this.msg = "Hello World!";
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	}
 
 
-	public static void main(String[] args, final String ans) {
+	public static void main(String[] args) {
 		String user_id = args[0];
 		to_id = args[1];
 		//String user_id = "user001";
@@ -138,15 +138,15 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Finish initializing MyMqttClient");
 		Timer m_timer = new Timer();
 		if(((MessageActivity)MessageActivity.context).presscheck==0) {
-			msg = "1번이다";
 			((MessageActivity)MessageActivity.context).presscheck = 1;
-		}TimerTask m_task = new TimerTask() {
+		}
+		TimerTask m_task = new TimerTask() {
 
 			@Override
 			public void run() {
 				System.out.println("Called Timer");
 				for (String p_topic : p_topics) {
-					smc.myPublish(p_topic, ans);
+					smc.myPublish(p_topic, msg);
 				}
 			}
 			
@@ -205,6 +205,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 				// /sbsys/form_id/msg_id/to_id/request
 				if(((MessageActivity)MessageActivity.context).sendcheck==0) {
 					insertNewTopic();
+					msg=((MessageActivity)MessageActivity.context).selectedanswer;
 					((MessageActivity)MessageActivity.context).sendcheck=1;
 				}
 				Thread.sleep(5000);

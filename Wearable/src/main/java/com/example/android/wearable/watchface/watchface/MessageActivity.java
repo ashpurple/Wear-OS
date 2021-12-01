@@ -107,9 +107,11 @@ public class MessageActivity extends Activity {
             public void onClick(View view){
                 if(presscheck==1){
                     final String[] args = {userID,touser};
-                    myMqttClient.main(args,selectedanswer);
+                    myMqttClient.main(args);
                     presscheck=0;
-                    sendcheck=0;
+            }
+                if(sendcheck==1){
+                sendcheck=0;
             }
             }
 
