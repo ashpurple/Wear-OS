@@ -42,7 +42,7 @@ public class MessageActivity extends Activity {
     public int presscheck=1;
     public String[] user;
     final String[] answerlist={"안녕하세요","감사합니다","전화주세요","나중에 연락 드리겠습니다","사랑합니다"};
-    String touser;
+    public String touser;
     String selectedanswer;
     public int sendcheck=1;
     ArrayList<Sender> receivers;
@@ -63,6 +63,7 @@ public class MessageActivity extends Activity {
         Button send =findViewById(R.id.bu);
         context=this;
         final MyMqttClient myMqttClient = new MyMqttClient();
+        final MyMqttClient myMqttClient2 = new MyMqttClient(getApplicationContext());
 
         final Spinner name=(Spinner)findViewById(R.id.spinner);
         ArrayAdapter adapter=new ArrayAdapter(
@@ -102,13 +103,13 @@ public class MessageActivity extends Activity {
 
             }
         });
-        final String[] args = {userID,touser};
-        myMqttClient.main(args);
+
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
             public void onClick(View view){
                 if(presscheck==1){
-
+                    final String[] args = {userID};
+                    myMqttClient.main(args);
                     presscheck=0;
             }
                 if(sendcheck==1){

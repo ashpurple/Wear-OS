@@ -42,14 +42,13 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	static ArrayList<String> p_msgs;
 
 	MqttTopic topic;
-	Context context;
+	public static Context context;
 
 	public MyMqttClient() {
 		super();
 	}
 	
 	public MyMqttClient(Context context){
-		
 		this.context=context;
 	}
 	public MyMqttClient(String from_id) {
@@ -119,7 +118,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Topic:" + revTopic);
 		revMsg = new String(message.getPayload());
 		System.out.println("Message: " + revMsg);
-		//Toast.makeText(context.getApplicationContext(), revTopic.substring(7,11)+" : "+revMsg,Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, revTopic.substring(7,11)+" : "+revMsg,Toast.LENGTH_SHORT).show();
 		if (revTopic.contains("/reply")) {
 			String reply_topic = revTopic;
 			reply_topic = reply_topic.replace("/reply", "");
@@ -140,7 +139,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 	public static void main(String[] args) {
 		String user_id = args[0];
-		to_id = args[1];
+		to_id = ((MessageActivity)MessageActivity.context).touser;
 		//String user_id = "user001";
 		final MyMqttClient smc = new MyMqttClient(user_id);
 		Thread runThread = new Thread(smc);
