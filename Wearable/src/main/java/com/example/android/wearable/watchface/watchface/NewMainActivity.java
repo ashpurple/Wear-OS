@@ -82,15 +82,18 @@ public class NewMainActivity extends Activity {
     String skin;
     String protective;
     String maxHeartRate;
+    ArrayList<String> ble;
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
     String scheduleInput;
     public float  stress = 0, fatigue = 0;
     public int heartTemp = 0, stepTemp = 0, fatigueTemp = 0;
     public double latitude = 0, longitude = 0;
+    public ArrayList<String> blelist=new ArrayList<String>();
     public float distance, calorie;
     public boolean sosFlag = false;
     public boolean broadcastingFlag = false;
+    public boolean scanningFlag = false;
     ArrayList<SensorValueInfo> heartList;
     ArrayList<SensorValueInfo> stepList;
     ArrayList<SensorValueInfo> gpsList;
@@ -117,6 +120,7 @@ public class NewMainActivity extends Activity {
     String onOff_pedometer;
     String onOff_hrm;
     String onOff_fatigue;
+    String onOff_ble;
     Messenger mServiceMessenger;
     public static Context context;
 
@@ -228,7 +232,8 @@ public class NewMainActivity extends Activity {
         postGPS.start();
         PostSensorThread postFatigue= new PostSensorThread("FATIGUE");
         postFatigue.start();
-
+        PostSensorThread postBLE= new PostSensorThread("BLE_SCAN");
+        postBLE.start();
         /* input parsing */
         jsonParser = new JsonParser();
         userInfo = new UserInfo();
@@ -244,13 +249,20 @@ public class NewMainActivity extends Activity {
         scanning.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
             @Override
             public void onClick(View view){
-             Intent intent=new Intent(getApplicationContext(),BeaconActivity.class);
-             startActivity(intent);
+
+                if(scanningFlag){
+                    scanningFlag = false;
+                    sendMessageToService("scanoff");
+                    layout.setBackgroundColor(Color.BLACK);
+                }
+                else{
+                    scanningFlag = true;
+                    sendMessageToService("scanon");
+                    layout.setBackgroundColor(Color.BLUE);
+                }
             }
 
         });
-
-
         Broadcasting.setOnClickListener(new View.OnClickListener(){ // BLE Broadcasting
             @Override
             public void onClick(View view){
@@ -337,6 +349,10 @@ public class NewMainActivity extends Activity {
                 longitude = msg.getData().getDouble("LONGITUDE");}
             if(msg.getData().getFloat("Advertise")!=0){
                 }
+            if(msg.getData().getStringArrayList("MAC")!=null){
+                blelist = msg.getData().getStringArrayList("MAC");
+                Log.e("BLE_SCAN:",String.valueOf(blelist));
+            }
             return false;
         }
     }));
@@ -390,6 +406,10 @@ public class NewMainActivity extends Activity {
                     upload_fatigue = uploadInterval;
                     collect_fatigue = collectInterval;
                     onOff_fatigue = onOff;
+                    break;
+                case "BLE_SCAN":
+                    Log.e("HI","HI");
+                    onOff_ble = onOff;
                     break;
             }
         }
@@ -586,7 +606,14 @@ public class NewMainActivity extends Activity {
                                 jsonObj = jsonBuilder.getFatigue(fatigueList); // fatigue
                                 uploadInterval = upload_fatigue;
                                 break;
+                            case "BLE_SCAN":
+                                onOff = onOff_ble;
+                                jsonObj = jsonBuilder.getBLE(blelist);
+
+                                break;
                         }
+                        if(blelist.size()<3&&sensorType.equals("BLE_SCAN"))
+                            continue;
                         if(!onOff.equals("O")) // if setting is off
                             continue;
                         Log.e(MAIN_TAG, sensorType+"| Upload Interval: "+uploadInterval);
@@ -624,6 +651,9 @@ public class NewMainActivity extends Activity {
                                 case "FATIGUE":
                                     fatigueList.clear();
                                     break;
+                                case "BLE_SCAN":
+                                    blelist.clear();
+                                    break;
                             }
                         }
                         Log.e(MAIN_TAG, sensorType+" "+returnMsg);
@@ -634,6 +664,8 @@ public class NewMainActivity extends Activity {
                         } else { Log.e(MAIN_TAG, sensorType+" RESPONSE CODE ERROR");}
 
                         conn.disconnect();
+                        if(sensorType.equals("BLE_SCAN"))
+                            continue;
                         sleep(uploadInterval * 1000L - initialDelay); // upload delay
                     }
                 }
