@@ -39,12 +39,24 @@ public class MessageActivity extends Activity {
     public static Context context;
     MqttTopic topic;
     public int presscheck=1;
-    final String[] user={"2103","2104","2106"};
-    final String[] answerlist={"11111111","2222222","3333333"};
+    public String[] user;
+    final String[] answerlist={"안녕하세요","감사합니다","전화주세요"};
     String touser;
     String selectedanswer;
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        ArrayList<Sender> receivers=((NewMainActivity)NewMainActivity.context).messageList;
+        String userID=((NewMainActivity)NewMainActivity.context).userId;
+        int n = receivers.size();
+        user = new String[n];
+        int i = 0;
+        for(Sender receiver : receivers){
+            user[i++] = String.valueOf(receiver.getUser_id());
+            System.out.println(receiver.getUser_id());
+
+        }
+
         setContentView(R.layout.messagetmp);
         Button send =findViewById(R.id.bu);
         context=this;
@@ -62,8 +74,10 @@ public class MessageActivity extends Activity {
         adapter.setDropDownViewResource(R.layout.spinner_down);
         answer.setAdapter(adapter2);
         selectedanswer = answer.getSelectedItem().toString();
+        System.out.println("!!!!!!!!!!!!"+selectedanswer);
         touser=name.getSelectedItem().toString();
-        String[] args = {"2106",touser};
+        System.out.println("!!!!!!!!!!!!"+touser);
+        String[] args = {userID,touser};
         myMqttClient.main(args,selectedanswer);
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
