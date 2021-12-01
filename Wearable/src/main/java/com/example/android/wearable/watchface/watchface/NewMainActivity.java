@@ -98,7 +98,7 @@ public class NewMainActivity extends Activity {
     /* Global variables */
     String scheduleInput;
     public float  stress = 0, fatigue = 0;
-    public int heartTemp = 0, stepTemp = 0, fatigueTemp = 0;
+    public int heartTemp = 0, stepTemp = 0, fatigueTemp = 0, stressTemp = 0;
     public int previousStep = 0, currentStep =0;
     public boolean stepFlag = false;
     public double latitude = 0, longitude = 0;
@@ -112,6 +112,8 @@ public class NewMainActivity extends Activity {
     ArrayList<SensorValueInfo> gpsList;
     ArrayList<SensorValueInfo> fatigueList;
     ArrayList<SensorValueInfo> heartForFatigueList;
+    ArrayList<SensorValueInfo> stressList;
+    ArrayList<SensorValueInfo> heartForStressList;
     UserInfo userInfo;
     ArrayList<TimerInfo> timerList;
     JsonParser jsonParser;
@@ -127,12 +129,15 @@ public class NewMainActivity extends Activity {
     int collect_hrm = 0;
     int upload_fatigue = 0;
     int collect_fatigue = 0;
+    int upload_stress = 0;
+    int collect_stress = 0;
 
     String onOff_battery;
     String onOff_gps;
     String onOff_pedometer;
     String onOff_hrm;
     String onOff_fatigue;
+    String onOff_stress;
     String onOff_ble;
     Messenger mServiceMessenger;
     public static Context context;
@@ -198,6 +203,8 @@ public class NewMainActivity extends Activity {
         stepList = new ArrayList<>();
         heartForFatigueList = new ArrayList<>();
         fatigueList = new ArrayList<>();
+        heartForStressList = new ArrayList<>();
+        stressList = new ArrayList<>();
 
         /* Text Views */
         userText = (TextView) findViewById(R.id.Name);
@@ -245,6 +252,8 @@ public class NewMainActivity extends Activity {
         postGPS.start();
         PostSensorThread postFatigue= new PostSensorThread("FATIGUE");
         postFatigue.start();
+        PostSensorThread postStress = new PostSensorThread("STRESS");
+        postStress.start();
         PostSensorThread postBLE= new PostSensorThread("BLE_SCAN");
         postBLE.start();
         /* input parsing */
@@ -429,6 +438,11 @@ public class NewMainActivity extends Activity {
                     collect_fatigue = collectInterval;
                     onOff_fatigue = onOff;
                     break;
+                case "STRESS":
+                    upload_stress = uploadInterval;
+                    collect_stress = collectInterval;
+                    onOff_stress = onOff;
+                    break;
                 case "BLE_SCAN":
                     Log.e("HI","HI");
                     onOff_ble = onOff;
@@ -480,6 +494,7 @@ public class NewMainActivity extends Activity {
                         int intLongitude = (int)longitude;
                         gpsText.setText(intLatitude+"."+intLongitude);
                         fatigueText.setText(String.valueOf(fatigueTemp));
+                        stressText.setText(stressTemp+"%");
                         //secondText.setText(second);
                     }
                 });
@@ -628,10 +643,14 @@ public class NewMainActivity extends Activity {
                                 jsonObj = jsonBuilder.getFatigue(fatigueList); // fatigue
                                 uploadInterval = upload_fatigue;
                                 break;
+                            case "STRESS":
+                                onOff = onOff_stress;
+                                jsonObj = jsonBuilder.getStress(stressList); // fatigue
+                                uploadInterval = upload_stress;
+                                break;
                             case "BLE_SCAN":
                                 onOff = onOff_ble;
                                 jsonObj = jsonBuilder.getBLE(blelist);
-
                                 break;
                         }
                         if(blelist.size()<3&&sensorType.equals("BLE_SCAN"))
@@ -673,6 +692,9 @@ public class NewMainActivity extends Activity {
                                 case "FATIGUE":
                                     fatigueList.clear();
                                     break;
+                                case "STRESS":
+                                    stressList.clear();
+                                    break;
                                 case "BLE_SCAN":
                                     blelist.clear();
                                     break;
@@ -707,26 +729,34 @@ public class NewMainActivity extends Activity {
                 int sec = 0;
                 while(true) {
                     sec += 1;
-                    if(sec % 30 == 0){
+                    if(sec % 30 == 0){ // heart
                         heartList.add(new SensorValueInfo(heartTemp, getTimestamp()));
                     }
-                    if(sec % 30 == 0){
+                    if(sec % 30 == 0){ // gps
                         gpsList.add(new SensorValueInfo(latitude, longitude, getTimestamp()));
                     }
-                    if(sec % 30 == 0){
+                    if(sec % 30 == 0){ // step
                         currentStep = stepTemp;
                         stepList.add(new SensorValueInfo(currentStep - previousStep, getTimestamp()));
                         previousStep = currentStep;
                     }
-                    if(sec % 2 == 0){
+                    if(sec % 2 == 0){ // heart for fatigue and stress
                         heartForFatigueList.add(new SensorValueInfo(heartTemp, getTimestamp()));
+                        heartForStressList.add(new SensorValueInfo(heartTemp, getTimestamp()));
                     }
-                    if(sec % 40 == 0){
+                    if(sec % 40 == 0){ // fatigue
                         CalculationFatigueStress calculationFatigueStress = new CalculationFatigueStress(heartForFatigueList);
                         int fatigueValue = calculationFatigueStress.calculateFatigue();
                         fatigueTemp = fatigueValue;
                         fatigueList.add(new SensorValueInfo(fatigueValue, getTimestamp()));
                         heartForFatigueList.clear();
+                    }
+                    if(sec % 40 == 0){ // stress
+                        CalculationFatigueStress calculationFatigueStress = new CalculationFatigueStress(heartForStressList);
+                        int stressValue = calculationFatigueStress.CalculateStress();
+                        stressTemp = stressValue;
+                        stressList.add(new SensorValueInfo(stressValue, getTimestamp()));
+                        heartForStressList.clear();
                     }
                     sleep(1000);
 

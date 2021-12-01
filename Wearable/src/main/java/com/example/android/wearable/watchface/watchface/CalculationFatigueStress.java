@@ -11,14 +11,18 @@ public class CalculationFatigueStress {
     private final ArrayList<Double> rr_interval;
 
     CalculationFatigueStress(ArrayList<SensorValueInfo> Input){
-        rr_interval = new ArrayList<Double>();
         ArrayList<Integer> heart_list = new ArrayList<Integer>();
+        /* Stress */
+        rr_interval = new ArrayList<Double>();
         for(SensorValueInfo sensorValueInfo: Input){
             int heartValue = sensorValueInfo.getValue();
             heart_list.add(heartValue);
             rr_interval.add((double)heartValue);
         }
-
+        for(int i = 0; i < rr_interval.size(); i++){
+            rr_interval.set(i, 60/rr_interval.get(i)*2000);
+        }
+        /* Fatigue */
         hrf = new ArrayList<Integer>();
         Collections.sort(heart_list, Collections.<Integer>reverseOrder());
         for(int i = 0; i < 10; i++){
@@ -30,9 +34,6 @@ public class CalculationFatigueStress {
             hrl.add(heart_list.get(i));
         }
 
-        for(int i = 0; i < rr_interval.size(); i++){
-            rr_interval.set(i, 60/rr_interval.get(i)*2000);
-        }
 
     }
 
@@ -58,18 +59,18 @@ public class CalculationFatigueStress {
         return avg;
     }
 
-    public double getStdev(ArrayList list){
+    public double getStdev(ArrayList<Double> list){
         double avg;
-        int sum = 0;
+        double sum = 0;
         for(int i = 0; i < list.size(); i++){
-            sum += (int)list.get(i);
+            sum += list.get(i);
         }
         avg = sum/list.size();
         sum = 0;
         for(int i =0; i < list.size(); i++) {
-            sum += Math.pow((int)list.get(i) - avg, 2);
+            sum += Math.pow(list.get(i) - avg, 2);
         }
-        double var = (double)sum / list.size();
+        double var = sum / list.size();
         double Stdev = Math.sqrt(var);
         return Stdev;
     }
@@ -137,7 +138,7 @@ public class CalculationFatigueStress {
         return LastTired;
     }
 
-        public int CalculateStress(){
+    public int CalculateStress(){
         double MinStress = 25.0;
         double MaxStress = 75.0;
 
