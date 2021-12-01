@@ -102,12 +102,13 @@ public class MessageActivity extends Activity {
 
             }
         });
+        final String[] args = {userID,touser};
+        myMqttClient.main(args);
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
             public void onClick(View view){
                 if(presscheck==1){
-                    final String[] args = {userID,touser};
-                    myMqttClient.main(args);
+
                     presscheck=0;
             }
                 if(sendcheck==1){
