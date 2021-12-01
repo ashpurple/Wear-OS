@@ -50,7 +50,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	}
 	
 	public MyMqttClient(Context context){
-		
+		super();
 		this.context=context;
 	}
 	public MyMqttClient(String from_id) {
@@ -142,6 +142,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	public static void main(String[] args) {
 		String user_id = args[0];
 		to_id = args[1];
+		System.out.println("USER: "+to_id);
 		//String user_id = "user001";
 		final MyMqttClient smc = new MyMqttClient(user_id);
 		Thread runThread = new Thread(smc);

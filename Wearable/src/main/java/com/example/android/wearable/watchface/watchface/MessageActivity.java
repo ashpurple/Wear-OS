@@ -62,7 +62,7 @@ public class MessageActivity extends Activity {
         setContentView(R.layout.messagetmp);
         Button send =findViewById(R.id.bu);
         context=this;
-        final MyMqttClient myMqttClient = new MyMqttClient();
+        final MyMqttClient myMqttClient = new MyMqttClient(getApplicationContext());
 
         final Spinner name=(Spinner)findViewById(R.id.spinner);
         ArrayAdapter adapter=new ArrayAdapter(
@@ -102,7 +102,7 @@ public class MessageActivity extends Activity {
 
             }
         });
-        final String[] args = {userID,touser};
+        String[] args = {userID,touser};
         myMqttClient.main(args);
         send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
