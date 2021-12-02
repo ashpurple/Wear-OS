@@ -26,4 +26,11 @@
         android:layout_height="wrap_content"
         tools:ignore="MissingConstraints"
         android:layout_below="@+id/spinner"/>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="SEE"
+        android:id="@+id/list"
+        android:layout_below="@+id/spinner2"
+        ></Button>
 </RelativeLayout>

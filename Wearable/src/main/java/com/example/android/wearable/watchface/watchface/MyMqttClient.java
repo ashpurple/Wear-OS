@@ -1,6 +1,10 @@
 package com.example.android.wearable.watchface.watchface;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.widget.Toast;
 
 
@@ -20,7 +24,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MyMqttClient implements MqttCallback, Runnable {
 
-
+	private Messenger mClient = null;
+	public static final int MSG_REGISTER_CLIENT = 1;
+	public static final int MSG_SEND_TO_SERVICE = 3;
+	public static final int MSG_SEND_TO_ACTIVITY = 4;
 	MqttClient myClient;
 	MqttConnectOptions connOpt;
 	static final int MAX_QUEUE_LEN = 10;
@@ -37,7 +44,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	static String msg;
 	Boolean subscriber;
 	public static String ans="";
-
+	public String revMsg;
 
 	static ArrayList<String> p_topics;
 	static ArrayList<String> p_msgs;
@@ -87,10 +94,11 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		String p_topic;
 		msgCount = (msgCount + 1) % 1000;
 		p_topic = "/sbsys/" + from_id + "/msg" + msgCount + "/" + to_id + "/request";
-		if (p_topics.size()>= MAX_QUEUE_LEN)
+		if (p_topics.size()>= MAX_QUEUE_LEN){
 			p_topics.remove(0);
+			p_msgs.remove(0);}
 		p_topics.add(p_topic);
-		p_msgs.add(msg);
+		p_msgs.add(p_topic+msg);
 	}
 
 
@@ -111,20 +119,35 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			e.printStackTrace();
 		}
 	}
+	private void sendMsgToActivity(String sendValue,String type){
+		try{
+			Bundle bundle= new Bundle();
+			bundle.putString(type,sendValue);
+			Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
+			msg.setData(bundle);
+			mClient.send(msg);
+		}
+		catch (RemoteException e){
 
+		}
+	}
 
 	@Override
 	public void messageArrived(String revTopic, MqttMessage message) throws Exception {
-		String revMsg;
+
 		System.out.println("Topic:" + revTopic);
 		revMsg = new String(message.getPayload());
 		System.out.println("Message: " + revMsg);
-		Toast.makeText(context2, revTopic.substring(7,11)+" : "+revMsg,Toast.LENGTH_SHORT).show();
+		//Toast.makeText(context2, revTopic.substring(7,11)+" : "+revMsg,Toast.LENGTH_SHORT).show();
 		if (revTopic.contains("/reply")) {
 			String reply_topic = revTopic;
 			reply_topic = reply_topic.replace("/reply", "");
 			System.out.println("Modified topic:" + reply_topic);
 			p_topics.remove(reply_topic);
+			for(int i=0; i<p_msgs.size();i++){
+				if(p_msgs.get(i).contains(reply_topic))
+					p_msgs.remove(i);
+		}
 		}
 		else if (revTopic.contains("/request")) {
 			String p_topic = revTopic+"/reply";
@@ -135,6 +158,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		else
 			System.out.println("Not proper message!");
 
+		//sendMsgToActivity(revMsg,"messages");
 	}
 
 
@@ -157,7 +181,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 				System.out.println("Called Timer");
 				int tmp=0;
 				for (String p_topic : p_topics) {
-					smc.myPublish(p_topic, p_msgs.get(tmp));
+					smc.myPublish(p_topic, p_msgs.get(tmp).substring(29));
 					tmp++;
 				}
 			}
