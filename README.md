@@ -32,10 +32,6 @@ extend this and add your own.
 We include several older watch faces to show best practices for Wear 1.0. If you are targeting
 older devices, you may want to review those watch faces (digital, opengl, and interactive).
 
-The digital watch face includes a watch-side and phone-side configuration example.
-
-This sample includes both a phone app and a wearable app.
-
 Because watch face apps do not have a default Activity in their project, you will need to set your
 Configurations to "Do not launch Activity" for both the Wear and Application modules. If you are
 unsure how to do this, please review the "Run Starter project" section in the
