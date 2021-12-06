@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.widget.Toast;
 
 
 import java.util.ArrayList;
@@ -32,8 +31,8 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	MqttConnectOptions connOpt;
 	static final int MAX_QUEUE_LEN = 10;
 	static String BROKER_URL = "tcp://15.164.45.229:1883";
-	//   static final String SBSYS_USERNAME = "";
-//   static final String SBSYS_PASSWORD = "";
+	//static final String SBSYS_USERNAME = "";
+	//static final String SBSYS_PASSWORD = "";
 	int msgCount;
 	String from_id;
 	static String to_id;
@@ -50,15 +49,17 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	static ArrayList<String> p_msgs;
 
 	MqttTopic topic;
-	public static Context context2;
+	public static Context mContext;
+	boolean messageFlag = false;
 
 	public MyMqttClient() {
 		super();
 	}
 
 	public MyMqttClient(Context context){
-		context2=context;
+		mContext = context;
 	}
+
 	public MyMqttClient(String from_id) {
 		super();
 		this.from_id = from_id;
@@ -66,8 +67,8 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		//System.out.println("s_topic: " + s_topic);
 		this.s_topic2 = "/sbsys/+/+/" + from_id + "/request";
 		//System.out.println("s_topic2: " + s_topic2);
-		this.p_topics = new ArrayList();
-		this.p_msgs=new ArrayList();
+		p_topics = new ArrayList<String>();
+		p_msgs=new ArrayList<String>();
 		this.subscriber = false;
 		this.msgCount = 0;
 
@@ -138,7 +139,15 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Topic:" + revTopic);
 		revMsg = new String(message.getPayload());
 		System.out.println("Message: " + revMsg);
-		//Toast.makeText(context2, revTopic.substring(7,11)+" : "+revMsg,Toast.LENGTH_SHORT).show();
+
+		messageFlag = true;
+//		MessageActivity.this.runOnUiThread(new Runnable() {
+//			@Override
+//			public void run() {
+//
+//			}
+//		});
+
 		if (revTopic.contains("/reply")) {
 			String reply_topic = revTopic;
 			reply_topic = reply_topic.replace("/reply", "");
@@ -165,14 +174,13 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	public static void main(String[] args) {
 		String user_id = args[0];
 		to_id = args[1];
-		//String user_id = "user001";
 		final MyMqttClient smc = new MyMqttClient(user_id);
 		Thread runThread = new Thread(smc);
 		runThread.start();
 		System.out.println("Finish initializing MyMqttClient");
 		Timer m_timer = new Timer();
-		if(((MessageActivity)MessageActivity.context).presscheck==0) {
-			((MessageActivity)MessageActivity.context).presscheck = 1;
+		if(!((MessageActivity) MessageActivity.context).isPressed) {
+			((MessageActivity)MessageActivity.context).isPressed = true;
 		}
 		TimerTask m_task = new TimerTask() {
 
@@ -188,13 +196,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 		};
 		m_timer.schedule(m_task, 5000, 5000);
-
 	}
-
 	@Override
 	public void run() {
 		connOpt = new MqttConnectOptions();
-
 		connOpt.setCleanSession(true);
 		connOpt.setKeepAliveInterval(30);
 		//connOpt.setUserName(SBSYS_USERNAME);
@@ -239,11 +244,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				if(((MessageActivity)MessageActivity.context).sendcheck==0) {
-
-					msg=((MessageActivity)MessageActivity.context).selectedanswer;
+				if(((MessageActivity)MessageActivity.context).sendFlag) {
+					msg=((MessageActivity)MessageActivity.context).selectedAnswer;
 					insertNewTopic(msg);
-					((MessageActivity)MessageActivity.context).sendcheck=1;
+					((MessageActivity)MessageActivity.context).sendFlag = true;
 				}
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {

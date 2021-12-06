@@ -3,34 +3,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <Button
+
+
+    <Spinner
+        android:id="@+id/name_spinner"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent"
-    android:id="@+id/bu"
-    android:text="PRESS"
+        android:textAlignment="center"
+        tools:ignore="MissingConstraints" />
 
-
-    tools:ignore="MissingConstraints"></Button>
     <Spinner
-        android:id="@+id/spinner"
-        android:layout_centerHorizontal="true"
+        android:id="@+id/answer_spinner"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints"
-        android:layout_below="@+id/bu"/>
-    <Spinner
-        android:id="@+id/spinner2"
+        android:layout_below="@+id/name_spinner"
         android:layout_centerHorizontal="true"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints"
-        android:layout_below="@+id/spinner"/>
+        android:textAlignment="center"
+        tools:ignore="MissingConstraints" />
     <Button
-        android:layout_height="wrap_content"
+        android:id="@+id/send_btn"
         android:layout_width="match_parent"
-        android:text="SEE"
-        android:id="@+id/list"
-        android:layout_below="@+id/spinner2"
-        ></Button>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/answer_spinner"
+        android:text="Send"
+        tools:ignore="MissingConstraints">
+    </Button>
+    <Button
+        android:id="@+id/view_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/send_btn"
+        android:layout_marginTop="30dp"
+        android:text="View">
+    </Button>
 </RelativeLayout>
