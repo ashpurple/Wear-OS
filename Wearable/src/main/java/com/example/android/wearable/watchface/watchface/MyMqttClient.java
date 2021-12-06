@@ -128,8 +128,14 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Arrived Message: " + revMsg);
 
 		String[] splitStr = revTopic.split("/");
-		String senderId = splitStr[4];
+		String senderId;
+		if(revMsg.equals("OK")){
+			senderId = splitStr[4];
+		} else{
+			senderId = splitStr[2];
+		}
 		/* Toast Message */
+		System.out.println("SENDER ID:" + senderId);
 		messageActivity.receiveMessage(senderId, revMsg);
 
 		if (revTopic.contains("/reply")) { // 상대의 수신 확인 메시지
