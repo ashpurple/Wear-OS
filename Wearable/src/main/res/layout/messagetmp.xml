@@ -10,7 +10,8 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="55dp"
+        android:gravity="center"
         android:textAlignment="center"
         tools:ignore="MissingConstraints" />
 
@@ -21,21 +22,27 @@
         android:layout_below="@+id/name_spinner"
         android:layout_centerHorizontal="true"
         android:textAlignment="center"
+        android:gravity="center"
         tools:ignore="MissingConstraints" />
+
     <Button
         android:id="@+id/send_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/answer_spinner"
+        android:layout_marginTop="5dp"
         android:text="Send"
         tools:ignore="MissingConstraints">
+
     </Button>
+
     <Button
         android:id="@+id/view_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/send_btn"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="0dp"
         android:text="View">
+
     </Button>
 </RelativeLayout>

@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.android.wearable.watchface.R;
 
@@ -122,6 +123,16 @@ public class MessageActivity extends Activity {
             }});
 
     }
+
+    public void displayMessage(final String msg){
+        MessageActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT ).show();
+            }
+        });
+    }
+
     private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {

@@ -49,7 +49,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	static ArrayList<String> p_msgs;
 
 	MqttTopic topic;
-	public static Context mContext;
+	public static Context messageContext;
 	boolean messageFlag = false;
 
 	public MyMqttClient() {
@@ -57,7 +57,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	}
 
 	public MyMqttClient(Context context){
-		mContext = context;
+		messageContext = context;
 	}
 
 	public MyMqttClient(String from_id) {
@@ -138,15 +138,12 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 		System.out.println("Topic:" + revTopic);
 		revMsg = new String(message.getPayload());
-		System.out.println("Message: " + revMsg);
+		System.out.println("Arrived Message: " + revMsg);
 
 		messageFlag = true;
-//		MessageActivity.this.runOnUiThread(new Runnable() {
-//			@Override
-//			public void run() {
-//
-//			}
-//		});
+		MessageActivity messageActivity = new MessageActivity();
+		messageActivity.displayMessage(revMsg);
+
 
 		if (revTopic.contains("/reply")) {
 			String reply_topic = revTopic;
@@ -156,7 +153,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			for(int i=0; i<p_msgs.size();i++){
 				if(p_msgs.get(i).contains(reply_topic))
 					p_msgs.remove(i);
-		}
+			}
 		}
 		else if (revTopic.contains("/request")) {
 			String p_topic = revTopic+"/reply";
