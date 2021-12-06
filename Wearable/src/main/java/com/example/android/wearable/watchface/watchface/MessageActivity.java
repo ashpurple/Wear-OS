@@ -1,92 +1,69 @@
 package com.example.android.wearable.watchface.watchface;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.android.wearable.watchface.R;
-
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
 
 import java.util.ArrayList;
 
 public class MessageActivity extends Activity {
-    MqttClient myClient;
-    MqttConnectOptions connOpt;
-    static final int MAX_QUEUE_LEN = 10;
-    static String BROKER_URL = "tcp://15.164.45.229:1883";
-    //	static final String SBSYS_USERNAME = "";
-//	static final String SBSYS_PASSWORD = "";
-    int msgCount;
-    String from_id;
-    static String to_id;
-    // send to other users
-    String s_topic;
-    // receive from other users
-    String s_topic2;
-    static String msg;
-    Boolean subscriber;
-    static ArrayList<String> p_topics;
+
+    public ArrayList<String> messageList;
+
     public static Context context;
-    MqttTopic topic;
-    public int presscheck=1;
+    public boolean isPressed = true;
     public String[] user;
-    final String[] answerlist={"안녕하세요","감사합니다","전화주세요","나중에 연락 드리겠습니다","사랑합니다"};
-    public String touser;
-    String selectedanswer;
-    public int sendcheck=1;
+    final String[] answerList = {"안녕하세요","감사합니다","전화주세요","알겠습니다","전화드릴게요"};
+    public String toUser;
+    String selectedAnswer;
+    public boolean sendFlag = false;
     ArrayList<Sender> receivers;
+    public boolean messageFlag = false;
+
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        context=this;
 
+        /* Set Receiver List */
         receivers=((NewMainActivity)NewMainActivity.context).messageList;
         final String userID=((NewMainActivity)NewMainActivity.context).userId;
         int n = receivers.size();
         user = new String[n];
+
+
         int i = 0;
-        for(Sender receiver : receivers){
+        for(Sender receiver : receivers){ // store receiver list
             user[i++] = String.valueOf(receiver.getUser_name());
-            System.out.println(receiver.getUser_id());
         }
 
         setContentView(R.layout.messagetmp);
-        Button send =findViewById(R.id.bu);
-        context=this;
-        final MyMqttClient myMqttClient = new MyMqttClient();
-        final MyMqttClient myMqttClient2 = new MyMqttClient(getApplicationContext());
 
+        final MyMqttClient myMqttClient = new MyMqttClient(this);
 
-        final Spinner name=(Spinner)findViewById(R.id.spinner);
-        ArrayAdapter adapter=new ArrayAdapter(
+        /* User Spinner */
+        final Spinner name=(Spinner)findViewById(R.id.name_spinner);
+        ArrayAdapter nameAdapter=new ArrayAdapter(
                 getApplicationContext(),R.layout.spinner,user);
-        adapter.setDropDownViewResource(R.layout.spinner_down);
-        name.setAdapter(adapter);
-//
-        final Spinner answer=(Spinner)findViewById(R.id.spinner2);
-        ArrayAdapter adapter2=new ArrayAdapter(
-                getApplicationContext(),R.layout.spinner,answerlist);
-        adapter.setDropDownViewResource(R.layout.spinner_down);
-        answer.setAdapter(adapter2);
-        answer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedanswer = String.valueOf(answer.getItemAtPosition(position));
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+        nameAdapter.setDropDownViewResource(R.layout.spinner_down);
+        name.setAdapter(nameAdapter);
 
-            }
-        });
         name.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -97,48 +74,100 @@ public class MessageActivity extends Activity {
                         uid = String.valueOf(receiver.getUser_id());
                     }
                 }
-                touser= uid;
+                toUser = uid;
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                String userName = String.valueOf(name.getItemAtPosition(0));
+                String uid = "";
+                for(Sender receiver : receivers){
+                    if(userName.equals(receiver.getUser_name())){
+                        uid = String.valueOf(receiver.getUser_id());
+                    }
+                }
+                toUser = uid;
             }
         });
-      //  String[] tmp={userID,"0000"};
-      //  myMqttClient.main(tmp);
-        send.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
+
+        /* Answer Spinner */
+        final Spinner answer=(Spinner)findViewById(R.id.answer_spinner);
+        ArrayAdapter answerAdapter=new ArrayAdapter( // answer spinner
+                getApplicationContext(),R.layout.spinner, answerList);
+        answerAdapter.setDropDownViewResource(R.layout.spinner_down);
+        //nameAdapter.setDropDownViewResource(R.layout.spinner_down);
+        answer.setAdapter(answerAdapter);
+        answer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedAnswer = String.valueOf(answer.getItemAtPosition(position));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedAnswer = String.valueOf(answer.getItemAtPosition(0));
+            }
+        });
+
+        /* Buttons */
+        Button send =findViewById(R.id.send_btn);
+        send.setOnClickListener(new View.OnClickListener(){ // send button
             @Override
             public void onClick(View view){
-                if(presscheck==1){
-                    final String[] args = {userID,touser};
+                messageFlag = true;
+                if(isPressed){
+                    final String[] args = {userID, toUser};
                     myMqttClient.main(args);
-                    presscheck=0;
+                    isPressed = false;
+                }
+                if(!sendFlag){
+                    sendFlag = true;
+                }
             }
-                if(sendcheck==1){
-                sendcheck=0;
-            }
-            }
+        });
+        Button view=findViewById(R.id.view_btn);
+        view.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
+            @Override
+            public void onClick(View view){
+                Intent intent=new Intent(getApplicationContext(),messagelist.class);
+                startActivity(intent);
+            }});
 
+    }
+
+    public void receiveMessage(String senderId, String msg){
+        String senderName = "";
+        final String myMsg;
+        for(Sender receiver : receivers){ // set sender name
+            if(Integer.parseInt(senderId) == receiver.getUser_id()){
+                senderName = String.valueOf(receiver.getUser_name());
+            }
+        }
+
+        if(msg.equals("OK")){
+            myMsg = senderName+"님이 메시지를 수신하였습니다";
+        } else{
+            myMsg = senderName+": "+msg;
+        }
+        MessageActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, myMsg, Toast.LENGTH_SHORT ).show();
+            }
         });
     }
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-    }
-        public void myPublish(String p_topic, String pubMsg) {
-        topic = myClient.getTopic(p_topic);
-        int pubQoS = 0;
-        MqttMessage message = new MqttMessage(pubMsg.getBytes());
-        message.setQos(pubQoS);
-        message.setRetained(false);
+    public void sendMessage(){
+        final String myMsg;
+        if(messageFlag) {
+            myMsg = "메시지 전송 완료";
 
-        // Publish the message
-        System.out.println("Publishing to topic \"" + p_topic + "\" qos " + pubQoS);
-        MqttDeliveryToken token = null;
-        try {
-            token = topic.publish(message);
-        } catch (Exception e) {
-            System.out.println("Error in onPublish()!");
-            e.printStackTrace();
+            MessageActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, myMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
+            messageFlag = false;
         }
     }
 }
+
