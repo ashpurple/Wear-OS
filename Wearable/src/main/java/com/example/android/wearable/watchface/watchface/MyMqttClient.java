@@ -1,14 +1,11 @@
 package com.example.android.wearable.watchface.watchface;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
-import android.os.Message;
+import android.annotation.SuppressLint;
 import android.os.Messenger;
-import android.os.RemoteException;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -50,19 +47,14 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	static ArrayList<String> p_msgs;
 
 	MqttTopic topic;
-	public static Context messageContext;
-	public static Activity messageActivity;
-	boolean messageFlag = false;
+	@SuppressLint("StaticFieldLeak")
+	public static MessageActivity messageActivity;
 
 	public MyMqttClient() {
 		super();
 	}
 
-	public MyMqttClient(Context context){
-		messageContext = context;
-	}
-
-	public MyMqttClient(Activity myActivity){
+	public MyMqttClient(MessageActivity myActivity){
 		messageActivity = myActivity;
 	}
 
@@ -77,7 +69,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		this.p_msgs=new ArrayList<String>();
 		this.subscriber = false;
 		this.msgCount = 0;
-
 	}
 
 	@Override
@@ -89,13 +80,16 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	@Override
 	public void deliveryComplete(IMqttDeliveryToken token) {
 		try {
-			System.out.println("Pubish is completed: " + new String(token.getMessage().getPayload()));
+			String myMsg = new String(token.getMessage().getPayload());
+			if(!myMsg.equals("OK")){ // reply가 아닐 때
+				messageActivity.sendMessage();
+			}
+			System.out.println("Publish is completed: " + new String(token.getMessage().getPayload()));
 		} catch (MqttException e) {
 			System.out.println("Error to publish topic");
 			e.printStackTrace();
 		}
 	}
-
 
 	public void insertNewTopic(String msg) {
 		String p_topic;
@@ -107,7 +101,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		p_topics.add(p_topic);
 		p_msgs.add(p_topic+msg);
 	}
-
 
 	public void myPublish(String p_topic, String pubMsg) {
 		topic = myClient.getTopic(p_topic);
@@ -126,18 +119,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			e.printStackTrace();
 		}
 	}
-	private void sendMsgToActivity(String sendValue,String type){
-		try{
-			Bundle bundle= new Bundle();
-			bundle.putString(type,sendValue);
-			Message msg=Message.obtain(null,MSG_SEND_TO_ACTIVITY);
-			msg.setData(bundle);
-			mClient.send(msg);
-		}
-		catch (RemoteException e){
-
-		}
-	}
 
 	@Override
 	public void messageArrived(String revTopic, MqttMessage message) throws Exception {
@@ -146,12 +127,12 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		revMsg = new String(message.getPayload());
 		System.out.println("Arrived Message: " + revMsg);
 
-		messageFlag = true;
-	//	MessageActivity messageActivity = new MessageActivity();
-	//	messageActivity.displayMessage(revMsg);
+		String[] splitStr = revTopic.split("/");
+		String senderId = splitStr[4];
+		/* Toast Message */
+		messageActivity.receiveMessage(senderId, revMsg);
 
-
-		if (revTopic.contains("/reply")) {
+		if (revTopic.contains("/reply")) { // 상대의 수신 확인 메시지
 			String reply_topic = revTopic;
 			reply_topic = reply_topic.replace("/reply", "");
 			System.out.println("Modified topic:" + reply_topic);
@@ -161,7 +142,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 					p_msgs.remove(i);
 			}
 		}
-		else if (revTopic.contains("/request")) {
+		else if (revTopic.contains("/request")) { // 상대에게 수신 확인 전송
 			String p_topic = revTopic+"/reply";
 			System.out.println("Publish " + p_topic + " topic");
 			myPublish(p_topic, "OK");
@@ -169,8 +150,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 		else
 			System.out.println("Not proper message!");
-
-		//sendMsgToActivity(revMsg,"messages");
 	}
 
 
@@ -228,8 +207,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			System.out.println("Error to connect!");
 		}
 
-
-
 		// subscribe to topic if subscriber
 		if (subscriber) {
 			try {
@@ -247,7 +224,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				if(!((MessageActivity)MessageActivity.context).sendFlag) {
+				if(((MessageActivity)MessageActivity.context).sendFlag) {
 					msg=((MessageActivity)MessageActivity.context).selectedAnswer;
 					insertNewTopic(msg);
 					((MessageActivity)MessageActivity.context).sendFlag = false;

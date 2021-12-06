@@ -28,14 +28,14 @@ public class MessageActivity extends Activity {
     public ArrayList<String> messageList;
 
     public static Context context;
-    Messenger mServiceMessenger;
     public boolean isPressed = true;
     public String[] user;
-    final String[] answerList = {"안녕하세요","감사합니다","전화주세요","나중에 연락 드리겠습니다","사랑합니다"};
+    final String[] answerList = {"안녕하세요","감사합니다","전화주세요","알겠습니다","전화드릴게요"};
     public String toUser;
     String selectedAnswer;
     public boolean sendFlag = false;
     ArrayList<Sender> receivers;
+    public boolean messageFlag = false;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -46,8 +46,7 @@ public class MessageActivity extends Activity {
         final String userID=((NewMainActivity)NewMainActivity.context).userId;
         int n = receivers.size();
         user = new String[n];
-        final Intent intent = new Intent(MessageActivity.this, MyMqttClient.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE); // ?
+
 
         int i = 0;
         for(Sender receiver : receivers){ // store receiver list
@@ -55,6 +54,8 @@ public class MessageActivity extends Activity {
         }
 
         setContentView(R.layout.messagetmp);
+
+        final MyMqttClient myMqttClient = new MyMqttClient(this);
 
         /* User Spinner */
         final Spinner name=(Spinner)findViewById(R.id.name_spinner);
@@ -77,7 +78,14 @@ public class MessageActivity extends Activity {
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                String userName = String.valueOf(name.getItemAtPosition(0));
+                String uid = "";
+                for(Sender receiver : receivers){
+                    if(userName.equals(receiver.getUser_name())){
+                        uid = String.valueOf(receiver.getUser_id());
+                    }
+                }
+                toUser = uid;
             }
         });
 
@@ -95,7 +103,7 @@ public class MessageActivity extends Activity {
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                selectedAnswer = String.valueOf(answer.getItemAtPosition(0));
             }
         });
 
@@ -104,9 +112,10 @@ public class MessageActivity extends Activity {
         send.setOnClickListener(new View.OnClickListener(){ // send button
             @Override
             public void onClick(View view){
+                messageFlag = true;
                 if(isPressed){
                     final String[] args = {userID, toUser};
-                    MyMqttClient.main(args);
+                    myMqttClient.main(args);
                     isPressed = false;
                 }
                 if(!sendFlag){
@@ -124,43 +133,41 @@ public class MessageActivity extends Activity {
 
     }
 
-    public void displayMessage(final String msg){
+    public void receiveMessage(String senderId, String msg){
+        String senderName = "";
+        final String myMsg;
+        for(Sender receiver : receivers){ // set sender name
+            if(Integer.parseInt(senderId) == receiver.getUser_id()){
+                senderName = String.valueOf(receiver.getUser_name());
+            }
+        }
+
+        if(msg.equals("OK")){
+            myMsg = senderName+"님이 메시지를 수신하였습니다";
+        } else{
+            myMsg = senderName+": "+msg;
+        }
         MessageActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT ).show();
+                Toast.makeText(context, myMsg, Toast.LENGTH_SHORT ).show();
             }
         });
     }
 
-    private final Messenger mMessenger = new Messenger(new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            if (msg.getData().getString("messages") != null) {
-                messageList.add(msg.getData().getString("messages"));
-                Log.e("RRRRRRRR",String.valueOf(messageList));
-            }
-            return false;
+    public void sendMessage(){
+        final String myMsg;
+        if(messageFlag) {
+            myMsg = "메시지 전송 완료";
 
-
+            MessageActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, myMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
+            messageFlag = false;
         }
-
-    }));
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mServiceMessenger = new Messenger(iBinder);
-            try {
-                Message msg = Message.obtain(null, BackService.MSG_REGISTER_CLIENT);
-                msg.replyTo = mMessenger;
-                mServiceMessenger.send(msg);
-            }
-            catch (RemoteException e) {
-            }
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-        }
-    };
+    }
 }
 
