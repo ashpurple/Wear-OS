@@ -47,7 +47,6 @@ public class MessageActivity extends Activity {
         int n = receivers.size();
         user = new String[n];
 
-
         int i = 0;
         for(Sender receiver : receivers){ // store receiver list
             user[i++] = String.valueOf(receiver.getUser_name());
@@ -124,13 +123,6 @@ public class MessageActivity extends Activity {
                 }
             }
         });
-        Button view=findViewById(R.id.view_btn);
-        view.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
-            @Override
-            public void onClick(View view){
-
-            }});
-
     }
 
     public void receiveMessage(String senderId, String msg){

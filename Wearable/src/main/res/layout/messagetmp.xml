@@ -32,21 +32,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/answer_spinner"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="20dp"
         android:text="Send"
-        android:textColor = "#FFFFFF"
+        android:textColor="#FFFFFF"
         tools:ignore="MissingConstraints">
 
     </Button>
 
-    <Button
-        android:id="@+id/view_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/send_btn"
-        android:layout_marginTop="0dp"
-        android:textColor = "#FFFFFF"
-        android:text="View">
-
-    </Button>
 </RelativeLayout>

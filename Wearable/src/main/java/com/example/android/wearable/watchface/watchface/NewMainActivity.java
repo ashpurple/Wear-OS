@@ -59,9 +59,9 @@ public class NewMainActivity extends Activity {
     //static final String userId = "2106";
 
 //    /* 건 */
-    static final String DUID = "MjA6MjA6MDg6Mjc6MDU6MDA";
-    static final String MAC = "20:20:08:27:05:00";
-    static final String userId = "2104";
+//    static final String DUID = "MjA6MjA6MDg6Mjc6MDU6MDA";
+//    static final String MAC = "20:20:08:27:05:00";
+//    static final String userId = "2104";
 
     /* Info Text */
     String jsonInput = "";
