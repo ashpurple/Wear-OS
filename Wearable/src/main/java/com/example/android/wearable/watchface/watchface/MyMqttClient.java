@@ -171,7 +171,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			((MessageActivity) MessageActivity.context).isPressed = true;
 		}
 		TimerTask m_task = new TimerTask() {
-
 			@Override
 			public void run() {
 				System.out.println("Called Timer");
@@ -181,7 +180,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 					tmp++;
 				}
 			}
-
 		};
 		m_timer.schedule(m_task, 5000, 5000);
 	}

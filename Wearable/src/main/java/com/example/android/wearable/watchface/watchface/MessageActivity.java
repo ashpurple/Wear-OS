@@ -127,8 +127,7 @@ public class MessageActivity extends Activity {
         view.setOnClickListener(new View.OnClickListener(){ // SCHEDULE
             @Override
             public void onClick(View view){
-                Intent intent=new Intent(getApplicationContext(),messagelist.class);
-                startActivity(intent);
+
             }});
 
     }
