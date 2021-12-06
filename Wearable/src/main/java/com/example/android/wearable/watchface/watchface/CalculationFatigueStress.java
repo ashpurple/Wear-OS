@@ -20,7 +20,7 @@ public class CalculationFatigueStress {
             rr_interval.add((double)heartValue);
         }
         for(int i = 0; i < rr_interval.size(); i++){
-            rr_interval.set(i, 60/rr_interval.get(i)*2000);
+            rr_interval.set(i, 60/rr_interval.get(i)*1500);
         }
         /* Fatigue */
         hrf = new ArrayList<Integer>();
