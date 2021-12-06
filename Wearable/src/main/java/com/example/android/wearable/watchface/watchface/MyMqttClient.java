@@ -141,8 +141,8 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Arrived Message: " + revMsg);
 
 		messageFlag = true;
-		MessageActivity messageActivity = new MessageActivity();
-		messageActivity.displayMessage(revMsg);
+	//	MessageActivity messageActivity = new MessageActivity();
+	//	messageActivity.displayMessage(revMsg);
 
 
 		if (revTopic.contains("/reply")) {
@@ -177,7 +177,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		System.out.println("Finish initializing MyMqttClient");
 		Timer m_timer = new Timer();
 		if(!((MessageActivity) MessageActivity.context).isPressed) {
-			((MessageActivity)MessageActivity.context).isPressed = true;
+			((MessageActivity) MessageActivity.context).isPressed = true;
 		}
 		TimerTask m_task = new TimerTask() {
 
@@ -244,7 +244,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 				if(((MessageActivity)MessageActivity.context).sendFlag) {
 					msg=((MessageActivity)MessageActivity.context).selectedAnswer;
 					insertNewTopic(msg);
-					((MessageActivity)MessageActivity.context).sendFlag = true;
+					((MessageActivity)MessageActivity.context).sendFlag = false;
 				}
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {

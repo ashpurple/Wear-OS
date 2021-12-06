@@ -34,7 +34,7 @@ public class MessageActivity extends Activity {
     final String[] answerList = {"안녕하세요","감사합니다","전화주세요","나중에 연락 드리겠습니다","사랑합니다"};
     public String toUser;
     String selectedAnswer;
-    public boolean sendFlag = true;
+    public boolean sendFlag = false;
     ArrayList<Sender> receivers;
 
     protected void onCreate(Bundle savedInstanceState){
@@ -109,8 +109,8 @@ public class MessageActivity extends Activity {
                     MyMqttClient.main(args);
                     isPressed = false;
                 }
-                if(sendFlag){
-                    sendFlag = false;
+                if(!sendFlag){
+                    sendFlag = true;
                 }
             }
         });
