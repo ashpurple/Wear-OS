@@ -1,5 +1,6 @@
 package com.example.android.wearable.watchface.watchface;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
@@ -50,6 +51,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 	MqttTopic topic;
 	public static Context messageContext;
+	public static Activity messageActivity;
 	boolean messageFlag = false;
 
 	public MyMqttClient() {
@@ -60,6 +62,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		messageContext = context;
 	}
 
+	public MyMqttClient(Activity myActivity){
+		messageActivity = myActivity;
+	}
+
 	public MyMqttClient(String from_id) {
 		super();
 		this.from_id = from_id;
@@ -67,8 +73,8 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		//System.out.println("s_topic: " + s_topic);
 		this.s_topic2 = "/sbsys/+/+/" + from_id + "/request";
 		//System.out.println("s_topic2: " + s_topic2);
-		p_topics = new ArrayList<String>();
-		p_msgs=new ArrayList<String>();
+		this.p_topics = new ArrayList<String>();
+		this.p_msgs=new ArrayList<String>();
 		this.subscriber = false;
 		this.msgCount = 0;
 
@@ -241,7 +247,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				if(((MessageActivity)MessageActivity.context).sendFlag) {
+				if(!((MessageActivity)MessageActivity.context).sendFlag) {
 					msg=((MessageActivity)MessageActivity.context).selectedAnswer;
 					insertNewTopic(msg);
 					((MessageActivity)MessageActivity.context).sendFlag = true;
