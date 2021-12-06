@@ -69,6 +69,7 @@ public class MessageActivity extends Activity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String userName = String.valueOf(name.getItemAtPosition(position));
                 String uid = "";
+
                 for(Sender receiver : receivers){
                     if(userName.equals(receiver.getUser_name())){
                         uid = String.valueOf(receiver.getUser_id());

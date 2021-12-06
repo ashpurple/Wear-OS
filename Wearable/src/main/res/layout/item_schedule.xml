@@ -7,7 +7,7 @@
         android:id="@+id/company_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -16,7 +16,7 @@
         android:id="@+id/biz_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -26,7 +26,7 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -35,7 +35,7 @@
         android:id="@+id/schedule_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -44,7 +44,7 @@
         android:id="@+id/contents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -53,7 +53,7 @@
         android:id="@+id/start_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -62,7 +62,7 @@
         android:id="@+id/end_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -71,7 +71,7 @@
         android:id="@+id/start_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
@@ -80,7 +80,7 @@
         android:id="@+id/end_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
+        android:textColor="#FFFFFF"
         android:textSize="11sp"
         android:textStyle="bold"
         android:gravity="center"/>
