@@ -279,6 +279,8 @@ public class NewMainActivity extends Activity {
                     scanningFlag = true;
                     sendMessageToService("scanon");
                     layout.setBackgroundColor(Color.BLUE);
+                    if(blelist==null)
+                        Toast.makeText(getApplicationContext(),"Nothing scanned",Toast.LENGTH_SHORT);
                 }
             }
 
