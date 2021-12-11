@@ -30,7 +30,7 @@ public class MessageActivity extends Activity {
     public static Context context;
     public boolean isPressed = true;
     public String[] user;
-    final String[] answerList = {"안녕하세요","감사합니다","전화주세요","알겠습니다","전화드릴게요"};
+    final String[] answerList = {"안녕하세요","알겠습니다","다시 연락주세요","감사합니다","연락드리겠습니다"};
     public String toUser;
     String selectedAnswer;
     public boolean sendFlag = false;

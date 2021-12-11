@@ -10,6 +10,7 @@ public class UserInfo {
     private String protective;
     private String maxHeartRate;
     private String group;
+    private String userId;
 
     // TimerList
     private final ArrayList<TimerInfo> timerList;
@@ -35,6 +36,7 @@ public class UserInfo {
         this.skin = "None";
         this.protective = "None";
         this.maxHeartRate = "None";
+        this.userId = "None";
         timerList = new ArrayList<TimerInfo>();
     }
     /* Setter */
@@ -59,6 +61,9 @@ public class UserInfo {
     public void setGroup(String group){
         this.group = group;
     }
+    public void setUserId(String userId){
+        this.userId = userId;
+    }
 
     /* Getter */
     // User Info List
@@ -82,5 +87,8 @@ public class UserInfo {
     }
     public String getGroup(){
         return group;
+    }
+    public String getUserId(){
+        return userId;
     }
 }

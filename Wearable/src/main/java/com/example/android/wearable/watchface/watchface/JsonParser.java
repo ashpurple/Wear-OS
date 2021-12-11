@@ -19,6 +19,7 @@ public class JsonParser {
             userInfo.setSkin(jsonObject.getString("skin"));
             userInfo.setMaxHeartRate(jsonObject.getString("maxHeartRate"));
             userInfo.setGroup(jsonObject.getString("group"));
+            userInfo.setUserId(jsonObject.getString("userId"));
 
             // timerList Array
             JSONArray jsonArray = jsonObject.getJSONArray("timerList");
