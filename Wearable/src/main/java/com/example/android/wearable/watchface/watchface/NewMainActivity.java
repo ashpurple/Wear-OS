@@ -506,7 +506,7 @@ public class NewMainActivity extends Activity {
     }
 
     class GetInfoThread extends Thread {
-        public String urlStr = "http://15.164.45.229:8889/users/"+DUID+"=";
+        public String urlStr = "http://15.164.45.229:8888/users/"+DUID+"=";
 
         //Handler handler = new Handler();
         @Override
@@ -550,7 +550,10 @@ public class NewMainActivity extends Activity {
                             if (data.charAt(i) == ':')
                                 temp2 = i;
                         }
+
+                        Log.d("hihi",String.valueOf(temp2));
                         temp = AES256s.decryptToString(data.substring(temp2 + 2, data.length() - 2), MAC);
+                        Log.e("ee",temp);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -565,7 +568,7 @@ public class NewMainActivity extends Activity {
             try {
                 while(true) {
                     sleep(60000); // upload delay 1 min
-                    String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/wear/";
+                    String urlStr = "http://15.164.45.229:8888/managers/"+DUID+"=/wear/";
                     if(heartTemp == 0){
                         Log.e(MAIN_TAG, "OFF");
                         urlStr += "off";
@@ -602,7 +605,7 @@ public class NewMainActivity extends Activity {
             this.sensorType = sensorName;
         }
 
-        String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/sensorInfos";
+        String urlStr = "http://15.164.45.229:8888/managers/"+DUID+"=/sensorInfos";
         @Override
         public void run() {
             try {
@@ -769,7 +772,7 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             try {
-                String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/sos";
+                String urlStr = "http://15.164.45.229:8888/managers/"+DUID+"=/sos";
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn != null) {
@@ -803,7 +806,7 @@ public class NewMainActivity extends Activity {
         public void run() {
             String schedule;
             try {
-                String urlStr = "http://15.164.45.229:8889/managers/"+DUID+"=/schedules";
+                String urlStr = "http://15.164.45.229:8888/managers/"+DUID+"=/schedules";
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn != null) {
@@ -861,7 +864,7 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             try {
-                String urlStr = "http://15.164.45.229:8889/messages/"+DUID+"=/senders";
+                String urlStr = "http://15.164.45.229:8888/messages/"+DUID+"=/senders";
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn != null) {
