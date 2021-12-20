@@ -60,7 +60,7 @@ public class JsonParser {
                 schedule.setCompany_name(obj.getString("companyNm"));
                 schedule.setStart_date(obj.getString("startDt"));
                 schedule.setEnd_date(obj.getString("endDt"));
-                schedule.setLocation(obj.getString("location"));
+                //schedule.setLocation(obj.getString("location"));
                 schedule.setStart_time(obj.getString("startTime"));
                 schedule.setEnd_time(obj.getString("endTime"));
                 schedule.setTitle(obj.getString("title"));
