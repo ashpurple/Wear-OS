@@ -43,7 +43,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	Boolean subscriber;
 	public static String ans="";
 	public String revMsg;
-
+	public int check=0;
 	static ArrayList<String> p_topics;
 	static ArrayList<String> p_msgs;
 
@@ -51,12 +51,18 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	@SuppressLint("StaticFieldLeak")
 	public static MessageActivity messageActivity;
 
+	public static NewMainActivity newMainActivity;
+
 	public MyMqttClient() {
 		super();
 	}
 
 	public MyMqttClient(MessageActivity myActivity){
 		messageActivity = myActivity;
+	}
+
+	public MyMqttClient(NewMainActivity myActivity){
+		newMainActivity = myActivity;
 	}
 
 	public MyMqttClient(String from_id) {
@@ -168,9 +174,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		runThread.start();
 		System.out.println("Finish initializing MyMqttClient");
 		Timer m_timer = new Timer();
-		if(!((MessageActivity) MessageActivity.context).isPressed) {
-			((MessageActivity) MessageActivity.context).isPressed = true;
-		}
 		TimerTask m_task = new TimerTask() {
 			@Override
 			public void run() {
@@ -229,12 +232,15 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				if(((MessageActivity)MessageActivity.context).sendFlag) {
-					msg=((MessageActivity)MessageActivity.context).selectedAnswer;
-					to_id = ((MessageActivity)MessageActivity.context).touser;
-					Log.d("HIHIHIHIHIHIHIHIIH",to_id);
-					insertNewTopic(msg);
-					((MessageActivity)MessageActivity.context).sendFlag = false;
+				Log.d("sssss",String.valueOf(check));
+				if(((MessageActivity)MessageActivity.context)!=null){
+					if(((MessageActivity)MessageActivity.context).sendFlag) {
+						msg = ((MessageActivity) MessageActivity.context).selectedAnswer;
+						to_id = ((MessageActivity) MessageActivity.context).touser;
+						Log.d("HIHIHIHIHIHIHIHIIH", to_id);
+						insertNewTopic(msg);
+						((MessageActivity) MessageActivity.context).sendFlag = false;
+					}
 				}
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
