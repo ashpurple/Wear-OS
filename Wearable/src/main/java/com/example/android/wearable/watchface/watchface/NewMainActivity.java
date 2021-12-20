@@ -61,7 +61,6 @@ public class NewMainActivity extends Activity {
 //   static final String DUID = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
 //   static final String MAC = "9C:5A:44:B7:B9:8E";
 
-
     /* 건 */
     static final String DUID = "MjA6MjA6MDg6Mjc6MDU6MDA";
     static final String MAC = "20:20:08:27:05:00";
