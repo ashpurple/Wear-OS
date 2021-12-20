@@ -21,7 +21,7 @@ public class AES256s {
 	public static final String TRANSFORMATION = "AES/CBC/NoPadding";
 	public static final String CHARSET = "UTF-8";
 
-	private static String getKey(String key) {
+	public static String getKey(String key) {
 		int length = key.length();
 		if(length > 32) {
 			return key.substring(0, 32);
@@ -35,8 +35,8 @@ public class AES256s {
 		int index = 0;
 		String nkey = key;
 		while(index<size) {
-			index++;
 			nkey += (index) % 10;
+			index++;
 		}
 		return nkey;
 	}

@@ -39,10 +39,13 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.NetworkInterface;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NewMainActivity extends Activity {
     // permission
@@ -50,18 +53,16 @@ public class NewMainActivity extends Activity {
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
     /* 세훈 */
-   // static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
-   // static final String MAC = "08:97:98:0E:E6:DA";
-   // public String userId = "2103";
+    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
+    static final String MAC = "08:97:98:0E:E6:DA";
     /* 찬빈 */
-    static final String DUID = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
-    static final String MAC = "9C:5A:44:B7:B9:8E";
-    static final String userId = "2106";
+//    static final String DUID = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
+//    static final String MAC = "9C:5A:44:B7:B9:8E";
+
 
 //    /* 건 */
 //    static final String DUID = "MjA6MjA6MDg6Mjc6MDU6MDA";
 //    static final String MAC = "20:20:08:27:05:00";
-//    static final String userId = "2104";
 
     /* Info Text */
     String jsonInput = "";
@@ -94,6 +95,8 @@ public class NewMainActivity extends Activity {
     String skin;
     String protective;
     String maxHeartRate;
+    String userId;
+    String wifiMacAddress = "";
     ArrayList<String> ble;
     String MAIN_TAG = "NEW MAIN";
     /* Global variables */
@@ -180,6 +183,26 @@ public class NewMainActivity extends Activity {
             }
         }
     }
+
+    public static String getMACAddress(String interfaceName) {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (interfaceName != null) {
+                    if (!intf.getName().equalsIgnoreCase(interfaceName)) continue;
+                }
+                byte[] mac = intf.getHardwareAddress();
+                if (mac==null) return "";
+                StringBuilder buf = new StringBuilder();
+                for (int idx=0; idx<mac.length; idx++)
+                    buf.append(String.format("%02X:", mac[idx]));
+                if (buf.length()>0) buf.deleteCharAt(buf.length()-1);
+                return buf.toString();
+            }
+        } catch (Exception ex) { } // for now eat exceptions
+        return "";
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // always on display
@@ -264,6 +287,7 @@ public class NewMainActivity extends Activity {
         skin = userInfo.getSkin();
         protective = userInfo.getProtective();
         maxHeartRate = userInfo.getMaxHeartRate();
+        userId = userInfo.getUserId();
         updateInfo();
 
         scanning.setOnClickListener(new View.OnClickListener(){ // BLE SCAN
@@ -397,6 +421,7 @@ public class NewMainActivity extends Activity {
             protective = userInfo.getProtective();
             maxHeartRate = userInfo.getMaxHeartRate();
             timerList = userInfo.getTimerList();
+            userId = userInfo.getUserId();
             updateTimer();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -512,8 +537,12 @@ public class NewMainActivity extends Activity {
         @Override
         public void run() {
             Log.e(MAIN_TAG, "GET");
+
+
             try {
                 while(true) {
+                    wifiMacAddress  = getMACAddress("wlan0");
+                    Log.e("WIFI MacAddress: ",wifiMacAddress);
                     URL url = new URL(urlStr);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     if (conn != null) {
