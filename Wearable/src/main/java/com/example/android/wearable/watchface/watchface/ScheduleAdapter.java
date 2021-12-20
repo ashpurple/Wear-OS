@@ -48,7 +48,7 @@ public class ScheduleAdapter extends BaseAdapter {
             scheduleHolder.company_name= convertview2.findViewById(R.id.company_name);
             scheduleHolder.biz_name = convertview2.findViewById(R.id.biz_name);
             scheduleHolder.title = convertview2.findViewById(R.id.title);
-            scheduleHolder.location=convertview2.findViewById(R.id.schedule_location);
+            //scheduleHolder.location=convertview2.findViewById(R.id.schedule_location);
             scheduleHolder.contents= convertview2.findViewById(R.id.contents);
             scheduleHolder.start_date = convertview2.findViewById(R.id.start_date);
             scheduleHolder.end_date = convertview2.findViewById(R.id.end_date);
@@ -62,7 +62,7 @@ public class ScheduleAdapter extends BaseAdapter {
             scheduleHolder.company_name.setText("회사 이름 : " + schedules.get(position).getCompany_name());
             scheduleHolder.biz_name.setText("업체 이름 : " + schedules.get(position).getBiz_name());
             scheduleHolder.title.setText("일정 :" + schedules.get(position).getTitle());
-            scheduleHolder.location.setText("위치 : " + schedules.get(position).getLocation() + "dBm");
+            //scheduleHolder.location.setText("위치 : " + schedules.get(position).getLocation() + "dBm");
             scheduleHolder.contents.setText("내용 : " + schedules.get(position).getContents());
             scheduleHolder.start_date.setText("시작 일자 : " + schedules.get(position).getStart_date());
             scheduleHolder.end_date.setText("종료 일자 : " + schedules.get(position).getEnd_date());
