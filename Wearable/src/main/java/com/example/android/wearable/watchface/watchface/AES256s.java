@@ -227,7 +227,7 @@ public class AES256s {
 
 	public static void main(String[] args) throws Exception {
 //		String duid = "08:97:98:0E:E6:DA";
-		String duid = "OUM6NUE6NDQ6Qjc6Qjk6OEU";
+		String duid = "OUM6NUE6NDQ6Qjc6Qjk6OEU=";
 		String str = "인코딩 필요";
 
 		String key = getKey(duid);
