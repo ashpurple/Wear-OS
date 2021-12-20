@@ -57,6 +57,8 @@ public class MessageActivity extends Activity {
         setContentView(R.layout.messagetmp);
 
         final MyMqttClient myMqttClient = new MyMqttClient(this);
+        final String[] args = {userID};
+        myMqttClient.main(args);
 
         /* User Spinner */
         final Spinner name=(Spinner)findViewById(R.id.name_spinner);
@@ -77,6 +79,7 @@ public class MessageActivity extends Activity {
                     }
                 }
                 toUser = uid;
+                touser=toUser;
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -88,6 +91,7 @@ public class MessageActivity extends Activity {
                     }
                 }
                 toUser = uid;
+                touser=toUser;
             }
         });
 
@@ -117,8 +121,6 @@ public class MessageActivity extends Activity {
                 messageFlag = true;
                 if(isPressed){
                     //final String[] args = {userID, toUser};
-                    final String[] args = {userID};
-                    myMqttClient.main(args);
                     touser=toUser;
                     isPressed = false;
                 }

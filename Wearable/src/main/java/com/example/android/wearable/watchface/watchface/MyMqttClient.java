@@ -2,6 +2,7 @@ package com.example.android.wearable.watchface.watchface;
 
 import android.annotation.SuppressLint;
 import android.os.Messenger;
+import android.util.Log;
 
 
 import java.util.ArrayList;
@@ -231,6 +232,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 				if(((MessageActivity)MessageActivity.context).sendFlag) {
 					msg=((MessageActivity)MessageActivity.context).selectedAnswer;
 					to_id = ((MessageActivity)MessageActivity.context).touser;
+					Log.d("HIHIHIHIHIHIHIHIIH",to_id);
 					insertNewTopic(msg);
 					((MessageActivity)MessageActivity.context).sendFlag = false;
 				}
