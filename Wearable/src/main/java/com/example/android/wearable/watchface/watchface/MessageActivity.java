@@ -36,6 +36,8 @@ public class MessageActivity extends Activity {
     public boolean sendFlag = false;
     ArrayList<Sender> receivers;
     public boolean messageFlag = false;
+    String touser="";
+
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -114,8 +116,10 @@ public class MessageActivity extends Activity {
             public void onClick(View view){
                 messageFlag = true;
                 if(isPressed){
-                    final String[] args = {userID, toUser};
+                    //final String[] args = {userID, toUser};
+                    final String[] args = {userID};
                     myMqttClient.main(args);
+                    touser=toUser;
                     isPressed = false;
                 }
                 if(!sendFlag){

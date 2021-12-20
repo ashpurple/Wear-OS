@@ -161,7 +161,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 	public static void main(String[] args) {
 		String user_id = args[0];
-		to_id = args[1];
+
 		final MyMqttClient smc = new MyMqttClient(user_id);
 		Thread runThread = new Thread(smc);
 		runThread.start();
@@ -230,6 +230,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 				// /sbsys/form_id/msg_id/to_id/request
 				if(((MessageActivity)MessageActivity.context).sendFlag) {
 					msg=((MessageActivity)MessageActivity.context).selectedAnswer;
+					to_id = ((MessageActivity)MessageActivity.context).touser;
 					insertNewTopic(msg);
 					((MessageActivity)MessageActivity.context).sendFlag = false;
 				}
