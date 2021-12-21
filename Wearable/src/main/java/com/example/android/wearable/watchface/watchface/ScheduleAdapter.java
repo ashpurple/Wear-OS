@@ -48,7 +48,7 @@ public class ScheduleAdapter extends BaseAdapter {
             scheduleHolder.company_name= convertview2.findViewById(R.id.company_name);
             scheduleHolder.biz_name = convertview2.findViewById(R.id.biz_name);
             scheduleHolder.title = convertview2.findViewById(R.id.title);
-            scheduleHolder.location=convertview2.findViewById(R.id.schedule_location);
+            //scheduleHolder.location=convertview2.findViewById(R.id.schedule_location);
             scheduleHolder.contents= convertview2.findViewById(R.id.contents);
             scheduleHolder.start_date = convertview2.findViewById(R.id.start_date);
             scheduleHolder.end_date = convertview2.findViewById(R.id.end_date);
