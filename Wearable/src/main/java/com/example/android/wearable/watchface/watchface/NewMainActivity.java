@@ -52,7 +52,6 @@ public class NewMainActivity extends Activity {
     private final static String[] permissions = new String[]
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
-<<<<<<< HEAD
 
 //    /* 세훈 */
 //    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
