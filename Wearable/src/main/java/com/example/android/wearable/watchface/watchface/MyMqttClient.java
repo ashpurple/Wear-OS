@@ -144,7 +144,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		}
 		/* Toast Message */
 		System.out.println("SENDER ID:" + senderId);
-		//messageActivity.receiveMessage(senderId, revMsg);
+		messageActivity.receiveMessage(senderId, revMsg);
 
 		if (revTopic.contains("/reply")) { // 상대의 수신 확인 메시지
 			String reply_topic = revTopic;
@@ -233,20 +233,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				if(((NewMainActivity)NewMainActivity.context)!=null){
-					if(((NewMainActivity)NewMainActivity.context).disconnectFlag){
-						((NewMainActivity)NewMainActivity.context).disconnectFlag=false;
-						Log.e("dDD","DDD");
-						try {
-							myClient.disconnect();
-							((NewMainActivity)NewMainActivity.context).endflag=true;
-							Log.e("DISCONNECT","DISCONNECT");
-						} catch (MqttException e) {
-							System.out.println("Error in disconnect()!");
-							e.printStackTrace();
-						}
-					}
-				}
 				if(((MessageActivity)MessageActivity.context)!=null){
 					if(((MessageActivity)MessageActivity.context).sendFlag) {
 						msg = ((MessageActivity) MessageActivity.context).selectedAnswer;
