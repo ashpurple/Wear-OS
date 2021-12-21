@@ -46,7 +46,8 @@ public class MyMqttClient implements MqttCallback, Runnable {
 	public int check=0;
 	static ArrayList<String> p_topics;
 	static ArrayList<String> p_msgs;
-
+	boolean NewmainconnectFlag=false;
+	boolean messageconnectFlag=false;
 	MqttTopic topic;
 	@SuppressLint("StaticFieldLeak")
 	public static MessageActivity messageActivity;
@@ -55,6 +56,10 @@ public class MyMqttClient implements MqttCallback, Runnable {
 
 	public MyMqttClient() {
 		super();
+	}
+
+	public MyMqttClient(MessageActivity myActivity){
+		messageActivity = myActivity;
 	}
 
 	public MyMqttClient(NewMainActivity myActivity){
@@ -228,7 +233,20 @@ public class MyMqttClient implements MqttCallback, Runnable {
 			try {
 				// Publish New topic
 				// /sbsys/form_id/msg_id/to_id/request
-				Log.d("sssss",String.valueOf(check));
+				if(((NewMainActivity)NewMainActivity.context)!=null){
+					if(((NewMainActivity)NewMainActivity.context).disconnectFlag){
+						((NewMainActivity)NewMainActivity.context).disconnectFlag=false;
+						Log.e("dDD","DDD");
+						try {
+							myClient.disconnect();
+							((NewMainActivity)NewMainActivity.context).endflag=true;
+							Log.e("DISCONNECT","DISCONNECT");
+						} catch (MqttException e) {
+							System.out.println("Error in disconnect()!");
+							e.printStackTrace();
+						}
+					}
+				}
 				if(((MessageActivity)MessageActivity.context)!=null){
 					if(((MessageActivity)MessageActivity.context).sendFlag) {
 						msg = ((MessageActivity) MessageActivity.context).selectedAnswer;

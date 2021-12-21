@@ -76,6 +76,7 @@ public class NewMainActivity extends Activity {
     public boolean sendFlag = false;
     ArrayList<Sender> receivers;
     public boolean messageFlag = false;
+    public boolean disconnectFlag=false;
     String touser="";
     String jsonInput = "";
     TextView userText;
@@ -149,7 +150,7 @@ public class NewMainActivity extends Activity {
     int collect_fatigue = 0;
     int upload_stress = 0;
     int collect_stress = 0;
-
+    public boolean endflag=false;
     String onOff_battery;
     String onOff_gps;
     String onOff_pedometer;
@@ -373,7 +374,9 @@ public class NewMainActivity extends Activity {
         message_button.setOnClickListener(new View.OnClickListener(){ // MESSAGE
             @Override
             public void onClick(View view){
+                disconnectFlag=true;
                 MessageThread messageThread = new MessageThread();
+                Log.d("NEWMAIN",String.valueOf(disconnectFlag));
                 messageThread.start();
             }
         });
@@ -438,12 +441,13 @@ public class NewMainActivity extends Activity {
             timerList = userInfo.getTimerList();
             userId = userInfo.getUserId();
             updateTimer();
+            /**
             if(!userId.equals("None")&&!publishFlag) {
                 final MyMqttClient myMqttClient = new MyMqttClient(this);
                 final String[] args = {userId};
                 myMqttClient.main(args);
                 publishFlag=true;
-            }
+            }**/
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -960,6 +964,9 @@ public class NewMainActivity extends Activity {
                 System.out.println(message.getUser_id());
             }
             Intent intent=new Intent(getApplicationContext(),MessageActivity.class);
+            /**while(!endflag){
+                Log.d("dhdihdi","hdidho");
+            }**/
             startActivity(intent);
         }
     }
