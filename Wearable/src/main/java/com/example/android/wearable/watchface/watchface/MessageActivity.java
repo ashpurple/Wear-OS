@@ -56,9 +56,6 @@ public class MessageActivity extends Activity {
 
         setContentView(R.layout.messagetmp);
 
-        final MyMqttClient myMqttClient = new MyMqttClient(this);
-        final String[] args = {userID};
-        myMqttClient.main(args);
 
         /* User Spinner */
         final Spinner name=(Spinner)findViewById(R.id.name_spinner);

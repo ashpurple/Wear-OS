@@ -52,6 +52,7 @@ public class NewMainActivity extends Activity {
     private final static String[] permissions = new String[]
             {Manifest.permission.BODY_SENSORS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private static final int REQUEST_RECORD_PERMISSION = 100;
+<<<<<<< HEAD
 
 //    /* 세훈 */
 //    static final String DUID = "MDg6OTc6OTg6MEU6RTY6REE";
@@ -66,6 +67,18 @@ public class NewMainActivity extends Activity {
     static final String MAC = "20:20:08:27:05:00";
 
     /* Info Text */
+
+
+    public static Context context;
+    public boolean isPressed = true;
+    public String[] user;
+    final String[] answerList = {"안녕하세요","알겠습니다","다시 연락주세요","감사합니다","연락드리겠습니다"};
+    public String toUser;
+    String selectedAnswer;
+    public boolean sendFlag = false;
+    ArrayList<Sender> receivers;
+    public boolean messageFlag = false;
+    String touser="";
     String jsonInput = "";
     TextView userText;
     TextView groupText;
@@ -113,6 +126,7 @@ public class NewMainActivity extends Activity {
     public boolean sosFlag = false;
     public boolean broadcastingFlag = false;
     public boolean scanningFlag = false;
+    public boolean publishFlag=false;
     ArrayList<SensorValueInfo> heartList;
     ArrayList<SensorValueInfo> stepList;
     ArrayList<SensorValueInfo> gpsList;
@@ -146,7 +160,6 @@ public class NewMainActivity extends Activity {
     String onOff_stress;
     String onOff_ble;
     Messenger mServiceMessenger;
-    public static Context context;
 
     /* Service Binding */
     boolean isServiced = false;
@@ -211,6 +224,9 @@ public class NewMainActivity extends Activity {
         context=this;
         Log.e(MAIN_TAG, "onCreate");
         setPermissions(); // Permission Check
+
+
+
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newmainpage);
@@ -424,6 +440,12 @@ public class NewMainActivity extends Activity {
             timerList = userInfo.getTimerList();
             userId = userInfo.getUserId();
             updateTimer();
+            if(!userId.equals("None")&&!publishFlag) {
+                final MyMqttClient myMqttClient = new MyMqttClient(this);
+                final String[] args = {userId};
+                myMqttClient.main(args);
+                publishFlag=true;
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
