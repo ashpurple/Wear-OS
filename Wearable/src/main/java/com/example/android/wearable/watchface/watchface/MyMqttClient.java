@@ -57,10 +57,6 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		super();
 	}
 
-	public MyMqttClient(MessageActivity myActivity){
-		messageActivity = myActivity;
-	}
-
 	public MyMqttClient(NewMainActivity myActivity){
 		newMainActivity = myActivity;
 	}
@@ -143,7 +139,7 @@ public class MyMqttClient implements MqttCallback, Runnable {
 		}
 		/* Toast Message */
 		System.out.println("SENDER ID:" + senderId);
-		messageActivity.receiveMessage(senderId, revMsg);
+		//messageActivity.receiveMessage(senderId, revMsg);
 
 		if (revTopic.contains("/reply")) { // 상대의 수신 확인 메시지
 			String reply_topic = revTopic;
