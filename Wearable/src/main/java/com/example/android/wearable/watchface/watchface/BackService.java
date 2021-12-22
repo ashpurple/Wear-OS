@@ -428,7 +428,10 @@ public class BackService extends Service implements SensorEventListener, Locatio
                     Mac.add(result.getDevice().getName());
                     Mac.add(String.valueOf(result.getRssi()));
                     Mac.add(simpleDateFormat.format(new Date()));
-                    Toast.makeText(getApplicationContext(),result.getDevice().getName()+" is detected",Toast.LENGTH_SHORT).show();
+                    if(result.getDevice().getName().contains("MiniBeacon")) {
+                        Toast.makeText(getApplicationContext(), result.getDevice().getName() + " is detected", Toast.LENGTH_SHORT).show();
+                    }
+                    //Toast.makeText(getApplicationContext(), result.getDevice().getName() + " is detected", Toast.LENGTH_SHORT).show();
 
                     final ScanResult scanResult = result;
                     new Thread(new Runnable() {
